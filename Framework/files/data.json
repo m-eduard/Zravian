@@ -1,0 +1,1090 @@
+{
+  "buildings": [
+    {
+      "id": 0,
+      "name": "Empty place",
+      "requirements": []
+    },
+    {
+      "id": 1,
+      "name": "Woodcutter",
+      "requirements": []
+    },
+    {
+      "id": 2,
+      "name": "Clay Pit",
+      "requirements": []
+    },
+    {
+      "id": 3,
+      "name": "Iron Mine",
+      "requirements": []
+    },
+    {
+      "id": 4,
+      "name": "Cropland",
+      "requirements": []
+    },
+    {
+      "id": 5,
+      "name": "Sawmill",
+      "requirements": [
+        [
+          "Woodcutter",
+          10
+        ],
+        [
+          "Main Building",
+          5
+        ]
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Brickworks",
+      "requirements": [
+        [
+          "Clay Pit",
+          10
+        ],
+        [
+          "Main Building",
+          5
+        ]
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Iron Foundry",
+      "requirements": [
+        [
+          "Iron Mine",
+          10
+        ],
+        [
+          "Main Building",
+          5
+        ]
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Flour Mill",
+      "requirements": [
+        [
+          "Cropland",
+          5
+        ]
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Bakery",
+      "requirements": [
+        [
+          "Cropland",
+          10
+        ],
+        [
+          "Flour Mill",
+          5
+        ],
+        [
+          "Main Building",
+          5
+        ]
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Warehouse",
+      "requirements": [
+        [
+          "Main Building",
+          1
+        ]
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Granary",
+      "requirements": [
+        [
+          "Main Building",
+          1
+        ]
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Blacksmith",
+      "requirements": [
+        [
+          "Main Building",
+          3
+        ],
+        [
+          "Academy",
+          3
+        ]
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Armoury",
+      "requirements": [
+        [
+          "Main Building",
+          3
+        ],
+        [
+          "Academy",
+          1
+        ]
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Tournament Square",
+      "requirements": [
+        [
+          "Rally Point",
+          15
+        ]
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Main Building",
+      "requirements": []
+    },
+    {
+      "id": 16,
+      "name": "Rally Point",
+      "requirements": []
+    },
+    {
+      "id": 17,
+      "name": "Marketplace",
+      "requirements": [
+        [
+          "Warehouse",
+          1
+        ],
+        [
+          "Granary",
+          1
+        ],
+        [
+          "Main Building",
+          3
+        ]
+      ]
+    },
+    {
+      "id": 18,
+      "name": "Embassy",
+      "requirements": [
+        [
+          "Main Building",
+          1
+        ]
+      ]
+    },
+    {
+      "id": 19,
+      "name": "Barracks",
+      "requirements": [
+        [
+          "Main Building",
+          3
+        ],
+        [
+          "Rally point",
+          1
+        ]
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Stable",
+      "requirements": [
+        [
+          "Blacksmith",
+          3
+        ],
+        [
+          "Academy",
+          5
+        ]
+      ]
+    },
+    {
+      "id": 21,
+      "name": "Siege Workshop",
+      "requirements": [
+        [
+          "Main Building",
+          5
+        ],
+        [
+          "Academy",
+          10
+        ]
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Academy",
+      "requirements": [
+        [
+          "Main Building",
+          5
+        ],
+        [
+          "Barracks",
+          3
+        ]
+      ]
+    },
+    {
+      "id": 23,
+      "name": "Cranny",
+      "requirements": []
+    },
+    {
+      "id": 24,
+      "name": "Town Hall",
+      "requirements": [
+        [
+          "Main Building",
+          10
+        ],
+        [
+          "Academy",
+          10
+        ]
+      ]
+    },
+    {
+      "id": 25,
+      "name": "Residence",
+      "requirements": [
+        [
+          "Main Building",
+          5
+        ]
+      ]
+    },
+    {
+      "id": 26,
+      "name": "Palace",
+      "requirements": [
+        [
+          "Main Building",
+          5
+        ],
+        [
+          "Embassy",
+          1
+        ]
+      ]
+    },
+    {
+      "id": 28,
+      "name": "Trade Office",
+      "requirements": [
+        [
+          "Marketplace",
+          20
+        ],
+        [
+          "Stable",
+          10
+        ]
+      ]
+    },
+    {
+      "id": 29,
+      "name": "Great Barracks",
+      "requirements": [
+        [
+          "Barracks",
+          20
+        ]
+      ]
+    },
+    {
+      "id": 30,
+      "name": "Great Stable",
+      "requirements": [
+        [
+          "Stable",
+          20
+        ]
+      ]
+    },
+    {
+      "id": 32,
+      "name": "Wall",
+      "requirements": []
+    },
+    {
+      "id": 34,
+      "name": "Stonemason",
+      "requirements": [
+        [
+          "Main Building",
+          5
+        ],
+        [
+          "Palace",
+          3
+        ]
+      ]
+    },
+    {
+      "id": 35,
+      "name": "Brewery",
+      "requirements": [
+        [
+          "Granary",
+          20
+        ],
+        [
+          "Rally Point",
+          10
+        ]
+      ]
+    },
+    {
+      "id": 36,
+      "name": "Trapper",
+      "requirements": [
+        [
+          "Rally Point",
+          1
+        ]
+      ]
+    },
+    {
+      "id": 37,
+      "name": "Hero's Mansion",
+      "requirements": [
+        [
+          "Main Building",
+          3
+        ],
+        [
+          "Rally Point",
+          1
+        ]
+      ]
+    },
+    {
+      "id": 38,
+      "name": "Great Warehouse",
+      "requirements": [
+        [
+          "Warehouse",
+          10
+        ]
+      ]
+    },
+    {
+      "id": 39,
+      "name": "Great Granary",
+      "requirements": [
+        [
+          "Granary",
+          10
+        ]
+      ]
+    }
+  ],
+  "troops": {
+    "romans": [
+      {
+        "name": "Legionnaire",
+        "attack": 40,
+        "defenseInfantry": 35,
+        "defenseCavalry": 50,
+        "costs": [
+          120,
+          100,
+          180,
+          40
+        ],
+        "capacity": 40,
+        "upkeep": 1,
+        "requirements": []
+      },
+      {
+        "name": "Praetorian",
+        "attack": 30,
+        "defenseInfantry": 65,
+        "defenseCavalry": 35,
+        "costs": [
+          100,
+          130,
+          160,
+          70
+        ],
+        "capacity": 20,
+        "upkeep": 1,
+        "requirements": [
+          [
+            "Armoury",
+            1
+          ],
+          [
+            "Academy",
+            1
+          ]
+        ]
+      },
+      {
+        "name": "Imperian",
+        "attack": 70,
+        "defenseInfantry": 40,
+        "defenseCavalry": 25,
+        "costs": [
+          150,
+          160,
+          210,
+          80
+        ],
+        "capacity": 50,
+        "upkeep": 1,
+        "requirements": [
+          [
+            "Blacksmith",
+            1
+          ],
+          [
+            "Academy",
+            5
+          ]
+        ]
+      },
+      {
+        "name": "Equites Legati",
+        "attack": 0,
+        "defenseInfantry": 20,
+        "defenseCavalry": 10,
+        "costs": [
+          140,
+          160,
+          20,
+          40
+        ],
+        "capacity": 0,
+        "upkeep": 2,
+        "requirements": [
+          [
+            "Stable",
+            1
+          ],
+          [
+            "Academy",
+            5
+          ]
+        ]
+      },
+      {
+        "name": "Equites Imperatoris",
+        "attack": 120,
+        "defenseInfantry": 65,
+        "defenseCavalry": 50,
+        "costs": [
+          550,
+          440,
+          320,
+          100
+        ],
+        "capacity": 100,
+        "upkeep": 3,
+        "requirements": [
+          [
+            "Stable",
+            5
+          ],
+          [
+            "Academy",
+            5
+          ]
+        ]
+      },
+      {
+        "name": "Equites Caesaris",
+        "attack": 180,
+        "defenseInfantry": 80,
+        "defenseCavalry": 105,
+        "costs": [
+          550,
+          640,
+          800,
+          180
+        ],
+        "capacity": 70,
+        "upkeep": 4,
+        "requirements": [
+          [
+            "Stable",
+            10
+          ],
+          [
+            "Academy",
+            5
+          ]
+        ]
+      },
+      {
+        "name": "Ram",
+        "attack": 60,
+        "defenseInfantry": 30,
+        "defenseCavalry": 75,
+        "costs": [
+          900,
+          360,
+          500,
+          70
+        ],
+        "capacity": 0,
+        "upkeep": 3,
+        "requirements": [
+          [
+            "Siege Workshop",
+            1
+          ],
+          [
+            "Academy",
+            10
+          ]
+        ]
+      },
+      {
+        "name": "Fire Catapult",
+        "attack": 75,
+        "defenseInfantry": 60,
+        "defenseCavalry": 10,
+        "costs": [
+          950,
+          1350,
+          600,
+          90
+        ],
+        "capacity": 0,
+        "upkeep": 6,
+        "requirements": [
+          [
+            "Siege Workshop",
+            10
+          ],
+          [
+            "Academy",
+            15
+          ]
+        ]
+      },
+      {
+        "name": "Senator",
+        "attack": 50,
+        "defenseInfantry": 40,
+        "defenseCavalry": 30,
+        "costs": [
+          3750,
+          27200,
+          45000,
+          37500
+        ],
+        "capacity": 0,
+        "upkeep": 5,
+        "requirements": [
+          [
+            "Rally Point",
+            10
+          ],
+          [
+            "Academy",
+            20
+          ]
+        ]
+      },
+      {
+        "name": "Settler",
+        "attack": 0,
+        "defenseInfantry": 80,
+        "defenseCavalry": 80,
+        "costs": [
+          800,
+          5300,
+          7200,
+          5500
+        ],
+        "capacity": 3000,
+        "upkeep": 1,
+        "requirements": [
+          [
+            "Residence",
+            10
+          ]
+        ]
+      }
+    ],
+    "teutons": [
+      {
+        "name": "Clubswinger",
+        "attack": 40,
+        "defenseInfantry": 20,
+        "defenseCavalry": 5,
+        "costs": [
+          95,
+          75,
+          40,
+          40
+        ],
+        "capacity": 60,
+        "upkeep": 1,
+        "requirements": []
+      },
+      {
+        "name": "Spearman",
+        "attack": 10,
+        "defenseInfantry": 35,
+        "defenseCavalry": 60,
+        "costs": [
+          145,
+          70,
+          85,
+          40
+        ],
+        "capacity": 40,
+        "upkeep": 1,
+        "requirements": [
+          [
+            "Academy",
+            1
+          ]
+        ]
+      },
+      {
+        "name": "Axeman",
+        "attack": 60,
+        "defenseInfantry": 30,
+        "defenseCavalry": 30,
+        "costs": [
+          130,
+          120,
+          170,
+          70
+        ],
+        "capacity": 50,
+        "upkeep": 1,
+        "requirements": [
+          [
+            "Blacksmith",
+            1
+          ],
+          [
+            "Academy",
+            3
+          ]
+        ]
+      },
+      {
+        "name": "Scout",
+        "attack": 0,
+        "defenseInfantry": 10,
+        "defenseCavalry": 5,
+        "costs": [
+          160,
+          100,
+          50,
+          50
+        ],
+        "capacity": 0,
+        "upkeep": 1,
+        "requirements": [
+          [
+            "Main Building",
+            5
+          ],
+          [
+            "Academy",
+            1
+          ]
+        ]
+      },
+      {
+        "name": "Paladin",
+        "attack": 55,
+        "defenseInfantry": 100,
+        "defenseCavalry": 40,
+        "costs": [
+          370,
+          270,
+          290,
+          75
+        ],
+        "capacity": 110,
+        "upkeep": 2,
+        "requirements": [
+          [
+            "Stable",
+            3
+          ],
+          [
+            "Academy",
+            5
+          ]
+        ]
+      },
+      {
+        "name": "Teutonic Knight",
+        "attack": 150,
+        "defenseInfantry": 50,
+        "defenseCavalry": 75,
+        "costs": [
+          450,
+          515,
+          480,
+          80
+        ],
+        "capacity": 80,
+        "upkeep": 3,
+        "requirements": [
+          [
+            "Stable",
+            10
+          ],
+          [
+            "Academy",
+            15
+          ]
+        ]
+      },
+      {
+        "name": "Ram",
+        "attack": 65,
+        "defenseInfantry": 30,
+        "defenseCavalry": 80,
+        "costs": [
+          1000,
+          300,
+          350,
+          70
+        ],
+        "capacity": 0,
+        "upkeep": 3,
+        "requirements": [
+          [
+            "Siege Workshop",
+            1
+          ],
+          [
+            "Academy",
+            10
+          ]
+        ]
+      },
+      {
+        "name": "Catapult",
+        "attack": 50,
+        "defenseInfantry": 60,
+        "defenseCavalry": 10,
+        "costs": [
+          900,
+          1200,
+          600,
+          60
+        ],
+        "capacity": 0,
+        "upkeep": 6,
+        "requirements": [
+          [
+            "Siege Workshop",
+            10
+          ],
+          [
+            "Academy",
+            15
+          ]
+        ]
+      },
+      {
+        "name": "Chieftain",
+        "attack": 40,
+        "defenseInfantry": 60,
+        "defenseCavalry": 40,
+        "costs": [
+          3500,
+          26600,
+          25000,
+          27200
+        ],
+        "capacity": 0,
+        "upkeep": 4,
+        "requirements": [
+          [
+            "Rally Point",
+            5
+          ],
+          [
+            "Academy",
+            20
+          ]
+        ]
+      },
+      {
+        "name": "Settler",
+        "attack": 10,
+        "defenseInfantry": 80,
+        "defenseCavalry": 80,
+        "costs": [
+          7200,
+          5500,
+          5800,
+          6500
+        ],
+        "capacity": 3000,
+        "upkeep": 1,
+        "requirements": [
+          [
+            "Residence",
+            10
+          ]
+        ]
+      }
+    ],
+    "gauls": [
+      {
+        "name": "Phalanx",
+        "attack": 15,
+        "defenseInfantry": 40,
+        "defenseCavalry": 50,
+        "costs": [
+          100,
+          130,
+          55,
+          30
+        ],
+        "capacity": 30,
+        "upkeep": 1,
+        "requirements": []
+      },
+      {
+        "name": "Swordsman",
+        "attack": 65,
+        "defenseInfantry": 35,
+        "defenseCavalry": 20,
+        "costs": [
+          140,
+          150,
+          185,
+          60
+        ],
+        "capacity": 45,
+        "upkeep": 1,
+        "requirements": [
+          [
+            "Blacksmith",
+            1
+          ],
+          [
+            "Academy",
+            1
+          ]
+        ]
+      },
+      {
+        "name": "Pathfinder",
+        "attack": 0,
+        "defenseInfantry": 20,
+        "defenseCavalry": 10,
+        "costs": [
+          170,
+          150,
+          20,
+          40
+        ],
+        "capacity": 0,
+        "upkeep": 2,
+        "requirements": [
+          [
+            "Stable",
+            1
+          ],
+          [
+            "Academy",
+            5
+          ]
+        ]
+      },
+      {
+        "name": "Theutates Thunder",
+        "attack": 90,
+        "defenseInfantry": 25,
+        "defenseCavalry": 40,
+        "costs": [
+          350,
+          450,
+          230,
+          60
+        ],
+        "capacity": 75,
+        "upkeep": 2,
+        "requirements": [
+          [
+            "Stable",
+            3
+          ],
+          [
+            "Academy",
+            5
+          ]
+        ]
+      },
+      {
+        "name": "Druidrider",
+        "attack": 45,
+        "defenseInfantry": 115,
+        "defenseCavalry": 55,
+        "costs": [
+          360,
+          330,
+          280,
+          120
+        ],
+        "capacity": 35,
+        "upkeep": 2,
+        "requirements": [
+          [
+            "Stable",
+            5
+          ],
+          [
+            "Academy",
+            5
+          ]
+        ]
+      },
+      {
+        "name": "Haeduan",
+        "attack": 140,
+        "defenseInfantry": 50,
+        "defenseCavalry": 165,
+        "costs": [
+          500,
+          620,
+          675,
+          170
+        ],
+        "capacity": 65,
+        "upkeep": 3,
+        "requirements": [
+          [
+            "Stable",
+            10
+          ],
+          [
+            "Academy",
+            15
+          ]
+        ]
+      },
+      {
+        "name": "Battering Ram",
+        "attack": 50,
+        "defenseInfantry": 30,
+        "defenseCavalry": 105,
+        "costs": [
+          950,
+          555,
+          330,
+          75
+        ],
+        "capacity": 0,
+        "upkeep": 3,
+        "requirements": [
+          [
+            "Siege Workshop",
+            1
+          ],
+          [
+            "Academy",
+            10
+          ]
+        ]
+      },
+      {
+        "name": "Trebuchet",
+        "attack": 70,
+        "defenseInfantry": 45,
+        "defenseCavalry": 10,
+        "costs": [
+          960,
+          1450,
+          630,
+          90
+        ],
+        "capacity": 0,
+        "upkeep": 6,
+        "requirements": [
+          [
+            "Siege Workshop",
+            10
+          ],
+          [
+            "Academy",
+            15
+          ]
+        ]
+      },
+      {
+        "name": "Chief",
+        "attack": 40,
+        "defenseInfantry": 50,
+        "defenseCavalry": 50,
+        "costs": [
+          3750,
+          45400,
+          31000,
+          37500
+        ],
+        "capacity": 0,
+        "upkeep": 4,
+        "requirements": [
+          [
+            "Rally Point",
+            10
+          ],
+          [
+            "Academy",
+            20
+          ]
+        ]
+      },
+      {
+        "name": "Settler",
+        "attack": 0,
+        "defenseInfantry": 80,
+        "defenseCavalry": 80,
+        "costs": [
+          5500,
+          7000,
+          5300,
+          4900
+        ],
+        "capacity": 3000,
+        "upkeep": 1,
+        "requirements": [
+          [
+            "Residence",
+            10
+          ]
+        ]
+      }
+    ]
+  }
+}

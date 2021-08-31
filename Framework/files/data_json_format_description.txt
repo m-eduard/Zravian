@@ -1,0 +1,26 @@
+Main_json: {
+    buildings: list of buildings
+    troops: list of troops
+}
+
+building: {
+    "id": Int,
+    "name": String,
+    "requirements": List of pairs of type [("Building_name", Building_level)]
+}
+
+troop: {
+    "name": String,
+    "attack": Int,
+    "defenseInfantry": Int,
+    "defenseCavalry": Int,
+    "costs": [
+      Int,  // Lumber
+      Int,  // Clay
+      Int,  // Iron
+      Int   // Crop
+    ],
+    "Capacity": Int,
+    "Upkeep": Int,  // How much crop does unit consumes per hour
+    "requirements": List of pairs of type [("Building_name", Building_level)]
+}
