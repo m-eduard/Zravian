@@ -15,7 +15,7 @@ DATA_PATH = os.path.join(FRAMEWORK_PATH, 'files\\data.json')
 # Account path
 ACCOUNT_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account.json')
 # Logs path
-LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\logs.txt')
+LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\execution.log')
 
 #
 # General
