@@ -7,5 +7,8 @@
 # File containing credentials
 Framework/files/account.json
 
+# File containing future updates
+Framework/files/notes.txt
+
 # File containing logs
 Framework/files/execution.log

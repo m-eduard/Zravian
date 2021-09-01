@@ -25,16 +25,6 @@ MAX_PAGE_LOAD_TIME = 30
 # Zravian URL
 ZRAVIAN1_URL = 'https://s1.zravian.com/'
 ZRAVIAN5_URL = 'https://s5.zravian.com/'
-# HTTP string
-HTTP_STRING = 'https://'
-# Building site pattern
-BUILDING_SITE_PATTERN = '/build.php?id=%d'
-# First building site from village
-FIRST_BUILDING_SITE_VILLAGE = 19
-# Last building site from village
-LAST_BUILDING_SITE_VILLAGE = 40
-# Not constructed prefix
-NOT_CONSTRUCTED = 'Build a'
 
 
 def get_building_type_by_name(text):
@@ -210,10 +200,6 @@ class TroopType(Enum):
     Trebuchet = 28
     Chief = 29
     GSettler = 30
-
-
-# List of all resource buildings
-ResourceFields = [BuildingType.Woodcutter, BuildingType.ClayPit, BuildingType.IronMine, BuildingType.Cropland]
 
 
 # Class containing building properties

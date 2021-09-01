@@ -1,12 +1,10 @@
 from Framework.screen.Login import login
-from Framework.utils.Constants import BuildingType, get_BUILDINGS
+from Framework.utils.Constants import BuildingType
 from Framework.VillageManagement.Builder import check_building_page_title, enter_building_menu, get_building_level
-
-BUILDINGS = get_BUILDINGS()
 
 
 if __name__ == "__main__":
-    with login(headless=False) as driver:
+    with login(headless=True) as driver:
         for bdType in BuildingType:
             buildings = get_building_level(driver, bdType)
             if buildings:
