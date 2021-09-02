@@ -30,6 +30,10 @@ def get_busy_workers_timer(driver):
         if move_to_overview(driver):
             propList = [XPATH.FINISH_DIALOG, XPATH.INSIDE_TIMER]
             workingTimer = getElementAttribute(driver, propList, 'text')
+            if workingTimer:
+                while re.search('[^0-9]', workingTimer[0]):
+                    workingTimer = getElementAttribute(driver, propList, 'text')
+                    time.sleep(1)
             if not get(driver, initialURL):
                 logger.error('In function get_busy_workers_timer: Failed to return to initial URL')
             else:
