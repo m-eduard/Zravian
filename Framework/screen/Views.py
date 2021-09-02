@@ -1,11 +1,13 @@
+from Framework.screen.Login import ACCOUNT
 import re
 from enum import IntEnum, Enum
-from Framework.utils.Constants import Tribe, get_XPATHS
+from Framework.utils.Constants import Tribe, get_ACCOUNT, get_XPATHS
 from Framework.utils.Logger import get_projectLogger
 from Framework.utils.SeleniumUtils import get, getCurrentUrl, isVisible, getElementAttribute, clickElement
 
 
 logger = get_projectLogger()
+ACCOUNT = get_ACCOUNT()
 XPATHS = get_XPATHS()
 TRIBE = None
 
@@ -45,7 +47,7 @@ def getTribe(driver):
     if not TRIBE:
         num = int(re.search('s[0-9]', getCurrentUrl(driver)).group()[1])
         initialURL = getCurrentUrl(driver)
-        PROFILE_URL = 'https://s%d.zravian.com/profile.php' % num
+        PROFILE_URL = f'{ACCOUNT.URL}profile.php' % num
         if get(driver, PROFILE_URL):
             propList = ['//*[@class="details"]', './/*[contains(text(), "Tribe:")]/..']
             text = getElementAttribute(driver, propList, 'text')
@@ -167,12 +169,11 @@ def __move_to_screen(driver, screen, forced=False):
     Returns:
         - True if the operation was successful, False otherwise.
     """
-    num = int(re.search('s[0-9]', getCurrentUrl(driver)).group()[1])
     URLS = {
-        Screens.OVERVIEW: 'https://s%d.zravian.com/village1.php' % num,
-        Screens.VILLAGE: 'https://s%d.zravian.com/village2.php' % num,
-        Screens.MAP: 'https://s%d.zravian.com/map.php' % num,
-        Screens.STATS: 'https://s%d.zravian.com/statistics.php' % num
+        Screens.OVERVIEW: f'{ACCOUNT.URL}village1.php',
+        Screens.VILLAGE: f'{ACCOUNT.URL}village2.php',
+        Screens.MAP: f'{ACCOUNT.URL}map.php',
+        Screens.STATS: f'{ACCOUNT.URL}statistics.php'
     }
     status = False
     if isinstance(screen, Screens):

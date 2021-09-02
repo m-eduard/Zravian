@@ -59,17 +59,17 @@ def get_time_to_build(driver, bdType):
     if isinstance(bdType, BuildingType):
         if isVisible(driver, XPATH.BUILDING_PAGE_EMPTY_TITLE):
             propList = [XPATH.CONSTRUCT_BUILDING_NAME % BUILDINGS[bdType].name, XPATH.CONSTRUCT_COSTS]
-            costs = getElementAttribute(driver, propList, 'text')
-            if costs:
-                costs = costs[0]
+            costsTag = getElementAttribute(driver, propList, 'text')
+            if costsTag:
+                costs = costsTag[0]
                 time_left = time_to_seconds(costs.split('|')[-1])
             else:
                 logger.error('In function get_time_to_build: Could not find costs')
         else:
             propList = [XPATH.LEVEL_UP_COSTS]
-            costs = getElementAttribute(driver, propList, 'text')
-            if costs:
-                costs = costs[0]
+            costsTag = getElementAttribute(driver, propList, 'text')
+            if costsTag:
+                costs = costsTag[0]
                 time_left = time_to_seconds(costs.split('|')[-1].split()[0])
             else:
                 logger.error('In function get_time_to_build: Could not find costs')
@@ -103,6 +103,7 @@ def press_upgrade_button(driver, bdType, waitToFinish=False):
             if clickElement(driver, propList, refresh=True):
                 if waitToFinish:
                     if get(driver, initialURL):
+                        logger.info('In function press_upgrade_button: Sleep for %d seconds' % time_to_build)
                         time.sleep(time_to_build)
                     else:
                         logger.error('In function press_upgrade_button: Failed to return to initial URL')
@@ -261,7 +262,7 @@ def check_resources(driver, bdType, forced=False):
         propList.append(XPATH.INSIDE_TIMER)
         requirementTimer = getElementAttribute(driver, propList, 'text')
         if requirementTimer:
-            time_left = time_to_seconds(requirementTimer)
+            time_left = time_to_seconds(requirementTimer[0])
             if forced:
                 time.sleep(time_left)
                 if refresh(driver):
@@ -408,8 +409,12 @@ def level_up_building_at(driver, index, forced=False, waitToFinish=False):
         - True if the operation is successful, False otherwise.
     """
     status = False
-    if index >= FIRST_BUILDING_SITE_VILLAGE and index <= LAST_BUILDING_SITE_VILLAGE:
-        if move_to_village(driver):
+    if index > 0 and index <= LAST_BUILDING_SITE_VILLAGE:
+        if index < FIRST_BUILDING_SITE_VILLAGE:
+            moveStatus = move_to_overview(driver)
+        else:
+            moveStatus = move_to_village(driver)
+        if moveStatus:
             buildingSiteElemText = getElementAttribute(driver, XPATH.BUILDING_SITE_ID % index, 'alt')
             bdType = None
             if buildingSiteElemText:
@@ -443,7 +448,7 @@ def level_up_building_at(driver, index, forced=False, waitToFinish=False):
             else:
                 logger.error(f'In function level_up_building_at: Error identifying building type')
         else:
-            logger.error('In function level_up_building_at: Failed to move to village')
+            logger.error('In function level_up_building_at: Failed to change view')
     else:
         logger.error(f'In function level_up_building_at: Invalid index {index}')
     return status
