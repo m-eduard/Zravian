@@ -106,6 +106,12 @@ class XPATHCollection(dict):
             # DEMOLITION
             'DEMOLITION_BUILDING_OPTION': '//*[contains(text(), "%s")]',
             'DEMOLITION_BTN': '//*[@id="btn_demolish"]',
+            #
+            # Academy
+            #
+            'RESEARCH_TROOP': '//*[contains(text(), "%s")]/../../..//*[contains(text(), "Research")]',
+            # Research errors
+            'RESEARCH_ERR_RESOURCES': '//*[contains(text(), "%s")]/../../..//*[contains(text(), "Not enough resources")]',
         }
         for key, value in self.objects.items():
             self.__setitem__(key, value)
