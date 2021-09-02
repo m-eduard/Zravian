@@ -5,7 +5,7 @@ from Framework.utils.Constants import  BuildingType, get_XPATHS, get_BUILDINGS, 
 from Framework.utils.SeleniumUtils import clickElement, getCurrentUrl, getElementAttribute, isVisible, get, refresh
 from Framework.screen.Views import move_to_overview, move_to_village
 from Framework.VillageManagement.Utils import FIRST_BUILDING_SITE_VILLAGE, LAST_BUILDING_SITE_VILLAGE, ResourceFields,\
-    time_to_seconds, enter_building_menu, check_building_page_title, find_building, get_building_level
+    time_to_seconds, enter_building_menu, check_building_page_title, find_building, find_buildings, get_building_data
 
 
 logger = get_projectLogger()
@@ -167,7 +167,7 @@ def check_requirements(driver, bdType, forced=False):
     if isinstance(bdType, BuildingType):
         requirements = BUILDINGS[bdType].requirements
         for reqBd, reqLevel in requirements:
-            reqBdList = get_building_level(driver, reqBd)
+            reqBdList = get_building_data(driver, reqBd)
             if not reqBdList:  # Construct
                 if forced:
                     if not construct_building(driver, reqBd, forced=True, waitToFinish=True):
@@ -176,7 +176,7 @@ def check_requirements(driver, bdType, forced=False):
                 else:
                     logger.warning(f'In function check_requirements: {reqBd} not found')
                     break
-            reqBdList = get_building_level(driver, reqBd)
+            reqBdList = get_building_data(driver, reqBd)
             # Check level
             if reqBdList[-1][1] < reqLevel:  # Upgrade is required
                 if forced:
@@ -184,7 +184,7 @@ def check_requirements(driver, bdType, forced=False):
                         if not level_up_building_at(driver, reqBdList[-1][0], forced=True, waitToFinish=True):
                             logger.error(f'In function check_requirements: Failed to level up {reqBd}')
                             break
-                        reqBdList = get_building_level(driver, reqBd)
+                        reqBdList = get_building_data(driver, reqBd)
                 else:
                     logger.warning(f'In function check_requirements: {reqBd} level is too low')
                     break
@@ -218,7 +218,7 @@ def check_storage(driver, bdType, storageType, forced=False):
             propList.append(storageXPATH)
             if isVisible(driver, propList):
                 if forced:
-                    storageList = get_building_level(driver, storageType)
+                    storageList = get_building_data(driver, storageType)
                     if not storageList:
                         if not construct_building(driver, storageType, forced=True, waitToFinish=True):
                             logger.error(f'In function check_storage: Failed to construct {storageType}')
@@ -355,16 +355,16 @@ def construct_building(driver, bdType, forced=False, waitToFinish=False):
             if move_to_village(driver):
                 if check_requirements(driver, bdType, forced):
                     # Check for empty place
-                    emptyPlaces = find_building(driver, BuildingType.EmptyPlace)
+                    toBuildSite = find_building(driver, BuildingType.EmptyPlace)
                     if bdType is BuildingType.RallyPoint or bdType is bdType.Wall:
-                        buildings = get_building_level(driver, bdType)
+                        buildings = get_building_data(driver, bdType)
                         if buildings:
                             status = True  # Already built
                         else:
-                            emptyPlaces = find_building(driver, bdType)
+                            toBuildSite = find_building(driver, bdType)
                     if not status:
-                        if emptyPlaces:
-                            if enter_building_menu(driver, emptyPlaces[0]):
+                        if toBuildSite:
+                            if enter_building_menu(driver, toBuildSite):
                                 if check_storage(driver, bdType, BuildingType.Warehouse, forced) and \
                                         check_storage(driver, bdType, BuildingType.Granary, forced) and \
                                         check_resources(driver, bdType, forced) and \
@@ -468,7 +468,6 @@ def demolish_building_at(driver, index):
         wrapper = [index]
     mainBuildingIndex = find_building(driver, BuildingType.MainBuilding)
     if mainBuildingIndex:
-        mainBuildingIndex = mainBuildingIndex[0]
         if enter_building_menu(driver, mainBuildingIndex) and \
                 check_building_page_title(driver, BuildingType.MainBuilding):
             for index in wrapper:

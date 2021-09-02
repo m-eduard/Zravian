@@ -22,9 +22,9 @@ FIRST_BUILDING_SITE_VILLAGE = 19
 LAST_BUILDING_SITE_VILLAGE = 40
 
 
-def find_building(driver, bdType):
+def find_buildings(driver, bdType):
     """
-    Finds building sites for requested building type.
+    Finds all building sites ids for requested type.
 
     Parameters:
         - driver (WebDriver): Used to interact with the webpage.
@@ -47,20 +47,40 @@ def find_building(driver, bdType):
                 if siteIndexText:
                     lst.append(int(siteIndexText.group()[3:]))
                 else:
-                    logger.error('In function find_building: No attribute href found for element')
+                    logger.error('In function find_buildings: No attribute href found for element')
                     break
             else:  # If not breaks encountered
                 if bdType is BuildingType.Wall and lst:  # Wall appears multiple times
                     lst = lst[:1]
                 ret = lst
         else:
-            logger.error('In function find_building: Failed to move to corresponding view')
+            logger.error('In function find_buildings: Failed to move to corresponding view')
     else:
-        logger.error('In function find_building: Invalid parameter bdType')
+        logger.error('In function find_buildings: Invalid parameter bdType')
     return ret
 
 
-def get_building_level(driver, bdType):
+def find_building(driver, bdType):
+    """
+    Finds the highest level building with requested type.
+
+    Parameters:
+        - driver (WebDriver): Used to interact with the webpage.
+        - bdType (BuildingType): Denotes a type of building.
+
+    Returns:
+        - List of Ints if operation is successful, None otherwise.
+    """
+    ret = None
+    retList = find_buildings(driver, bdType)
+    if retList:
+        ret = retList[0]
+    else:
+        logger.info('In function find_building: No buildings of required type')
+    return ret
+
+
+def get_building_data(driver, bdType):
     """
     Finds building site id and level for requested buildin type ordered by level.
 
@@ -87,14 +107,14 @@ def get_building_level(driver, bdType):
                 if siteIndexText:
                     elemId = int(siteIndexText.group()[3:])
                 else:
-                    logger.info('In function get_building_level: No attribute href found for element')
+                    logger.info('In function get_building_data: No attribute href found for element')
                     break
                 elemLvl = None
                 levelText = re.search('[1-2]?[0-9]', elem[1])
                 if levelText:
                     elemLvl = int(levelText.group())
                 else:
-                    logger.info('In function get_building_level: No attribute alt found for element')
+                    logger.info('In function get_building_data: No attribute alt found for element')
                     break
                 lst.append((elemId, elemLvl))
             else:
@@ -103,9 +123,9 @@ def get_building_level(driver, bdType):
                 lst.sort(key=lambda e: e[1])
                 ret = lst
         else:
-            logger.error('In function find_building: Failed to move to corresponding view')
+            logger.error('In function get_building_data: Failed to move to corresponding view')
     else:
-        logger.error('In function get_building_level: Invalid parameter bdType')
+        logger.error('In function get_building_data: Invalid parameter bdType')
     return ret
 
 
@@ -163,14 +183,14 @@ def check_building_page_title(driver, bdType):
             if isVisible(driver, XPATH.BUILDING_PAGE_EMPTY_TITLE):
                 status = True
             else:
-                logger.error(f'In function check_building_page_title: Page does not correspond \
-                    to building {getCurrentUrl(driver)} and {BUILDINGS[bdType].name}')
+                logger.info(f'In function check_building_page_title: Page does not correspond'
+                    f'to building {getCurrentUrl(driver)} and {BUILDINGS[bdType].name}')
         else:
             if isVisible(driver, XPATH.BUILDING_PAGE_TITLE % BUILDINGS[bdType].name):
                 status = True
             else:
-                logger.error('In function check_building_page_title: Page does not correspond \
-                    to building {getCurrentUrl(driver)} and {BUILDINGS[bdType].name}')
+                logger.info('In function check_building_page_title: Page does not correspond'
+                    f'to building {getCurrentUrl(driver)} and {BUILDINGS[bdType].name}')
     else:
         logger.error('In function check_building_page_title: Invalid parameter bdType')
     return status
