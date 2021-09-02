@@ -1,13 +1,13 @@
 from Framework.VillageManagement.Builder import construct_building, level_up_building_at
 from Framework.VillageManagement.Utils import check_building_page_title, get_building_data
 from Framework.utils.SeleniumUtils import clickElement, isVisible
-from Framework.utils.Constants import BuildingType, TroopType, get_TROOPS, get_XPATHS
+from Framework.utils.Constants import BuildingType, TroopType, get_TROOPS, get_XPATH
 from Framework.utils.Logger import ProjectLogger
 
 
 logger = ProjectLogger()
 TROOPS = get_TROOPS()
-XPATH = get_XPATHS()
+XPATH = get_XPATH()
 
 def select_and_research(driver, tpType):
     """

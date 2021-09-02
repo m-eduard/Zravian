@@ -1,12 +1,12 @@
 from Framework.utils.Logger import get_projectLogger
 from contextlib import contextmanager
 from selenium import webdriver
-from Framework.utils.Constants import CHROME_DRIVER_PATH, get_ACCOUNT, get_XPATHS
+from Framework.utils.Constants import CHROME_DRIVER_PATH, get_ACCOUNT, get_XPATH
 from Framework.utils.SeleniumUtils import get, sendKeys, clickElement
 
 
 logger = get_projectLogger()
-XPATHS = get_XPATHS()
+XPATH = get_XPATH()
 ACCOUNT = get_ACCOUNT()
 
 
@@ -33,9 +33,9 @@ def login(travianURL=ACCOUNT.URL, headless=False, user=ACCOUNT.NAME, password=AC
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     driver = webdriver.Chrome(chrome_options=options, executable_path=CHROME_DRIVER_PATH)
     if get(driver, travianURL):
-        if sendKeys(driver, XPATHS.LOGIN_USER_INPUT, user):
-            if sendKeys(driver, XPATHS.LOGIN_PASS_INPUT, password):
-                if clickElement(driver, XPATHS.LOGIN_SUBMIT_BTN, refresh=True):
+        if sendKeys(driver, XPATH.LOGIN_USER_INPUT, user):
+            if sendKeys(driver, XPATH.LOGIN_PASS_INPUT, password):
+                if clickElement(driver, XPATH.LOGIN_SUBMIT_BTN, refresh=True):
                     initString = '<' + 25 * '-' + 'STARTED NEW SESSION' + 25 * '-' + '>'
                     logger.info(initString)
                     yield driver

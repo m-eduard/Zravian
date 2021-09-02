@@ -1,7 +1,7 @@
 from Framework.utils.Constants import get_BUILDINGS
 from Framework.screen.Views import get_production
-from Framework.VillageManagement.Utils import ResourceFields, get_building_data
 from Framework.screen.Login import login
+from Framework.VillageManagement.Utils import ResourceFields, get_building_data
 from Framework.VillageManagement.Builder import BUILDINGS, level_up_building_at
 
 
@@ -27,6 +27,9 @@ def raise_resources_to_level(driver, level):
         raise_lowest_production(driver)
         
 
+"""
+This test checks upgrading functions by raising all resource fields to a level.
+"""
 if __name__ == "__main__":
     with login(headless=False) as driver:
         raise_resources_to_level(driver, 20)

@@ -2,6 +2,7 @@ from datetime import datetime
 from Framework.utils.Constants import LOGS_PATH
 
 
+# Format for log timestamp
 TIMESTAMP_FORMAT = "%d/%m/%y %H:%M:%S"
 
 

@@ -1,6 +1,6 @@
 import re
 from Framework.utils.Logger import get_projectLogger
-from Framework.utils.Constants import BuildingType, get_BUILDINGS, get_XPATHS
+from Framework.utils.Constants import BuildingType, get_BUILDINGS, get_XPATH
 from Framework.utils.SeleniumUtils import get, getElementsAttribute, getCurrentUrl, isVisible
 from Framework.screen.Views import move_to_overview, move_to_village
 
@@ -8,7 +8,7 @@ from Framework.screen.Views import move_to_overview, move_to_village
 # Constants
 logger = get_projectLogger()
 BUILDINGS = get_BUILDINGS()
-XPATH = get_XPATHS()
+XPATH = get_XPATH()
 
 # List of all resource buildings
 ResourceFields = [BuildingType.Woodcutter, BuildingType.ClayPit, BuildingType.IronMine, BuildingType.Cropland]

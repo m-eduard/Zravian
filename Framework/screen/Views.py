@@ -1,14 +1,14 @@
 from Framework.screen.Login import ACCOUNT
 import re
 from enum import IntEnum, Enum
-from Framework.utils.Constants import Tribe, get_ACCOUNT, get_XPATHS
+from Framework.utils.Constants import Tribe, get_ACCOUNT, get_XPATH
 from Framework.utils.Logger import get_projectLogger
 from Framework.utils.SeleniumUtils import get, getCurrentUrl, isVisible, getElementAttribute, clickElement
 
 
 logger = get_projectLogger()
 ACCOUNT = get_ACCOUNT()
-XPATHS = get_XPATHS()
+XPATH = get_XPATH()
 TRIBE = None
 
 
@@ -36,21 +36,19 @@ def getTribe(driver):
     """
     global TRIBE
     if not TRIBE:
-        if isVisible(driver, XPATHS.ROMAN_TASK_MASTER):
+        if isVisible(driver, XPATH.ROMAN_TASK_MASTER):
             TRIBE = Tribe.ROMANS
-        elif isVisible(driver, XPATHS.TEUTON_TASK_MASTER):
+        elif isVisible(driver, XPATH.TEUTON_TASK_MASTER):
             TRIBE = Tribe.TEUTONS
-        elif isVisible(driver, XPATHS.GAUL_TASK_MASTER):
+        elif isVisible(driver, XPATH.GAUL_TASK_MASTER):
             TRIBE = Tribe.GAULS
         else:
             logger.warning('In function getTribe: Could not identify the tribe by task manager')
     if not TRIBE:
-        num = int(re.search('[0-9]', getCurrentUrl(driver)).group())
         initialURL = getCurrentUrl(driver)
-        PROFILE_URL = f'{ACCOUNT.URL}profile.php' % num
+        PROFILE_URL = f'{ACCOUNT.URL}profile.php'
         if get(driver, PROFILE_URL):
-            propList = ['//*[@class="details"]', './/*[contains(text(), "Tribe:")]/..']
-            text = getElementAttribute(driver, propList, 'text')
+            text = getElementAttribute(driver, XPATH.PROFILE_TRIBE, 'text')
             if text:
                 text = text[0].split()[-1].upper()
                 for tr in Tribe:
@@ -103,7 +101,7 @@ def get_level_up_mode(driver):
     status = None
     currentView = get_current_screen(driver)
     if currentView == Screens.OVERVIEW or currentView == Screens.VILLAGE:
-        coneTitle = getElementAttribute(driver, XPATHS.LEVEL_UP_CONE, 'title')
+        coneTitle = getElementAttribute(driver, XPATH.LEVEL_UP_CONE, 'title')
         if coneTitle:
             coneTitle = coneTitle[0]
             if "enable" in coneTitle:
@@ -135,12 +133,12 @@ def set_level_up_mode(driver, levelUpMode):
     if isinstance(levelUpMode, LevelUpMode):
         currentView = get_current_screen(driver)
         if currentView == Screens.OVERVIEW or currentView == Screens.VILLAGE:
-            coneTitle = getElementAttribute(driver, XPATHS.LEVEL_UP_CONE, 'title')
+            coneTitle = getElementAttribute(driver, XPATH.LEVEL_UP_CONE, 'title')
             if coneTitle:
                 coneTitle = coneTitle[0]
                 if (levelUpMode == LevelUpMode.ON and "enable" in coneTitle) or \
                         (levelUpMode == LevelUpMode.OFF and "disable" in coneTitle):
-                    if clickElement(driver, XPATHS.LEVEL_UP_CONE, refresh=True):
+                    if clickElement(driver, XPATH.LEVEL_UP_CONE, refresh=True):
                         status = True
                     else:
                         logger.error('In function set_level_up_mode: Failed to click LEVEL_UP_CONE')
@@ -256,23 +254,23 @@ def get_storage(driver):
         - List of 4 Ints if operation was successful, None otherwise.
     """
     storage = []
-    if isVisible(driver, XPATHS.PRODUCTION_LUMBER):
-        lumber = getElementAttribute(driver, XPATHS.PRODUCTION_LUMBER, 'text')
+    if isVisible(driver, XPATH.PRODUCTION_LUMBER):
+        lumber = getElementAttribute(driver, XPATH.PRODUCTION_LUMBER, 'text')
         if lumber:
             lumber = lumber[0].split('/')
             storage.append((int(lumber[0]), int(lumber[1])))
-    if isVisible(driver, XPATHS.PRODUCTION_CLAY):
-        clay =  getElementAttribute(driver, XPATHS.PRODUCTION_CLAY, 'text')
+    if isVisible(driver, XPATH.PRODUCTION_CLAY):
+        clay =  getElementAttribute(driver, XPATH.PRODUCTION_CLAY, 'text')
         if clay:
             clay = clay[0].split('/')
             storage.append((int(clay[0]), int(clay[1])))
-    if isVisible(driver, XPATHS.PRODUCTION_IRON):
-        iron = getElementAttribute(driver, XPATHS.PRODUCTION_IRON, 'text')
+    if isVisible(driver, XPATH.PRODUCTION_IRON):
+        iron = getElementAttribute(driver, XPATH.PRODUCTION_IRON, 'text')
         if iron:
             iron = iron[0].split('/')
             storage.append((int(iron[0]), int(iron[1])))
-    if isVisible(driver, XPATHS.PRODUCTION_CROP):
-        crop = getElementAttribute(driver, XPATHS.PRODUCTION_CROP, 'text')
+    if isVisible(driver, XPATH.PRODUCTION_CROP):
+        crop = getElementAttribute(driver, XPATH.PRODUCTION_CROP, 'text')
         if crop:
             crop = crop[0].split('/')
             storage.append((int(crop[0]), int(crop[1])))
@@ -293,16 +291,16 @@ def get_production(driver):
         - List of 4 Ints if operation was successful, None otherwise.
     """
     production = []
-    lumber = getElementAttribute(driver, XPATHS.PRODUCTION_LUMBER, 'title')
+    lumber = getElementAttribute(driver, XPATH.PRODUCTION_LUMBER, 'title')
     if lumber:
         production.append(int(lumber[0]))
-    clay = getElementAttribute(driver, XPATHS.PRODUCTION_CLAY, 'title')
+    clay = getElementAttribute(driver, XPATH.PRODUCTION_CLAY, 'title')
     if clay:
         production.append(int(clay[0]))
-    iron = getElementAttribute(driver, XPATHS.PRODUCTION_IRON, 'title')
+    iron = getElementAttribute(driver, XPATH.PRODUCTION_IRON, 'title')
     if iron:
         production.append(int(iron[0]))
-    crop = getElementAttribute(driver, XPATHS.PRODUCTION_CROP, 'title')
+    crop = getElementAttribute(driver, XPATH.PRODUCTION_CROP, 'title')
     if crop:
         production.append(int(crop[0]))
     if len(production) != 4:

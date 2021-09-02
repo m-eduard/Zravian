@@ -1,7 +1,6 @@
 from selenium.webdriver.support.expected_conditions import staleness_of
 from Framework.utils.SeleniumUtils import getElementAttribute
 from Framework.utils.Constants import get_ACCOUNT
-from Framework.utils.Constants import get_ACCOUNT
 from Framework.screen.Login import login
 from Framework.screen.Views import LevelUpMode, Screens, getTribe, get_current_screen, get_level_up_mode, get_production, get_storage,\
     set_level_up_mode, move_to_overview, move_to_village, move_to_map, move_to_stats
@@ -10,9 +9,11 @@ from Framework.screen.Views import LevelUpMode, Screens, getTribe, get_current_s
 ACCOUNT = get_ACCOUNT()
 
 
+"""
+This test checks the view management and login functions.
+"""
 if __name__ == "__main__":
     with login(headless=False) as driver:
-        ### Test visual getters
         # Check tribe
         assert ACCOUNT.TRIBE == getTribe(driver)
         # Check production

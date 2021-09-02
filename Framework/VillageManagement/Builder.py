@@ -1,7 +1,7 @@
 import re
 import time
 from Framework.utils.Logger import get_projectLogger
-from Framework.utils.Constants import  BuildingType, get_XPATHS, get_BUILDINGS, get_building_type_by_name
+from Framework.utils.Constants import  BuildingType, get_XPATH, get_BUILDINGS, get_building_type_by_name
 from Framework.utils.SeleniumUtils import clickElement, getCurrentUrl, getElementAttribute, isVisible, get, refresh
 from Framework.screen.Views import move_to_overview, move_to_village
 from Framework.VillageManagement.Utils import FIRST_BUILDING_SITE_VILLAGE, LAST_BUILDING_SITE_VILLAGE, ResourceFields,\
@@ -10,7 +10,7 @@ from Framework.VillageManagement.Utils import FIRST_BUILDING_SITE_VILLAGE, LAST_
 
 logger = get_projectLogger()
 BUILDINGS = get_BUILDINGS()
-XPATH = get_XPATHS()
+XPATH = get_XPATH()
 
 
 # Utils
