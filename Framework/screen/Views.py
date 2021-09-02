@@ -43,7 +43,7 @@ def getTribe(driver):
         else:
             logger.warning('In function getTribe: Could not identify the tribe by task manager')
     if not TRIBE:
-        num = int(re.search('s[0-9]', getCurrentUrl(driver)).group()[1])
+        num = int(re.search('[0-9]', getCurrentUrl(driver)).group())
         initialURL = getCurrentUrl(driver)
         PROFILE_URL = 'https://s%d.zravian.com/profile.php' % num
         if get(driver, PROFILE_URL):

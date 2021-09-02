@@ -96,7 +96,7 @@ def __findElement(driver, prop, method=By.XPATH, waitFor=False):
 
 
 @__seleniumRefreshLock
-def __findElements(driver, prop, method, waitFor=False):
+def __findElements(driver, prop, method=By.XPATH, waitFor=False):
     """
     Finds WebElements identified by method and prop.
 
