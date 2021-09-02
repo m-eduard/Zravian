@@ -60,6 +60,24 @@ class XPATHCollection(dict):
         super().__init__()
         self.objects = {
             #
+            # Temporary email
+            #
+            'TE_DISABLED_EMAIL_BOX': '//*[@id="mail"][contains(@class, "disabledText")]',
+            'TE_COPY_MAIL_BTN': '//*[contains(@class, "copyIconGreenBtn")]',
+            #
+            # Create account
+            #
+            'STRING_ON_SCREEN': '//*[contains(text(), "%s")]',
+            'SERVER_SELECTION': '//*[contains(@alt="%s")]',
+            'REGISTER_USER_INPUT': '//*[@id="name"]',
+            'REGISTER_PASS1_INPUT': '//*[@id="pw1"]',
+            'REGISTER_PASS2_INPUT': '//*[@id="pw2"]',
+            'REGISTER_MAIL_INPUT': '//*[@id="mail"]',
+            'REGISTER_MAIL2_INPUT': '//*[@id="mail2"]',
+            'REGISTER_AGREE_1_CHKBOX': '//*[@id="chk"]',
+            'REGISTER_AGREE_2_CHKBOX': '//*[@id="spon"]',
+            'Register_SUBMIT_BTN': '//input[@type="submit"][@value="Continue"]',
+            #
             # Login
             #
             'LOGIN_USER_INPUT': '//*[@id="name"]',
