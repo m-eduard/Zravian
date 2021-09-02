@@ -17,15 +17,6 @@ ACCOUNT_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account.json')
 # Logs path
 LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\execution.log')
 
-#
-# General
-#
-# Max time for a page to load
-MAX_PAGE_LOAD_TIME = 30
-# Zravian URL
-ZRAVIAN1_URL = 'https://s1.zravian.com/'
-ZRAVIAN5_URL = 'https://s5.zravian.com/'
-
 
 def get_building_type_by_name(text):
     """

@@ -2,120 +2,18 @@ import re
 import time
 from Framework.utils.Logger import get_projectLogger
 from Framework.utils.Constants import  BuildingType, get_XPATHS, get_BUILDINGS, get_building_type_by_name
-from Framework.utils.SeleniumUtils import clickElement, getCurrentUrl, getElementAttribute, getElementsAttribute, isVisible, get, refresh
+from Framework.utils.SeleniumUtils import clickElement, getCurrentUrl, getElementAttribute, isVisible, get, refresh
 from Framework.screen.Views import move_to_overview, move_to_village
+from Framework.VillageManagement.Utils import FIRST_BUILDING_SITE_VILLAGE, LAST_BUILDING_SITE_VILLAGE, ResourceFields,\
+    time_to_seconds, enter_building_menu, check_building_page_title, find_building, get_building_level
 
 
 logger = get_projectLogger()
 BUILDINGS = get_BUILDINGS()
 XPATH = get_XPATHS()
 
-# Constants
-
-# List of all resource buildings
-ResourceFields = [BuildingType.Woodcutter, BuildingType.ClayPit, BuildingType.IronMine, BuildingType.Cropland]
-
-# HTTP string
-HTTP_STRING = 'https://'
-
-# Building site pattern
-BUILDING_SITE_PATTERN = '/build.php?id=%d'
-
-# First building site from village
-FIRST_BUILDING_SITE_VILLAGE = 19
-
-# Last building site from village
-LAST_BUILDING_SITE_VILLAGE = 40
-
 
 # Utils
-def find_building(driver, bdType):
-    """
-    Finds building sites for requested building type.
-
-    Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
-        - bdType (BuildingType): Denotes a type of building.
-
-    Returns:
-        - List of Ints if operation is successful, None otherwise.
-    """
-    ret = None
-    if isinstance(bdType, BuildingType):
-        if bdType in ResourceFields:
-            moveStatus = move_to_overview(driver)
-        else:
-            moveStatus = move_to_village(driver)
-        if moveStatus:
-            lst = []
-            elems = getElementsAttribute(driver, XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, 'href')
-            for elem in elems:
-                siteIndexText = re.search('id=[0-9]+', elem[0])
-                if siteIndexText:
-                    lst.append(int(siteIndexText.group()[3:]))
-                else:
-                    logger.error('In function find_building: No attribute href found for element')
-                    break
-            else:  # If not breaks encountered
-                if bdType is BuildingType.Wall and lst:  # Wall appears multiple times
-                    lst = lst[:1]
-                ret = lst
-        else:
-            logger.error('In function find_building: Failed to move to corresponding view')
-    else:
-        logger.error('In function find_building: Invalid parameter bdType')
-    return ret
-
-
-def get_building_level(driver, bdType):
-    """
-    Finds building site id and level for requested buildin type ordered by level.
-
-    Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
-        - bdType (BuildingType): Denotes a type of building.
-
-    Returns:
-        - List of tuples(Int, Int) if operation is successful, None otherwise.
-    """
-    ret = None
-    if isinstance(bdType, BuildingType):
-        if bdType in ResourceFields:
-            moveStatus = move_to_overview(driver)
-        else:
-            moveStatus = move_to_village(driver)
-        if moveStatus:
-            lst = []
-            attributes = ['href', 'alt']
-            elems = getElementsAttribute(driver, XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, attributes)
-            for elem in elems:
-                elemId = None
-                siteIndexText = re.search('id=[0-9]+', elem[0])
-                if siteIndexText:
-                    elemId = int(siteIndexText.group()[3:])
-                else:
-                    logger.info('In function get_building_level: No attribute href found for element')
-                    break
-                elemLvl = None
-                levelText = re.search('[1-2]?[0-9]', elem[1])
-                if levelText:
-                    elemLvl = int(levelText.group())
-                else:
-                    logger.info('In function get_building_level: No attribute alt found for element')
-                    break
-                lst.append((elemId, elemLvl))
-            else:
-                if bdType is BuildingType.Wall and lst:  # Wall appears with multiple ids
-                    lst = lst[:1]
-                lst.sort(key=lambda e: e[1])
-                ret = lst
-        else:
-            logger.error('In function find_building: Failed to move to corresponding view')
-    else:
-        logger.error('In function get_building_level: Invalid parameter bdType')
-    return ret
-
-
 def get_busy_workers_timer(driver):
     """
     Verifies how long untill the workers finish the next building.
@@ -218,81 +116,38 @@ def press_upgrade_button(driver, bdType, waitToFinish=False):
     return status
 
 
-def enter_building_menu(driver, index):
+def select_and_demolish_building(driver, index):
     """
-    Enters a building menu.
+    On main building`s screen selects and demolishes one building.
 
     Parameters:
         - driver (WebDriver): Used to interact with the webpage.
-        - index (Int): Denotes building site index.
+        - index (Int): Denotes index of building site.
 
     Returns:
-        - True if the operation is successful, False otherwise.
+        - True if the operation is successful, False otherwise.    
     """
     status = False
-    if index > 0 and index <= LAST_BUILDING_SITE_VILLAGE:
-        if index > 0 and index < FIRST_BUILDING_SITE_VILLAGE:
-            moveStatus = move_to_overview(driver)
-        else:
-            moveStatus = move_to_village(driver)
-        if moveStatus:
-            initialURL = getCurrentUrl(driver)
-            if initialURL:
-                if initialURL.startswith(HTTP_STRING):
-                    newURL = HTTP_STRING + initialURL[len(HTTP_STRING):].split('/', 1)[0] + BUILDING_SITE_PATTERN % index
-                    if get(driver, newURL):
-                        status = True
-                    else:
-                        logger.error(f'In function enter_building_menu: Failed to load {newURL}')
-                else:
-                    logger.error('In function enter_building_menu: Invalid URL format')
-            else:
-                logger.error('In function enter_building_menu: Failed to retrieve current URL')
-        else:
-            logger.error('In function enter_building_menu: Failed to change view')
-    else:
-        logger.error(f'In function enter_building_menu: Invalid parameter index {index}')
-    return status
-
-
-def check_building_page_title(driver, bdType):
-    """
-    Checks if page title correspons to the building.
-
-    Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
-        - bdType (BuildingType): Denotes a type of building.
-
-    Returns:
-        - True if page title corresponds to building, False otherwise.
-    """
-    status = False
-    if isinstance(bdType, BuildingType):
-        if bdType == BuildingType.EmptyPlace:
-            if isVisible(driver, XPATH.BUILDING_PAGE_EMPTY_TITLE):
+    if check_building_page_title(driver, BuildingType.MainBuilding):
+        option = clickElement(driver, XPATH.DEMOLITION_BUILDING_OPTION % (str(index) + '.'))
+        if option:
+            if clickElement(driver, XPATH.DEMOLITION_BTN, refresh=True):
+                propList = [XPATH.FINISH_DIALOG, XPATH.INSIDE_TIMER]
+                demolitionTimer = getElementAttribute(driver, propList, 'text')
+                while demolitionTimer:
+                    demolitionTimer = getElementAttribute(driver, propList, 'text')
+                    if demolitionTimer:
+                        dmTime = max(1, time_to_seconds(demolitionTimer[0]))
+                        time.sleep(dmTime)
                 status = True
+                logger.success(f'In function select_and_demolish_building: Successfully demolished {index}')
             else:
-                logger.error(f'In function check_building_page_title: Page does not correspond \
-                    to building {getCurrentUrl(driver)} and {BUILDINGS[bdType].name}')
+                logger.error('In function select_and_demolish_building: Failed to press demolition button')
         else:
-            if isVisible(driver, XPATH.BUILDING_PAGE_TITLE % BUILDINGS[bdType].name):
-                status = True
-            else:
-                logger.error('In function check_building_page_title: Page does not correspond \
-                    to building {getCurrentUrl(driver)} and {BUILDINGS[bdType].name}')
+            logger.error(f'In function select_and_demolish_building: Could not select option {index}')
     else:
-        logger.error('In function check_building_page_title: Invalid parameter bdType')
+        logger.error('In function select_and_demolish_building: Main building page not visible')
     return status
-
-
-def time_to_seconds(currTime):
-    """
-    Converts time in format hh:mm:ss to seconds
-    :param currTime: time in format hh:mm:ss.
-    :return: equivalent time in seconds.
-    """
-    h, m, s = currTime.split(':')
-    return int(h) * 3600 + int(m) * 60 + int(s)
 
 
 # Checks
@@ -511,20 +366,16 @@ def construct_building(driver, bdType, forced=False, waitToFinish=False):
                         if emptyPlaces:
                             if enter_building_menu(driver, emptyPlaces[0]):
                                 if check_storage(driver, bdType, BuildingType.Warehouse, forced) and \
-                                        check_storage(driver, bdType, BuildingType.Granary, forced):
-                                    if check_resources(driver, bdType, forced):
-                                        if check_busy_workers(driver, bdType, forced):
-                                            # Upgrade
-                                            if press_upgrade_button(driver, bdType, waitToFinish=waitToFinish):
-                                                logger.success('Success building %s' % BUILDINGS[bdType].name)
-                                                status = True
-                                            else:
-                                                logger.error('In function construct_building: Failed to press\
-                                                    upgrade button')
-                                        else:
-                                            logger.error('In function construct_building: Busy workers check failed')
+                                        check_storage(driver, bdType, BuildingType.Granary, forced) and \
+                                        check_resources(driver, bdType, forced) and \
+                                        check_busy_workers(driver, bdType, forced):
+                                    # Upgrade
+                                    if press_upgrade_button(driver, bdType, waitToFinish=waitToFinish):
+                                        logger.success('Success building %s' % BUILDINGS[bdType].name)
+                                        status = True
                                     else:
-                                        logger.error('In function construct_building: Resources check failed')
+                                        logger.error('In function construct_building: Failed to press\
+                                            upgrade button')
                                 else:
                                     logger.error('In function construct_building: Storagecheck failed')
                             else:
@@ -624,34 +475,9 @@ def demolish_building_at(driver, index):
                 if index >= FIRST_BUILDING_SITE_VILLAGE and index < LAST_BUILDING_SITE_VILLAGE:
                     if mainBuildingIndex == index:
                         continue
-                    optionText = str(index) + '.'
-                    optionName = getElementAttribute(driver, XPATH.DEMOLITION_BUILDING_OPTION % optionText, 'text')
-                    if optionName:
-                        logger.info(f'In function demolish_building: Attempting to demolish {optionName}')
-                        if 'empty' not in optionName:
-                            option = clickElement(driver, XPATH.DEMOLITION_BUILDING_OPTION % optionText)
-                            if option:
-                                if clickElement(driver, XPATH.DEMOLITION_BTN, refresh=True):
-                                    propList = [XPATH.FINISH_DIALOG, XPATH.INSIDE_TIMER]
-                                    demolitionTimer = getElementAttribute(driver, propList, 'text')
-                                    while demolitionTimer:
-                                        demolitionTimer = getElementAttribute(driver, propList, 'text')
-                                        if demolitionTimer:
-                                            dmTime = max(1, time_to_seconds(demolitionTimer[0]))
-                                            time.sleep(dmTime)
-                                    logger.success(f'In function demolish_building: successfully demolished \
-                                        {optionName}')
-                                else:
-                                    logger.error('In function demolish_building: Failed to press demolition button')
-                                    break
-                            else:
-                                logger.error(f'In function demolish_building: Could not select option {optionText}')
-                                break
-                        else:
-                            logger.info('In function demolish_building: Attempted to demolish empty building')
-                            break
-                    else:
-                        logger.error('In function demolish_building: Failed to get option name')
+                    if not select_and_demolish_building(driver, index):
+                        logger.error(f'In function demolish_building: Failed to select/demolish')
+                        break
                 else:
                     logger.error(f'In function demolish_building: Invalid index value {index}')
                     break

@@ -1,4 +1,3 @@
-import enum
 from datetime import datetime
 from Framework.utils.Constants import LOGS_PATH
 

@@ -1,17 +1,18 @@
-from os import error
 import time
 from contextlib import contextmanager
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.expected_conditions import staleness_of
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
-from Framework.utils.Constants import MAX_PAGE_LOAD_TIME
 from Framework.utils.Logger import get_projectLogger
 
 
 logger = get_projectLogger()
+
+# Max time for a page to load
+MAX_PAGE_LOAD_TIME = 30
 
 
 @contextmanager
