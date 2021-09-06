@@ -10,11 +10,13 @@ from pathlib import Path
 FRAMEWORK_PATH = Path(os.path.dirname(os.path.abspath(__file__))).parent.absolute()
 # Chrome driver path
 CHROME_DRIVER_PATH = os.path.join(FRAMEWORK_PATH, 'files\chromedriver.exe')
-# Data path
+# Data file path
 DATA_PATH = os.path.join(FRAMEWORK_PATH, 'files\\data.json')
-# Account path
+# Account library file path
+ACCOUNT_LIBRARY_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account_library.json')
+# Current account file path
 ACCOUNT_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account.json')
-# Logs path
+# Log file path
 LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\execution.log')
 
 
@@ -141,10 +143,10 @@ class XPATHCollection(dict):
 
 
 # Enum of all existing tribes
-class Tribe(IntEnum):
-    ROMANS = 1
-    TEUTONS = 2
-    GAULS = 3
+class Tribe(Enum):
+    ROMANS = 'ROMANS'
+    TEUTONS = 'TEUTONS'
+    GAULS = 'GAULS'
     
 
 # Enum of all existing buildings

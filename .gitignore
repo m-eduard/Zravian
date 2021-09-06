@@ -4,8 +4,8 @@
 # vsCode config
 .vscode/
 
-# File containing credentials
-Framework/files/account.json
+# Files containing all credentials
+Framework/files/account*
 
 # File containing future updates
 Framework/files/notes.txt
