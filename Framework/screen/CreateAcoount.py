@@ -102,7 +102,8 @@ class CreateZravianAccount:
                 time.sleep(DEFAULT_POLLING_TIME)
                 startTime = time.time()
             else:
-                logger.error('In function activate_zravian_account: Failed to receive mail')
+                logger.error('In function activate_zravian_account: Failed to receive mail. ' \
+                            'This might be due to Temporary email problems')
         else:
             logger.error('In function activate_zravian_account: Failed to switch to tab')
         if email_opened:
