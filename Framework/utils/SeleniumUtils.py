@@ -121,13 +121,14 @@ def __findElements(driver, prop, method=By.XPATH, waitFor=False):
     return elems
 
 
-def get(driver, URL):
+def get(driver, URL, checkURL=True):
     """
     Loads a webpage.
 
     Parameters:
         - driver (WebDriver): Used to interact with the webpage.
         - URL (String): String denoting URL to load.
+        - checkURL (Boolean): If True verifies the link once loaded, True by default.
     
     Returns:
         - True if operation was successful, False otherwise.
@@ -136,7 +137,7 @@ def get(driver, URL):
     if isinstance(driver, webdriver.Chrome):
         with __waitPageToLoad(driver):
             driver.get(URL)
-        if driver.current_url == URL:
+        if driver.current_url == URL or not checkURL:
             success = True
         else:
             logger.error(f'In function get: Failed to load {URL}')
@@ -180,6 +181,67 @@ def refresh(driver):
         success = True
     else:
         logger.error('In function refresh: Invalid parameter driver')
+    return success
+
+
+def newTab(driver, URL, switchTo=False):
+    """
+    Creates a new tab with requested URL.
+
+    Parameters:
+        - driver (WebDriver): Used to interact with the webpage.
+        - URL (String): String denoting URL to load.
+        - switchTo (Boolean): If True will move to the new tab, False by default.
+
+    Returns:
+        - True if operation was successful, False otherwise.
+    """
+    success = False
+    if isinstance(driver, webdriver.Chrome):
+        driver.execute_script("window.open('" + URL +"');")
+        if switchTo:
+            for handle in driver.window_handles:
+                driver.switch_to.window(handle)
+                if URL in getCurrentUrl(driver):
+                    success = True
+                    break
+            else:
+                logger.error(f'In function switchToTab: Failed to find a tab by identifier {URL}')
+        else:
+            status = True
+    else:
+        logger.error('In function newTab: Invalid parameter driver')
+    return success
+    
+
+def switchToTab(driver, identifier):
+    """
+    Switches focus to a new tab.
+
+    Parameters:
+        - driver (WebDriver): Used to interact with the webpage.
+        - identifier (Int or String): Index of tab or URL.
+
+    Returns:
+        - True if operation was successful, False otherwise.
+    """
+    success = False
+    if isinstance(driver, webdriver.Chrome):
+        if isinstance(identifier, int) and identifier < len(driver.window_handles):
+            driver.switch_to.window(driver.window_handles[identifier])
+            success = True
+        elif isinstance(identifier, str):
+            for handle in driver.window_handles:
+                driver.switch_to.window(handle)
+                if identifier in getCurrentUrl(driver):
+                    success = True
+                    break
+            else:
+                logger.error(f'In function switchToTab: Failed to find a tab by identifier {identifier}')
+        else:
+            logger.error('In function switchToTab: Invalid parameter identifier')
+    else:
+        logger.error('In function switchToTab: Invalid parameter driver')
     return success
 
 
@@ -304,7 +366,7 @@ def getElementsAttribute(driver, prop, attr, method=By.XPATH, waitFor=False):
 
 
 @__seleniumRefreshLock
-def clickElement(driver, prop, refresh=False, method=By.XPATH, waitFor=False):
+def clickElement(driver, prop, refresh=False, method=By.XPATH, waitFor=False, scrollIntoView=False):
     """
     Clicks a WebElement.
 
@@ -314,7 +376,7 @@ def clickElement(driver, prop, refresh=False, method=By.XPATH, waitFor=False):
         - refresh (Boolean): If True, function will wait for page to reload.
         - method (By): Method used to identify prop, By.XPATH by default.
         - waitFor (Boolean): If True function will wait for element to load, False by default.
-        for inner text.
+        - scrollIntoView (Boolean): If True function will scroll to element, False by default.
 
     Returns:
         - True if operation was successful, False otherwise.
@@ -331,6 +393,8 @@ def clickElement(driver, prop, refresh=False, method=By.XPATH, waitFor=False):
             if driver:
                 elem = __findElement(driver, prop, method=method, waitFor=waitFor)
                 if elem:
+                    if scrollIntoView:
+                        driver.execute_script("arguments[0].scrollIntoView();", elem)
                     if refresh:
                         with __waitPageToLoad(driver):
                             elem.click()

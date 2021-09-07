@@ -10,11 +10,13 @@ from pathlib import Path
 FRAMEWORK_PATH = Path(os.path.dirname(os.path.abspath(__file__))).parent.absolute()
 # Chrome driver path
 CHROME_DRIVER_PATH = os.path.join(FRAMEWORK_PATH, 'files\chromedriver.exe')
-# Data path
+# Data file path
 DATA_PATH = os.path.join(FRAMEWORK_PATH, 'files\\data.json')
-# Account path
+# Account library file path
+ACCOUNT_LIBRARY_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account_library.json')
+# Current account file path
 ACCOUNT_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account.json')
-# Logs path
+# Log file path
 LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\execution.log')
 
 
@@ -59,6 +61,29 @@ class XPATHCollection(dict):
     def __init__(self):
         super().__init__()
         self.objects = {
+            #
+            # Temporary email
+            #
+            'TE_DISABLED_EMAIL_BOX': '//*[@id="mail"][contains(@class, "disabledText")]',
+            'TE_COPY_MAIL_BTN': '//*[contains(@class, "copyIconGreenBtn")]',
+            'TE_EMAIL_BOX': '//*[contains(@class, "field--value")]',
+            'TE_REMOVE_BTN': '//*[contains(@class, "button--remove")]',
+            'TE_ZRAVIAN_MAIL': '//*[contains(@class, "inbox__content")]//*[contains(text(), "Welcome to Zravian!")]',
+            #
+            # Create account
+            #
+            'STRING_ON_SCREEN': '//*[contains(text(), "%s")]',
+            'REGISTER_USER_INPUT': '//*[@id="name"]',
+            'REGISTER_PASS1_INPUT': '//*[@id="pw1"]',
+            'REGISTER_PASS2_INPUT': '//*[@id="pw2"]',
+            'REGISTER_MAIL_INPUT': '//*[@id="mail"]',
+            'REGISTER_MAIL2_INPUT': '//*[@id="mail2"]',
+            'REGISTER_AGREE_1_CHKBOX': '//*[@id="chk"]',
+            'REGISTER_AGREE_2_CHKBOX': '//*[@id="spon"]',
+            'REGISTER_SUBMIT_BTN': '//input[@type="submit"][@value="Continue"]',
+            'ZRAVIAN_SUCCESS_STATUS': '//legend[contains(text(), "Success")]',
+            'ZRAVIAN_ERROR_STATUS': '//legend[contains(text(), "Error")]',
+            'ZRAVIAN_ERROR_STATUS_MSG': '//legend[contains(text(), "Error")]/../div',
             #
             # Login
             #
@@ -122,10 +147,10 @@ class XPATHCollection(dict):
 
 
 # Enum of all existing tribes
-class Tribe(IntEnum):
-    ROMANS = 1
-    TEUTONS = 2
-    GAULS = 3
+class Tribe(Enum):
+    ROMANS = 'ROMANS'
+    TEUTONS = 'TEUTONS'
+    GAULS = 'GAULS'
     
 
 # Enum of all existing buildings
