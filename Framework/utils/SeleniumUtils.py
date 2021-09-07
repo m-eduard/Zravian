@@ -121,13 +121,14 @@ def __findElements(driver, prop, method, waitFor=False):
     return elems
 
 
-def get(driver, URL):
+def get(driver, URL, checkURL=True):
     """
     Loads a webpage.
 
     Parameters:
         - driver (WebDriver): Used to interact with the webpage.
         - URL (String): String denoting URL to load.
+        - checkURL (Boolean): If True verifies the link once loaded, True by default.
     
     Returns:
         - True if operation was successful, False otherwise.
@@ -136,7 +137,7 @@ def get(driver, URL):
     if isinstance(driver, webdriver.Chrome):
         with __waitPageToLoad(driver):
             driver.get(URL)
-        if driver.current_url == URL:
+        if driver.current_url == URL or not checkURL:
             success = True
         else:
             logger.error(f'In function get: Failed to load {URL}')
@@ -183,13 +184,14 @@ def refresh(driver):
     return success
 
 
-def newTab(driver, URL):
+def newTab(driver, URL, switchTo=False):
     """
     Creates a new tab with requested URL.
 
     Parameters:
         - driver (WebDriver): Used to interact with the webpage.
         - URL (String): String denoting URL to load.
+        - switchTo (Boolean): If True will move to the new tab, False by default.
 
     Returns:
         - True if operation was successful, False otherwise.
@@ -197,7 +199,16 @@ def newTab(driver, URL):
     success = False
     if isinstance(driver, webdriver.Chrome):
         driver.execute_script("window.open('" + URL +"');")
-        success = True
+        if switchTo:
+            for handle in driver.window_handles:
+                driver.switch_to.window(handle)
+                if URL in getCurrentUrl(driver):
+                    success = True
+                    break
+            else:
+                logger.error(f'In function switchToTab: Failed to find a tab by identifier {URL}')
+        else:
+            status = True
     else:
         logger.error('In function newTab: Invalid parameter driver')
     return success

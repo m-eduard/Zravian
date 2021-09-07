@@ -73,8 +73,6 @@ class XPATHCollection(dict):
             # Create account
             #
             'STRING_ON_SCREEN': '//*[contains(text(), "%s")]',
-            'SERVER_SELECTION': '//*[contains(@alt, "%s")]',
-            'REGISTER_BTN': '//input[@value="Register"]',
             'REGISTER_USER_INPUT': '//*[@id="name"]',
             'REGISTER_PASS1_INPUT': '//*[@id="pw1"]',
             'REGISTER_PASS2_INPUT': '//*[@id="pw2"]',
@@ -84,6 +82,8 @@ class XPATHCollection(dict):
             'REGISTER_AGREE_2_CHKBOX': '//*[@id="spon"]',
             'REGISTER_SUBMIT_BTN': '//input[@type="submit"][@value="Continue"]',
             'ZRAVIAN_SUCCESS_STATUS': '//legend[contains(text(), "Success")]',
+            'ZRAVIAN_ERROR_STATUS': '//legend[contains(text(), "Error")]',
+            'ZRAVIAN_ERROR_STATUS_MSG': '//legend[contains(text(), "Error")]/../div',
             #
             # Login
             #
