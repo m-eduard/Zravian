@@ -355,7 +355,3 @@ def create_new_account(username, password, server, tribe, region, headless=True)
     """
     creator = CreateZravianAccount(headless)
     return creator.register(username, password, server, tribe, region)
-
-
-logger.set_debugMode(True)
-print(create_new_account('salamxxs1', 'salamerr', Server.S10k, Tribe.TEUTONS, Region.PLUS_PLUS, headless=False))
