@@ -12,13 +12,13 @@ ACCOUNT = get_ACCOUNT()
 UNDEFINED = ''
 
 
-def get_account_password(server : Server, username):
+def get_account_password(server : Server, username : str):
     """
     Retrieves password for given account.
 
     Parameters:
         - server (Server): URL to load, taken from account json by default.
-        - username (String): username used to login, taken from account json by default.
+        - username (str): username used to login, taken from account json by default.
     
     Returns:
         - String if account was found, None otherwise.
@@ -41,15 +41,15 @@ def get_account_password(server : Server, username):
 
 
 @contextmanager
-def login(server : Server, username, headless=False, password=UNDEFINED):
+def login(server : Server, username : str, headless=False, password=UNDEFINED):
     """
     Opens travian and logs in based on given credentials.
 
     Parameters:
         - server (Server): URL to load, taken from account json by default.
-        - username (String): username used to login, taken from account json by default.
+        - username (str): username used to login, taken from account json by default.
         - headless (Boolean): Set to False in order to see browser, False by default.
-        - password (String): Password used to login, taken from account json by default.
+        - password (str): Password used to login, taken from account json by default.
     """
     sws = SWS(headless)
     if password == UNDEFINED:
@@ -62,11 +62,11 @@ def login(server : Server, username, headless=False, password=UNDEFINED):
                     logger.info(initString)
                     yield sws
                 else:
-                    logger.error('In function login: Failed to click LOGIN_SUBMIT_BTN!')
+                    logger.error('In login: Failed to click LOGIN_SUBMIT_BTN!')
             else:
-                logger.error('In function login: Failed to type text in LOGIN_PASS_INPUT!')
+                logger.error('In login: Failed to type text in LOGIN_PASS_INPUT!')
         else:
-            logger.error('In function login: Failed to type text in LOGIN_USER_INPUT!')
+            logger.error('In login: Failed to type text in LOGIN_USER_INPUT!')
     else:
-        logger.error('In function login: Failed to load {server.value}!')
+        logger.error('In login: Failed to load {server.value}!')
     sws.close()

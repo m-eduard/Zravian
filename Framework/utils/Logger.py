@@ -29,12 +29,12 @@ class ProjectLogger:
         if isinstance(status, bool):
             self.debugMode = status
 
-    def success(self, text):
+    def success(self, text : str):
         """
         Logs text to log file with a timestamp as success notification.
 
         Parameters:
-            - text (String): Text to log.
+            - text (str): Text to log.
         """
         timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
         message = '%s - SUCCESS: %s' % (timestamp, text)
@@ -44,12 +44,12 @@ class ProjectLogger:
         if self.debugMode:
             print(terminal_message)
 
-    def info(self, text):
+    def info(self, text : str):
         """
         Logs text to log file with a timestamp as informative.
 
         Parameters:
-            - text (String): Text to log.
+            - text (str): Text to log.
         """
         timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
         message = '%s - INFO: %s' % (timestamp, text)
@@ -59,12 +59,12 @@ class ProjectLogger:
         if self.debugMode:
             print(terminal_message)
 
-    def warning(self, text):
+    def warning(self, text : str):
         """
         Logs text to log file with a timestamp as warning.
 
         Parameters:
-            - text (String): Text to log.
+            - text (str): Text to log.
         """
         timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
         message = '%s - WARNING: %s' % (timestamp, text)
@@ -74,12 +74,12 @@ class ProjectLogger:
         if self.debugMode:
             print(terminal_message)
 
-    def error(self, text):
+    def error(self, text : str):
         """
         Logs text to log file with a timestamp as error.
 
         Parameters:
-            - text (String): Text to log.
+            - text (str): Text to log.
         """
         timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
         message = '%s - ERROR: %s' % (timestamp, text)

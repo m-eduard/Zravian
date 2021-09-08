@@ -20,11 +20,11 @@ ACCOUNT_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account.json')
 LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\execution.log')
 
 
-def get_building_type_by_name(text):
+def get_building_type_by_name(text : str):
     """
     Finds BuildingType based on text.
     Parameters:
-        - text (String): Building name to search by.
+        - text (str): Building name to search by.
     Returns:
         - BuildingType.
     """

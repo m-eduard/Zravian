@@ -1,5 +1,3 @@
-from Framework.screen.Login import ACCOUNT
-import re
 from enum import IntEnum, Enum
 from Framework.utils.Constants import Tribe, get_ACCOUNT, get_XPATH
 from Framework.utils.Logger import get_projectLogger
@@ -43,7 +41,7 @@ def getTribe(sws : SWS):
         elif sws.isVisible(XPATH.GAUL_TASK_MASTER):
             TRIBE = Tribe.GAULS
         else:
-            logger.warning('In function getTribe: Could not identify the tribe by task manager')
+            logger.warning('In getTribe: Could not identify the tribe by task manager')
     if not TRIBE:
         initialURL = sws.getCurrentUrl()
         PROFILE_URL = f'{ACCOUNT.URL}profile.php'
@@ -56,14 +54,14 @@ def getTribe(sws : SWS):
                         TRIBE = tr
                         break
                 else:
-                    logger.error('In function getTribe: Tribe could not be determined')
+                    logger.error('In getTribe: Tribe could not be determined')
                 if not sws.get(initialURL):
                     TRIBE = None
-                    logger.error('In function getTribe: Could not get back to initial page')
+                    logger.error('In getTribe: Could not get back to initial page')
             else:
-                logger.error('In function getTribe: Could not find text element')
+                logger.error('In getTribe: Could not find text element')
         else:
-            logger.error('In function getTribe: Could not get profile page')
+            logger.error('In getTribe: Could not get profile page')
     return TRIBE
 
 
@@ -109,16 +107,16 @@ def get_level_up_mode(sws : SWS):
             elif 'disable' in coneTitle:
                 status = LevelUpMode.ON
             else:
-                logger.error('In function get_level_up_mode: Unknown cone status')
+                logger.error('In get_level_up_mode: Unknown cone status')
         else:
-            logger.error('In function get_level_up_mode: Level up cone not found')
+            logger.error('In get_level_up_mode: Level up cone not found')
     else:
-        logger.error('In function get_level_up_mode: Level up mode is available just \
+        logger.error('In get_level_up_mode: Level up mode is available just \
             in overview and village')
     return status
 
 
-def set_level_up_mode(sws : SWS, levelUpMode):
+def set_level_up_mode(sws : SWS, levelUpMode : LevelUpMode):
     """
     Sets level up mode.
 
@@ -130,31 +128,28 @@ def set_level_up_mode(sws : SWS, levelUpMode):
         - True if the operation was successful, False otherwise.
     """
     status = False
-    if isinstance(levelUpMode, LevelUpMode):
-        currentView = get_current_screen(sws)
-        if currentView == Screens.OVERVIEW or currentView == Screens.VILLAGE:
-            coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
-            if coneTitle:
-                coneTitle = coneTitle[0]
-                if (levelUpMode == LevelUpMode.ON and "enable" in coneTitle) or \
-                        (levelUpMode == LevelUpMode.OFF and "disable" in coneTitle):
-                    if sws.clickElement(XPATH.LEVEL_UP_CONE, refresh=True):
-                        status = True
-                    else:
-                        logger.error('In function set_level_up_mode: Failed to click LEVEL_UP_CONE')
-                else:
+    currentView = get_current_screen(sws)
+    if currentView == Screens.OVERVIEW or currentView == Screens.VILLAGE:
+        coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
+        if coneTitle:
+            coneTitle = coneTitle[0]
+            if (levelUpMode == LevelUpMode.ON and "enable" in coneTitle) or \
+                    (levelUpMode == LevelUpMode.OFF and "disable" in coneTitle):
+                if sws.clickElement(XPATH.LEVEL_UP_CONE, refresh=True):
                     status = True
+                else:
+                    logger.error('In set_level_up_mode: Failed to click LEVEL_UP_CONE')
             else:
-                logger.error('In function set_level_up_mode: Cone title could not be found')
+                status = True
         else:
-            logger.error('In function set_level_up_mode: Level up mode is available just \
-                in overview and village')
+            logger.error('In set_level_up_mode: Cone title could not be found')
     else:
-        logger.error('In function set_level_up_mode: Invalid parameter levelUpMode')
+        logger.error('In set_level_up_mode: Level up mode is available just \
+            in overview and village')
     return status
 
 
-def __move_to_screen(sws : SWS, screen, forced=False):
+def __move_to_screen(sws : SWS, screen : Screens, forced : bool = False):
     """
     Ensures that the current view is the desired screen.
 
@@ -174,20 +169,17 @@ def __move_to_screen(sws : SWS, screen, forced=False):
         Screens.STATS: f'{ACCOUNT.URL}statistics.php'
     }
     status = False
-    if isinstance(screen, Screens):
-        if screen != get_current_screen(sws) or forced:
-            if sws.get(URLS[screen]):
-                status = True
-            else:
-                logger.error('In function __move_to_screen: Failed to move to screen')
-        else:
+    if screen != get_current_screen(sws) or forced:
+        if sws.get(URLS[screen]):
             status = True
+        else:
+            logger.error('In __move_to_screen: Failed to move to screen')
     else:
-        logger.error('In function __move_to_screen: Invalid parameter screen')
+        status = True
     return status
 
 
-def move_to_overview(sws : SWS, forced=False):
+def move_to_overview(sws : SWS, forced : bool = False):
     """
     Changes current screen to overview.
 
@@ -201,7 +193,7 @@ def move_to_overview(sws : SWS, forced=False):
     return __move_to_screen(sws, Screens.OVERVIEW, forced)
 
 
-def move_to_village(sws : SWS, forced=False):
+def move_to_village(sws : SWS, forced : bool = False):
     """
     Changes current screen to village.
 
@@ -215,7 +207,7 @@ def move_to_village(sws : SWS, forced=False):
     return __move_to_screen(sws, Screens.VILLAGE, forced)
 
 
-def move_to_map(sws : SWS, forced=False):
+def move_to_map(sws : SWS, forced : bool = False):
     """
     Changes current screen to map.
 
@@ -229,7 +221,7 @@ def move_to_map(sws : SWS, forced=False):
     return __move_to_screen(sws, Screens.MAP, forced)
 
 
-def move_to_stats(sws : SWS, forced=False):
+def move_to_stats(sws : SWS, forced : bool = False):
     """
     Changes current screen to stats.
 
@@ -276,7 +268,7 @@ def get_storage(sws : SWS):
             storage.append((int(crop[0]), int(crop[1])))
     if len(storage) != 4:
         storage = None
-        logger.error('In function get_storage: Less than 4 values found')
+        logger.error('In get_storage: Less than 4 values found')
     return storage
 
 
@@ -305,5 +297,5 @@ def get_production(sws : SWS):
         production.append(int(crop[0]))
     if len(production) != 4:
         production = None
-        logger.error('In function get_production: Less than 4 values found')
+        logger.error('In get_production: Less than 4 values found')
     return production

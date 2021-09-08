@@ -4,10 +4,11 @@ from enum import Enum
 from Framework.utils.SeleniumUtils import SWS
 from Framework.utils.Logger import get_projectLogger
 from Framework.utils.Constants import ACCOUNT_LIBRARY_PATH, Server, Tribe, get_XPATH
-from Framework.VillageManagement.Utils import XPATH
 
 logger = get_projectLogger()
 XPATH = get_XPATH()
+# Notation for undefined field
+UNDEFINED = ''
 
 TEMP_EMAIL_URL = 'https://cryptogmail.com/'
 DEFAULT_POLLING_TIME = 1
@@ -22,7 +23,7 @@ class Region(Enum):
 
 
 class CreateZravianAccount:
-    def __init__(self, headless):
+    def __init__(self, headless : bool):
         self.sws = SWS(headless)
 
     def close(self):
@@ -59,7 +60,7 @@ class CreateZravianAccount:
             else:
                 logger.error('In get_email: Failed to get initial email')
         else:
-            logger.error('In function generate_email: Failed to open new tab')
+            logger.error('In generate_email: Failed to open new tab')
         return ret
 
     def activate_zravian_account(self):
@@ -79,15 +80,15 @@ class CreateZravianAccount:
                     if self.sws.clickElement(XPATH.TE_ZRAVIAN_MAIL, scrollIntoView=True):
                         email_opened = True
                     else:
-                        logger.error('In function activate_zravian_account: Failed to click email')
+                        logger.error('In activate_zravian_account: Failed to click email')
                     break
                 time.sleep(DEFAULT_POLLING_TIME)
                 startTime = time.time()
             else:
-                logger.error('In function activate_zravian_account: Failed to receive mail. ' \
+                logger.error('In activate_zravian_account: Failed to receive mail. ' \
                             'This might be due to Temporary email problems')
         else:
-            logger.error('In function activate_zravian_account: Failed to switch to tab')
+            logger.error('In activate_zravian_account: Failed to switch to tab')
         if email_opened:
             ACTIVATE_TEXT = 'activate.php?'
             link = None
@@ -98,18 +99,18 @@ class CreateZravianAccount:
                         link = potential_link
                         break
                 else:
-                    logger.error('In function activate_zravian_account: Failed to extract activation link')
+                    logger.error('In activate_zravian_account: Failed to extract activation link')
             else:
-                logger.error('In function activate_zravian_account: Failed to extract activation link')
+                logger.error('In activate_zravian_account: Failed to extract activation link')
             if link:
                 if self.sws.get(link, checkURL=False):
                     if self.sws.isVisible(XPATH.ZRAVIAN_SUCCESS_STATUS, waitFor=True):
                         ret = True
                         logger.success('Activation successful')
                     else:
-                        logger.error('In function activate_zravian_account: Success message not found')
+                        logger.error('In activate_zravian_account: Success message not found')
                 else:
-                    logger.error('In function activate_zravian_account: Failed to access activation link')
+                    logger.error('In activate_zravian_account: Failed to access activation link')
         return ret
 
     # Zravian registration page
@@ -143,14 +144,14 @@ class CreateZravianAccount:
         num += 1
         return GENERIC_PHRASE + str(num)
 
-    def fill_registration_data(self, username, password, emailAddress):
+    def fill_registration_data(self, username : str, password : str, emailAddress : str):
         """
         Completes username, password and email fields.
 
         Parameters:
-            - username (String): Username of new account.
-            - password (String): Password of new account.
-            - emailAddress (String): Email of new account.
+            - username (str): Username of new account.
+            - password (str): Password of new account.
+            - emailAddress (str): Email of new account.
 
         Returns:
             - True if the operation was successful, False otherwise.
@@ -181,7 +182,7 @@ class CreateZravianAccount:
         if self.sws.clickElement(XPATH.STRING_ON_SCREEN % tribeName):
             ret = True
         else:
-            logger.error('In function select_tribe: Failed to select tribe')
+            logger.error('In select_tribe: Failed to select tribe')
         return ret
 
     def select_region(self, region : Region):
@@ -198,7 +199,7 @@ class CreateZravianAccount:
         if self.sws.clickElement(XPATH.STRING_ON_SCREEN % region.value):
             ret = True
         else:
-            logger.error('In function select_region: Failed to select region')
+            logger.error('In select_region: Failed to select region')
         return ret
 
     def agree_and_submit(self):
@@ -212,24 +213,25 @@ class CreateZravianAccount:
         if self.sws.clickElement(XPATH.REGISTER_AGREE_1_CHKBOX):  # Always displayed
             if self.sws.isVisible(XPATH.REGISTER_AGREE_2_CHKBOX):  # Not always displayed
                 if not self.sws.clickElement(XPATH.REGISTER_AGREE_2_CHKBOX):
-                    logger.error('In function agree_and_submit: Failed to check second checkbox')
+                    logger.error('In agree_and_submit: Failed to check second checkbox')
             if self.sws.clickElement(XPATH.REGISTER_SUBMIT_BTN):
                 ret = True
             else:
-                logger.error('In function agree_and_submit: Failed to submit')
+                logger.error('In agree_and_submit: Failed to submit')
         else:
-            logger.error('In function agree_and_submit: Failed to agree')
+            logger.error('In agree_and_submit: Failed to agree')
         return ret
 
-    def complete_registration_form(self, username, password, server : Server, emailAddress, tribe : Tribe, region : Region):
+    def complete_registration_form(self, username : str, password : str, server : Server, emailAddress : str,
+                tribe : Tribe, region : Region):
         """
         Opens a new tab and completes the registration form.
 
         Parameters:
-            - username (String): Username of new account.
-            - password (String): Password of new account.
+            - username (str): Username of new account.
+            - password (str): Password of new account.
             - server (Server): Server of new account.
-            - emailAddress (String): Email of new account.
+            - emailAddress (str): Email of new account.
             - tribe (Tribe): Tribe of new account.
             - region (Region): Region of new account.
 
@@ -244,9 +246,9 @@ class CreateZravianAccount:
                 if self.registration_error_checker():
                     ret = True
             else:
-                logger.error('In function complete_registration_form: Failed to complete registration process')
+                logger.error('In complete_registration_form: Failed to complete registration process')
         else:
-            logger.error('In function complete_registration_form: Failed to open new tab')
+            logger.error('In complete_registration_form: Failed to open new tab')
         return ret
 
     def registration_error_checker(self):
@@ -262,12 +264,12 @@ class CreateZravianAccount:
             if errorMsg:
                 logger.warning('Registration failed with following message: %s' % errorMsg[0])
             else:
-                logger.error('In function registration_error_checker: Could not retrieve error message')
+                logger.error('In registration_error_checker: Could not retrieve error message')
         elif self.sws.isVisible(XPATH.ZRAVIAN_SUCCESS_STATUS):
             logger.success('Registration successful')
             status = True
         else:
-            logger.error('In function registration_error_checker: Failed to find status')
+            logger.error('In registration_error_checker: Failed to find status')
         return status
 
     # Zravian first login
@@ -275,13 +277,13 @@ class CreateZravianAccount:
         pass
 
     # Local account management
-    def store_new_account(self, username, password, server):
+    def store_new_account(self, username : str, password : str, server : Server):
         """
         Stores the new account in account library.
 
         Parameters:
-            - username (String): Username of new account.
-            - password (String): Password of new account.
+            - username (str): Username of new account.
+            - password (str): Password of new account.
             - server (Server): Server of new account.
 
         Returns:
@@ -313,13 +315,13 @@ class CreateZravianAccount:
         return ret
 
     # Main method
-    def register(self, username, password, server, tribe, region):
+    def register(self, username : str, password : str, server : Server, tribe : Tribe, region : Region):
         """
         Attempts to complete registration process.
 
         Parameters:
-            - username (String): Username of new account.
-            - password (String): Password of new account.
+            - username (str): Username of new account.
+            - password (str): Password of new account.
             - server (Server): Server of new account.
             - tribe (Tribe): Tribe of new account.
             - region (Region): Region of new account.
@@ -337,22 +339,23 @@ class CreateZravianAccount:
                     if self.store_new_account(username, password, server):
                         status = True
                     else:
-                        logger.error('In function register: Failed to store the new account')
+                        logger.error('In register: Failed to store the new account')
                 else:
-                    logger.error('In function register: Failed to activate the new account')
+                    logger.error('In register: Failed to activate the new account')
             else:
-                logger.error('In function register: Failed to complete the registration form')
+                logger.error('In register: Failed to complete the registration form')
         else:
-            logger.error('In function register: Failed to generate an email address')
+            logger.error('In register: Failed to generate an email address')
         return status
 
-def create_new_account(username='', password='', server=Server.S10k, tribe=Tribe.TEUTONS, region=Region.PLUS_PLUS, headless=True):
+def create_new_account(username : str = UNDEFINED, password : str = UNDEFINED, server=Server.S10k, tribe=Tribe.TEUTONS,
+            region=Region.PLUS_PLUS, headless=True):
     """
     Creates and activates a new account.
 
     Parameters:
-        - username (String): username.
-        - password (String): password.
+        - username (str): username.
+        - password (str): password.
         - server (Server): Server of new account.
         - tribe (Tribe): Desired tribe.
 

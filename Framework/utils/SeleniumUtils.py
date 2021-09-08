@@ -17,7 +17,7 @@ MAX_PAGE_LOAD_TIME = 30
 
 
 class SWS:
-    def __init__(self, headless):
+    def __init__(self, headless : bool):
         options = webdriver.ChromeOptions()
         if headless:  # Set headless = False in order to see the browser
             options.add_argument("--headless")
@@ -63,13 +63,13 @@ class SWS:
         return inner_func
 
     @__seleniumRefreshLock
-    def __findElement(driver, prop, method=By.XPATH, waitFor=False):
+    def __findElement(driver, prop : str, method : By = By.XPATH, waitFor : bool = False):
         """
         Finds a WebElement identified by method and prop.
 
         Parameters:
             - driver (WebDriver or WebElement): Used to perform find_element().
-            - prop (String): Property to search for.
+            - prop (str): Property to search for.
             - method (By): Method used to identify prop, By.XPATH by default.
             - waitFor (Boolean): If True function will wait for element to load, False by default.
         
@@ -87,15 +87,14 @@ class SWS:
             logger.info(f'In __findElement: Element {method}={prop} not found')
         return elem
 
-
     @__seleniumRefreshLock
-    def __findElements(driver, prop, method=By.XPATH, waitFor=False):
+    def __findElements(driver, prop : str, method : By = By.XPATH, waitFor : bool = False):
         """
         Finds WebElements identified by method and prop.
 
         Parameters:
             - driver (WebDriver or WebElement): Used to perform find_element().
-            - prop (String): Property to search for.
+            - prop (str): Property to search for.
             - method (By): Method used to identify prop, By.XPATH by default.
             - waitFor (Boolean): If True function will wait for element to load, False by default.
         
@@ -113,9 +112,8 @@ class SWS:
             logger.info(f'In __findElements: Element {method}={prop} not found')
         return elems
 
-
     @contextmanager
-    def __waitPageToLoad(self, timeout=MAX_PAGE_LOAD_TIME):
+    def __waitPageToLoad(self, timeout : int = MAX_PAGE_LOAD_TIME):
         """
         Function used to wait for a page refresh.
 
@@ -138,12 +136,12 @@ class SWS:
             logger.error(f'In __waitPageToLoad: Failed to find new page')
         assert staleness_of(old_page)
 
-    def get(self, URL, checkURL=True):
+    def get(self, URL : str, checkURL : bool = True):
         """
         Loads a webpage.
 
         Parameters:
-            - URL (String): String denoting URL to load.
+            - URL (str): String denoting URL to load.
             - checkURL (Boolean): If True verifies the link once loaded, True by default.
         
         Returns:
@@ -173,12 +171,12 @@ class SWS:
         """
         self.driver.refresh()
 
-    def newTab(self, URL, switchTo=False):
+    def newTab(self, URL : str, switchTo : bool = False):
         """
         Creates a new tab with requested URL.
 
         Parameters:
-            - URL (String): String denoting URL to load.
+            - URL (str): String denoting URL to load.
             - switchTo (Boolean): If True will move to the new tab, False by default.
 
         Returns:
@@ -225,7 +223,7 @@ class SWS:
         return success
 
     @__seleniumRefreshLock
-    def isVisible(self, prop, method=By.XPATH, waitFor=False):
+    def isVisible(self, prop, method : By = By.XPATH, waitFor : bool = False):
         """
         Checks whether a WebElement is visible.
 
@@ -255,7 +253,7 @@ class SWS:
         return ret
 
     @__seleniumRefreshLock
-    def getElementAttribute(self, prop, attr, method=By.XPATH, waitFor=False):
+    def getElementAttribute(self, prop, attr, method : By = By.XPATH, waitFor : bool = False):
         """
         Finds a WebElement and returns the value of attr.
 
@@ -289,11 +287,11 @@ class SWS:
                         else:
                             ret.append(elem.get_attribute(at))
         else:
-            logger.error('In function getElementAttribute: Invalid parameter prop')
+            logger.error('In getElementAttribute: Invalid parameter prop')
         return ret
 
     @__seleniumRefreshLock
-    def getElementsAttribute(self, prop, attr, method=By.XPATH, waitFor=False):
+    def getElementsAttribute(self, prop, attr, method : By = By.XPATH, waitFor : bool = False):
         """
         Finds all corresponding WebElements and returns the value of attr.
 
@@ -329,11 +327,12 @@ class SWS:
                             tmpList.append(elem.get_attribute(at))
                     ret.append(tmpList)
         else:
-            logger.error('In function getElementsAttribute: Invalid parameter prop')
+            logger.error('In getElementsAttribute: Invalid parameter prop')
         return ret
 
     @__seleniumRefreshLock
-    def clickElement(self, prop, refresh=False, method=By.XPATH, waitFor=False, scrollIntoView=False):
+    def clickElement(self, prop, refresh : bool = False, method : By = By.XPATH, waitFor : bool = False,
+                scrollIntoView : bool =False):
         """
         Clicks a WebElement.
 
@@ -368,17 +367,17 @@ class SWS:
                         elem.click()
                 success = True
         else:
-            logger.error('In function clickElement: Invalid parameter prop')
+            logger.error('In clickElement: Invalid parameter prop')
         return success
 
     @__seleniumRefreshLock
-    def sendKeys(self, prop, text, method=By.XPATH, waitFor=False):
+    def sendKeys(self, prop, text : str, method : By = By.XPATH, waitFor : bool = False):
         """
         Sends text input to input box.
 
         Parameters:
             - prop (String or list of strings): Property to search for.
-            - text (String): String to insert in the textbox.
+            - text (str): String to insert in the textbox.
             - method (By): Method used to identify prop, By.XPATH by default.
             - waitFor (Boolean): If True function will wait for element to load, False by default.
 
@@ -400,5 +399,5 @@ class SWS:
                     elem.send_keys(text)
                     success = True
         else:
-            logger.error('In function sendKeys: Invalid parameter prop')
+            logger.error('In sendKeys: Invalid parameter prop')
         return success

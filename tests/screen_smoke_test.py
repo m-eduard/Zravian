@@ -9,7 +9,7 @@ ACCOUNT = get_ACCOUNT()
 
 
 """
-This test checks the view management and login functions.
+This test checks the view management and logIns.
 """
 if __name__ == "__main__":
     with login(headless=False) as sws:
