@@ -1,14 +1,13 @@
 import json
 import time
-from selenium import webdriver
-from Framework.utils.SeleniumUtils import clickElement, getCurrentUrl, getElementAttribute, isVisible, newTab, sendKeys, get, switchToTab
-from Framework.utils.Logger import ProjectLogger
-from Framework.utils.Constants import ACCOUNT_LIBRARY_PATH, CHROME_DRIVER_PATH, Tribe, get_XPATHS
-from Framework.VillageManagement.Utils import XPATH
 from enum import Enum
+from Framework.utils.SeleniumUtils import SWS
+from Framework.utils.Logger import get_projectLogger
+from Framework.utils.Constants import ACCOUNT_LIBRARY_PATH, Tribe, get_XPATH
+from Framework.VillageManagement.Utils import XPATH
 
-logger = ProjectLogger()
-XPATH = get_XPATHS()
+logger = get_projectLogger()
+XPATH = get_XPATH()
 
 TEMP_EMAIL_URL = 'https://cryptogmail.com/'
 DEFAULT_POLLING_TIME = 1
@@ -31,22 +30,12 @@ class Region(Enum):
 class CreateZravianAccount:
     def __init__(self, headless):
         # Webdriver
-        options = webdriver.ChromeOptions()
-        if headless:  # Set headless = False in order to see the browser
-            options.add_argument("--headless")
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-gpu')
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('start-maximized')
-        options.add_argument('disable-infobars')
-        options.add_argument("--disable-extensions")
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        self.driver = webdriver.Chrome(chrome_options=options, executable_path=CHROME_DRIVER_PATH)
+        self.sws = SWS(headless)
 
     def close(self):
-        if self.driver:
-            self.driver.close()
-        self.driver = None
+        if self.sws:
+            self.sws.close()
+        self.sws = None
 
     # Temporary email page    
     def generate_email(self):
@@ -57,14 +46,14 @@ class CreateZravianAccount:
             - String with new email if operation was successful, None otherwise.
         """
         ret = None
-        if newTab(self.driver, TEMP_EMAIL_URL, switchTo=True):
-            initialEmail = getElementAttribute(self.driver, XPATH.TE_EMAIL_BOX, 'text')
+        if self.sws.newTab(TEMP_EMAIL_URL, switchTo=True):
+            initialEmail = self.sws.getElementAttribute(XPATH.TE_EMAIL_BOX, 'text')
             if initialEmail:
-                if clickElement(self.driver, XPATH.TE_REMOVE_BTN):
+                if self.sws.clickElement(XPATH.TE_REMOVE_BTN):
                     startTime = time.time()
                     endTime = startTime + MAX_POLLING_TIME
                     while startTime < endTime:
-                        email = getElementAttribute(self.driver, XPATH.TE_EMAIL_BOX, 'text')
+                        email = self.sws.getElementAttribute(XPATH.TE_EMAIL_BOX, 'text')
                         if email and email[0] != initialEmail[0]:
                             ret = str(email[0])
                             break
@@ -89,12 +78,12 @@ class CreateZravianAccount:
         """
         ret = False
         email_opened = False
-        if switchToTab(self.driver, TEMP_EMAIL_URL):
+        if self.sws.switchToTab(TEMP_EMAIL_URL):
             startTime = time.time()
             endTime = startTime + MAX_POLLING_TIME
             while startTime < endTime:
-                if isVisible(self.driver, XPATH.TE_ZRAVIAN_MAIL):
-                    if clickElement(self.driver, XPATH.TE_ZRAVIAN_MAIL, scrollIntoView=True):
+                if self.sws.isVisible(XPATH.TE_ZRAVIAN_MAIL):
+                    if self.sws.clickElement(XPATH.TE_ZRAVIAN_MAIL, scrollIntoView=True):
                         email_opened = True
                     else:
                         logger.error('In function activate_zravian_account: Failed to click email')
@@ -109,7 +98,7 @@ class CreateZravianAccount:
         if email_opened:
             ACTIVATE_TEXT = 'activate.php?'
             link = None
-            elems = getElementAttribute(self.driver, XPATH.STRING_ON_SCREEN % ACTIVATE_TEXT, 'text', waitFor=True)
+            elems = self.sws.getElementAttribute(XPATH.STRING_ON_SCREEN % ACTIVATE_TEXT, 'text', waitFor=True)
             if elems:
                 for potential_link in elems[0].split():
                     if ACTIVATE_TEXT in potential_link:
@@ -120,8 +109,8 @@ class CreateZravianAccount:
             else:
                 logger.error('In function activate_zravian_account: Failed to extract activation link')
             if link:
-                if get(self.driver, link, checkURL=False):
-                    if isVisible(self.driver, XPATH.ZRAVIAN_SUCCESS_STATUS, waitFor=True):
+                if self.sws.get(link, checkURL=False):
+                    if self.sws.isVisible(XPATH.ZRAVIAN_SUCCESS_STATUS, waitFor=True):
                         ret = True
                         logger.success('Activation successful')
                     else:
@@ -144,11 +133,11 @@ class CreateZravianAccount:
             - True if the operation was successful, False otherwise.
         """
         ret = False
-        if sendKeys(self.driver, XPATH.REGISTER_USER_INPUT, username) and \
-                sendKeys(self.driver, XPATH.REGISTER_PASS1_INPUT, password) and \
-                sendKeys(self.driver, XPATH.REGISTER_PASS2_INPUT, password) and \
-                sendKeys(self.driver, XPATH.REGISTER_MAIL_INPUT, emailAddress) and \
-                sendKeys(self.driver, XPATH.REGISTER_MAIL2_INPUT, emailAddress):
+        if self.sws.sendKeys(XPATH.REGISTER_USER_INPUT, username) and \
+                self.sws.sendKeys(XPATH.REGISTER_PASS1_INPUT, password) and \
+                self.sws.sendKeys(XPATH.REGISTER_PASS2_INPUT, password) and \
+                self.sws.sendKeys(XPATH.REGISTER_MAIL_INPUT, emailAddress) and \
+                self.sws.sendKeys(XPATH.REGISTER_MAIL2_INPUT, emailAddress):
             ret = True
         else:
             logger.error('In fill_registration_data: Error while entering data')
@@ -167,7 +156,7 @@ class CreateZravianAccount:
         ret = False
         if isinstance(tribe, Tribe):
             tribeName = tribe.name[0] + tribe.name[1:-1].lower()
-            if clickElement(self.driver, XPATH.STRING_ON_SCREEN % tribeName):
+            if self.sws.clickElement(XPATH.STRING_ON_SCREEN % tribeName):
                 ret = True
             else:
                 logger.error('In function select_tribe: Failed to select tribe')
@@ -187,7 +176,7 @@ class CreateZravianAccount:
         """
         ret = False
         if isinstance(region, Region):
-            if clickElement(self.driver, XPATH.STRING_ON_SCREEN % region.value):
+            if self.sws.clickElement(XPATH.STRING_ON_SCREEN % region.value):
                 ret = True
             else:
                 logger.error('In function select_region: Failed to select region')
@@ -203,11 +192,11 @@ class CreateZravianAccount:
             - True if operation is successful, False otherwise.
         """
         ret = False
-        if clickElement(self.driver, XPATH.REGISTER_AGREE_1_CHKBOX):  # Always displayed
-            if isVisible(self.driver, XPATH.REGISTER_AGREE_2_CHKBOX):  # Not always displayed
-                if not clickElement(self.driver, XPATH.REGISTER_AGREE_2_CHKBOX):
+        if self.sws.clickElement(XPATH.REGISTER_AGREE_1_CHKBOX):  # Always displayed
+            if self.sws.isVisible(XPATH.REGISTER_AGREE_2_CHKBOX):  # Not always displayed
+                if not self.sws.clickElement(XPATH.REGISTER_AGREE_2_CHKBOX):
                     logger.error('In function agree_and_submit: Failed to check second checkbox')
-            if clickElement(self.driver, XPATH.REGISTER_SUBMIT_BTN):
+            if self.sws.clickElement(XPATH.REGISTER_SUBMIT_BTN):
                 ret = True
             else:
                 logger.error('In function agree_and_submit: Failed to submit')
@@ -233,7 +222,7 @@ class CreateZravianAccount:
         ret = False
         REGISTER_SUFFIX = 'register.php'
         if isinstance(server, Server):
-            if newTab(self.driver, server.value + REGISTER_SUFFIX, switchTo=True):
+            if self.sws.newTab(server.value + REGISTER_SUFFIX, switchTo=True):
                 if self.fill_registration_data(username, password, emailAddress) and \
                         self.select_tribe(tribe) and self.select_region(region) and self.agree_and_submit():
                     if self.registration_error_checker():
@@ -254,13 +243,13 @@ class CreateZravianAccount:
             - True if the registration was successful, False otherwise.
         """
         status = False
-        if isVisible(self.driver, XPATH.ZRAVIAN_ERROR_STATUS):
-            errorMsg = getElementAttribute(self.driver, XPATH.ZRAVIAN_ERROR_STATUS_MSG, 'text')
+        if self.sws.isVisible(XPATH.ZRAVIAN_ERROR_STATUS):
+            errorMsg = self.sws.getElementAttribute(XPATH.ZRAVIAN_ERROR_STATUS_MSG, 'text')
             if errorMsg:
                 logger.warning('Registration failed with following message: %s' % errorMsg[0])
             else:
                 logger.error('In function registration_error_checker: Could not retrieve error message')
-        elif isVisible(self.driver, XPATH.ZRAVIAN_SUCCESS_STATUS):
+        elif self.sws.isVisible(XPATH.ZRAVIAN_SUCCESS_STATUS):
             logger.success('Registration successful')
             status = True
         else:
@@ -354,4 +343,10 @@ def create_new_account(username, password, server, tribe, region, headless=True)
         - True if the operation is successful, False otherwise.
     """
     creator = CreateZravianAccount(headless)
-    return creator.register(username, password, server, tribe, region)
+    status = creator.register(username, password, server, tribe, region)
+    creator.close()
+    return status
+
+testName = 'Barosanius'
+logger.set_debugMode(True)
+create_new_account(testName, testName, Server.S10k, Tribe.GAULS, Region.PLUS_PLUS, headless=False)

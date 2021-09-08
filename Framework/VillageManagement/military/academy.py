@@ -1,20 +1,20 @@
 from Framework.VillageManagement.Builder import construct_building, level_up_building_at
 from Framework.VillageManagement.Utils import check_building_page_title, get_building_data
-from Framework.utils.SeleniumUtils import clickElement, isVisible
+from Framework.utils.SeleniumUtils import SWS
 from Framework.utils.Constants import BuildingType, TroopType, get_TROOPS, get_XPATH
-from Framework.utils.Logger import ProjectLogger
+from Framework.utils.Logger import get_projectLogger
 
 
-logger = ProjectLogger()
+logger = get_projectLogger()
 TROOPS = get_TROOPS()
 XPATH = get_XPATH()
 
-def select_and_research(driver, tpType):
+def select_and_research(sws : SWS, tpType):
     """
     Researches troup.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Used to interact with the webpage.
         - tpType (TroopType): Denotes troop.
 
     Returns:
@@ -22,8 +22,8 @@ def select_and_research(driver, tpType):
     """
     status = False
     if isinstance(tpType, TroopType):
-        if check_building_page_title(driver, BuildingType.Academy):
-            if clickElement(driver, XPATH.RESEARCH_TROOP % TROOPS[tpType].name):
+        if check_building_page_title(sws, BuildingType.Academy):
+            if sws.clickElement(XPATH.RESEARCH_TROOP % TROOPS[tpType].name):
                 logger.success(f'In function select_and_research: {TROOPS[tpType].name} was researched')
                 status = True
             else:
@@ -35,12 +35,12 @@ def select_and_research(driver, tpType):
     return status
 
 
-def check_troop__bd_requirements(driver, tpType, forced=False):
+def check_troop__bd_requirements(sws : SWS, tpType, forced=False):
     """
     Verifies requirements for troup.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Used to interact with the webpage.
         - tpType (TroopType): Denotes troop.
         - forced (Boolean): If True bypass any inconvenience, False by default.
 
@@ -51,24 +51,24 @@ def check_troop__bd_requirements(driver, tpType, forced=False):
     if isinstance(tpType, TroopType):
         requirements = TROOPS[type].requirements
         for reqBd, reqLevel in requirements:
-            reqBdList = get_building_data(driver, reqBd)
+            reqBdList = get_building_data(sws, reqBd)
             if not reqBdList:  # Construct
                 if forced:
-                    if not construct_building(driver, reqBd, forced=True, waitToFinish=True):
+                    if not construct_building(sws, reqBd, forced=True, waitToFinish=True):
                         logger.error(f'In function check_requirements: Failed to construct {reqBd}')
                         break
                 else:
                     logger.warning(f'In function check_requirements: {reqBd} not found')
                     break
-            reqBdList = get_building_data(driver, reqBd)
+            reqBdList = get_building_data(sws, reqBd)
             # Check level
             if reqBdList[-1][1] < reqLevel:  # Upgrade is required
                 if forced:
                     while reqBdList[-1][1] < reqLevel:
-                        if not level_up_building_at(driver, reqBdList[-1][0], forced=True, waitToFinish=True):
+                        if not level_up_building_at(sws, reqBdList[-1][0], forced=True, waitToFinish=True):
                             logger.error(f'In function check_requirements: Failed to level up {reqBd}')
                             break
-                        reqBdList = get_building_data(driver, reqBd)
+                        reqBdList = get_building_data(sws, reqBd)
                 else:
                     logger.warning(f'In function check_requirements: {reqBd} level is too low')
                     break
@@ -79,12 +79,12 @@ def check_troop__bd_requirements(driver, tpType, forced=False):
     return status
 
 
-def research(driver, tpType, forced=False):
+def research(sws : SWS, tpType, forced=False):
     """
     Researches troup.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Used to interact with the webpage.
         - tpType (TroopType): Denotes troop.
         - forced (Boolean): If True bypass any inconvenience, False by default.
 

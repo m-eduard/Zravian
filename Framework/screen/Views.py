@@ -3,7 +3,7 @@ import re
 from enum import IntEnum, Enum
 from Framework.utils.Constants import Tribe, get_ACCOUNT, get_XPATH
 from Framework.utils.Logger import get_projectLogger
-from Framework.utils.SeleniumUtils import get, getCurrentUrl, isVisible, getElementAttribute, clickElement
+from Framework.utils.SeleniumUtils import SWS
 
 
 logger = get_projectLogger()
@@ -24,11 +24,12 @@ class Screens(Enum):
     STATS = 'statistics'
 
 
-def getTribe(driver):
+def getTribe(sws : SWS):
     """
     Gets the tribe.
 
     Parameters:
+        - sws (SWS): Selenium Web Scraper
         - driver (WebDriver): Used to interact with the webpage.
 
     Returns:
@@ -36,19 +37,19 @@ def getTribe(driver):
     """
     global TRIBE
     if not TRIBE:
-        if isVisible(driver, XPATH.ROMAN_TASK_MASTER):
+        if sws.isVisible(XPATH.ROMAN_TASK_MASTER):
             TRIBE = Tribe.ROMANS
-        elif isVisible(driver, XPATH.TEUTON_TASK_MASTER):
+        elif sws.isVisible(XPATH.TEUTON_TASK_MASTER):
             TRIBE = Tribe.TEUTONS
-        elif isVisible(driver, XPATH.GAUL_TASK_MASTER):
+        elif sws.isVisible(XPATH.GAUL_TASK_MASTER):
             TRIBE = Tribe.GAULS
         else:
             logger.warning('In function getTribe: Could not identify the tribe by task manager')
     if not TRIBE:
-        initialURL = getCurrentUrl(driver)
+        initialURL = sws.getCurrentUrl()
         PROFILE_URL = f'{ACCOUNT.URL}profile.php'
-        if get(driver, PROFILE_URL):
-            text = getElementAttribute(driver, XPATH.PROFILE_TRIBE, 'text')
+        if sws.get(PROFILE_URL):
+            text = sws.getElementAttribute(XPATH.PROFILE_TRIBE, 'text')
             if text:
                 text = text[0].split()[-1].upper()
                 for tr in Tribe:
@@ -57,7 +58,7 @@ def getTribe(driver):
                         break
                 else:
                     logger.error('In function getTribe: Tribe could not be determined')
-                if not get(driver, initialURL):
+                if not sws.get(initialURL):
                     TRIBE = None
                     logger.error('In function getTribe: Could not get back to initial page')
             else:
@@ -67,7 +68,7 @@ def getTribe(driver):
     return TRIBE
 
 
-def get_current_screen(driver):
+def get_current_screen(sws : SWS):
     """
     Tells which of the following screens is active:
       - Overview
@@ -77,31 +78,31 @@ def get_current_screen(driver):
       - None, if you are inside a menu i.e. Constructing a new building.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
 
     Returns:
         - Current screen if operation was successful, None otherwise.
     """
     for view in Screens:
-        if view.value in driver.current_url:
+        if view.value in sws.getCurrentUrl():
             return view
     return None
 
 
-def get_level_up_mode(driver):
+def get_level_up_mode(sws : SWS):
     """
     Checks level up mode status.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
 
     Returns:
         - LevelUpMode if operation was successful, None otherwise.
     """
     status = None
-    currentView = get_current_screen(driver)
+    currentView = get_current_screen(sws)
     if currentView == Screens.OVERVIEW or currentView == Screens.VILLAGE:
-        coneTitle = getElementAttribute(driver, XPATH.LEVEL_UP_CONE, 'title')
+        coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
         if coneTitle:
             coneTitle = coneTitle[0]
             if "enable" in coneTitle:
@@ -118,12 +119,12 @@ def get_level_up_mode(driver):
     return status
 
 
-def set_level_up_mode(driver, levelUpMode):
+def set_level_up_mode(sws : SWS, levelUpMode):
     """
     Sets level up mode.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - levelUpMode (LevelUpMode): Will set level up mode to this.
 
     Returns:
@@ -131,14 +132,14 @@ def set_level_up_mode(driver, levelUpMode):
     """
     status = False
     if isinstance(levelUpMode, LevelUpMode):
-        currentView = get_current_screen(driver)
+        currentView = get_current_screen(sws)
         if currentView == Screens.OVERVIEW or currentView == Screens.VILLAGE:
-            coneTitle = getElementAttribute(driver, XPATH.LEVEL_UP_CONE, 'title')
+            coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
             if coneTitle:
                 coneTitle = coneTitle[0]
                 if (levelUpMode == LevelUpMode.ON and "enable" in coneTitle) or \
                         (levelUpMode == LevelUpMode.OFF and "disable" in coneTitle):
-                    if clickElement(driver, XPATH.LEVEL_UP_CONE, refresh=True):
+                    if sws.clickElement(XPATH.LEVEL_UP_CONE, refresh=True):
                         status = True
                     else:
                         logger.error('In function set_level_up_mode: Failed to click LEVEL_UP_CONE')
@@ -154,12 +155,12 @@ def set_level_up_mode(driver, levelUpMode):
     return status
 
 
-def __move_to_screen(driver, screen, forced=False):
+def __move_to_screen(sws : SWS, screen, forced=False):
     """
     Ensures that the current view is the desired screen.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - screen (Screen): Desired screen.
         - forced (Boolean): If True will refresh the screen even tho
             is the desired one, False by default
@@ -175,8 +176,8 @@ def __move_to_screen(driver, screen, forced=False):
     }
     status = False
     if isinstance(screen, Screens):
-        if screen != get_current_screen(driver) or forced:
-            if get(driver, URLS[screen]):
+        if screen != get_current_screen(sws) or forced:
+            if sws.get(URLS[screen]):
                 status = True
             else:
                 logger.error('In function __move_to_screen: Failed to move to screen')
@@ -187,90 +188,90 @@ def __move_to_screen(driver, screen, forced=False):
     return status
 
 
-def move_to_overview(driver, forced=False):
+def move_to_overview(sws : SWS, forced=False):
     """
     Changes current screen to overview.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - forced (Boolean): If true will refresh the page.
 
     Returns:
         - True if operation is successful, False otherwise.
     """
-    return __move_to_screen(driver, Screens.OVERVIEW, forced)
+    return __move_to_screen(sws, Screens.OVERVIEW, forced)
 
 
-def move_to_village(driver, forced=False):
+def move_to_village(sws : SWS, forced=False):
     """
     Changes current screen to village.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - forced (Boolean): If true will refresh the page.
 
     Returns:
         - True if operation is successful, False otherwise.
     """
-    return __move_to_screen(driver, Screens.VILLAGE, forced)
+    return __move_to_screen(sws, Screens.VILLAGE, forced)
 
 
-def move_to_map(driver, forced=False):
+def move_to_map(sws : SWS, forced=False):
     """
     Changes current screen to map.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - forced (Boolean): If true will refresh the page.
 
     Returns:
         - True if operation is successful, False otherwise.
     """
-    return __move_to_screen(driver, Screens.MAP, forced)
+    return __move_to_screen(sws, Screens.MAP, forced)
 
 
-def move_to_stats(driver, forced=False):
+def move_to_stats(sws : SWS, forced=False):
     """
     Changes current screen to stats.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - forced (Boolean): If true will refresh the page.
 
     Returns:
         - True if operation is successful, False otherwise.
     """
-    return __move_to_screen(driver, Screens.STATS, forced)
+    return __move_to_screen(sws, Screens.STATS, forced)
 
 
-def get_storage(driver):
+def get_storage(sws : SWS):
     """
     Checks for storage for each resource.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
     
     Returns:
         - List of 4 Ints if operation was successful, None otherwise.
     """
     storage = []
-    if isVisible(driver, XPATH.PRODUCTION_LUMBER):
-        lumber = getElementAttribute(driver, XPATH.PRODUCTION_LUMBER, 'text')
+    if sws.isVisible(XPATH.PRODUCTION_LUMBER):
+        lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'text')
         if lumber:
             lumber = lumber[0].split('/')
             storage.append((int(lumber[0]), int(lumber[1])))
-    if isVisible(driver, XPATH.PRODUCTION_CLAY):
-        clay =  getElementAttribute(driver, XPATH.PRODUCTION_CLAY, 'text')
+    if sws.isVisible(XPATH.PRODUCTION_CLAY):
+        clay =  sws.getElementAttribute(XPATH.PRODUCTION_CLAY, 'text')
         if clay:
             clay = clay[0].split('/')
             storage.append((int(clay[0]), int(clay[1])))
-    if isVisible(driver, XPATH.PRODUCTION_IRON):
-        iron = getElementAttribute(driver, XPATH.PRODUCTION_IRON, 'text')
+    if sws.isVisible(XPATH.PRODUCTION_IRON):
+        iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, 'text')
         if iron:
             iron = iron[0].split('/')
             storage.append((int(iron[0]), int(iron[1])))
-    if isVisible(driver, XPATH.PRODUCTION_CROP):
-        crop = getElementAttribute(driver, XPATH.PRODUCTION_CROP, 'text')
+    if sws.isVisible(XPATH.PRODUCTION_CROP):
+        crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, 'text')
         if crop:
             crop = crop[0].split('/')
             storage.append((int(crop[0]), int(crop[1])))
@@ -280,27 +281,27 @@ def get_storage(driver):
     return storage
 
 
-def get_production(driver):
+def get_production(sws : SWS):
     """
     Checks for production for each resource.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
     
     Returns:
         - List of 4 Ints if operation was successful, None otherwise.
     """
     production = []
-    lumber = getElementAttribute(driver, XPATH.PRODUCTION_LUMBER, 'title')
+    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'title')
     if lumber:
         production.append(int(lumber[0]))
-    clay = getElementAttribute(driver, XPATH.PRODUCTION_CLAY, 'title')
+    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, 'title')
     if clay:
         production.append(int(clay[0]))
-    iron = getElementAttribute(driver, XPATH.PRODUCTION_IRON, 'title')
+    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, 'title')
     if iron:
         production.append(int(iron[0]))
-    crop = getElementAttribute(driver, XPATH.PRODUCTION_CROP, 'title')
+    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, 'title')
     if crop:
         production.append(int(crop[0]))
     if len(production) != 4:

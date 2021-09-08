@@ -2,7 +2,7 @@ import re
 import time
 from Framework.utils.Logger import get_projectLogger
 from Framework.utils.Constants import  BuildingType, get_XPATH, get_BUILDINGS, get_building_type_by_name
-from Framework.utils.SeleniumUtils import clickElement, getCurrentUrl, getElementAttribute, isVisible, get, refresh
+from Framework.utils.SeleniumUtils import SWS
 from Framework.screen.Views import move_to_overview, move_to_village
 from Framework.VillageManagement.Utils import FIRST_BUILDING_SITE_VILLAGE, LAST_BUILDING_SITE_VILLAGE, ResourceFields,\
     time_to_seconds, enter_building_menu, check_building_page_title, find_building, find_buildings, get_building_data
@@ -14,27 +14,27 @@ XPATH = get_XPATH()
 
 
 # Utils
-def get_busy_workers_timer(driver):
+def get_busy_workers_timer(sws : SWS):
     """
     Verifies how long untill the workers finish the next building.
     
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
 
     Returns:
         - Int if operation was successful, None otherwise.
     """
     ret = None
-    initialURL = getCurrentUrl(driver)
+    initialURL = sws.getCurrentUrl()
     if initialURL:
-        if move_to_overview(driver):
+        if move_to_overview(sws):
             propList = [XPATH.FINISH_DIALOG, XPATH.INSIDE_TIMER]
-            workingTimer = getElementAttribute(driver, propList, 'text')
+            workingTimer = sws.getElementAttribute(propList, 'text')
             if workingTimer:
                 while re.search('[^0-9]', workingTimer[0]):
-                    workingTimer = getElementAttribute(driver, propList, 'text')
+                    workingTimer = sws.getElementAttribute(propList, 'text')
                     time.sleep(1)
-            if not get(driver, initialURL):
+            if not sws.get(initialURL):
                 logger.error('In function get_busy_workers_timer: Failed to return to initial URL')
             else:
                 if workingTimer:
@@ -48,12 +48,12 @@ def get_busy_workers_timer(driver):
     return ret
 
 
-def get_time_to_build(driver, bdType):
+def get_time_to_build(sws : SWS, bdType):
     """
     Get the necesary time to construct / upgrade a building.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -61,9 +61,9 @@ def get_time_to_build(driver, bdType):
     """
     time_left = None
     if isinstance(bdType, BuildingType):
-        if isVisible(driver, XPATH.BUILDING_PAGE_EMPTY_TITLE):
+        if sws.isVisible(XPATH.BUILDING_PAGE_EMPTY_TITLE):
             propList = [XPATH.CONSTRUCT_BUILDING_NAME % BUILDINGS[bdType].name, XPATH.CONSTRUCT_COSTS]
-            costsTag = getElementAttribute(driver, propList, 'text')
+            costsTag = sws.getElementAttribute(propList, 'text')
             if costsTag:
                 costs = costsTag[0]
                 time_left = time_to_seconds(costs.split('|')[-1])
@@ -71,7 +71,7 @@ def get_time_to_build(driver, bdType):
                 logger.error('In function get_time_to_build: Could not find costs')
         else:
             propList = [XPATH.LEVEL_UP_COSTS]
-            costsTag = getElementAttribute(driver, propList, 'text')
+            costsTag = sws.getElementAttribute(propList, 'text')
             if costsTag:
                 costs = costsTag[0]
                 time_left = time_to_seconds(costs.split('|')[-1].split()[0])
@@ -82,12 +82,12 @@ def get_time_to_build(driver, bdType):
     return time_left
 
 
-def press_upgrade_button(driver, bdType, waitToFinish=False):
+def press_upgrade_button(sws : SWS, bdType, waitToFinish=False):
     """
     Press level up building / construct building.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
         - waitToFinish (Boolean): If True, will wait for building to finish construct,
             False by default.
@@ -97,16 +97,16 @@ def press_upgrade_button(driver, bdType, waitToFinish=False):
     """
     status = False
     if isinstance(bdType, BuildingType):
-        if isVisible(driver, XPATH.BUILDING_PAGE_EMPTY_TITLE):
+        if sws.isVisible(XPATH.BUILDING_PAGE_EMPTY_TITLE):
             propList = [XPATH.CONSTRUCT_BUILDING_NAME % BUILDINGS[bdType].name, XPATH.CONSTRUCT_BUILDING_ID]
         else:
             propList = [XPATH.LEVEL_UP_BUILDING_BTN]
-        initialURL = getCurrentUrl(driver)
+        initialURL = sws.getCurrentUrl()
         if initialURL:
-            time_to_build = max(1, get_time_to_build(driver, bdType))
-            if clickElement(driver, propList, refresh=True):
+            time_to_build = max(1, get_time_to_build(sws, bdType))
+            if sws.clickElement(propList, refresh=True):
                 if waitToFinish:
-                    if get(driver, initialURL):
+                    if sws.get(initialURL):
                         logger.info('In function press_upgrade_button: Sleep for %d seconds' % time_to_build)
                         time.sleep(time_to_build)
                     else:
@@ -121,26 +121,26 @@ def press_upgrade_button(driver, bdType, waitToFinish=False):
     return status
 
 
-def select_and_demolish_building(driver, index):
+def select_and_demolish_building(sws : SWS, index):
     """
     On main building`s screen selects and demolishes one building.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - index (Int): Denotes index of building site.
 
     Returns:
         - True if the operation is successful, False otherwise.    
     """
     status = False
-    if check_building_page_title(driver, BuildingType.MainBuilding):
-        option = clickElement(driver, XPATH.DEMOLITION_BUILDING_OPTION % (str(index) + '.'))
+    if check_building_page_title(sws, BuildingType.MainBuilding):
+        option = sws.clickElement(XPATH.DEMOLITION_BUILDING_OPTION % (str(index) + '.'))
         if option:
-            if clickElement(driver, XPATH.DEMOLITION_BTN, refresh=True):
+            if sws.clickElement(XPATH.DEMOLITION_BTN, refresh=True):
                 propList = [XPATH.FINISH_DIALOG, XPATH.INSIDE_TIMER]
-                demolitionTimer = getElementAttribute(driver, propList, 'text')
+                demolitionTimer = sws.getElementAttribute(propList, 'text')
                 while demolitionTimer:
-                    demolitionTimer = getElementAttribute(driver, propList, 'text')
+                    demolitionTimer = sws.getElementAttribute(propList, 'text')
                     if demolitionTimer:
                         dmTime = max(1, time_to_seconds(demolitionTimer[0]))
                         time.sleep(dmTime)
@@ -156,12 +156,12 @@ def select_and_demolish_building(driver, index):
 
 
 # Checks
-def check_requirements(driver, bdType, forced=False):
+def check_requirements(sws : SWS, bdType, forced=False):
     """
     Verifies whether the requirements are fulfilled for building.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
         - forced (Boolean): If True bypass any inconvenience, False by default.
 
@@ -172,24 +172,24 @@ def check_requirements(driver, bdType, forced=False):
     if isinstance(bdType, BuildingType):
         requirements = BUILDINGS[bdType].requirements
         for reqBd, reqLevel in requirements:
-            reqBdList = get_building_data(driver, reqBd)
+            reqBdList = get_building_data(sws, reqBd)
             if not reqBdList:  # Construct
                 if forced:
-                    if not construct_building(driver, reqBd, forced=True, waitToFinish=True):
+                    if not construct_building(sws, reqBd, forced=True, waitToFinish=True):
                         logger.error(f'In function check_requirements: Failed to construct {reqBd}')
                         break
                 else:
                     logger.warning(f'In function check_requirements: {reqBd} not found')
                     break
-            reqBdList = get_building_data(driver, reqBd)
+            reqBdList = get_building_data(sws, reqBd)
             # Check level
             if reqBdList[-1][1] < reqLevel:  # Upgrade is required
                 if forced:
                     while reqBdList[-1][1] < reqLevel:
-                        if not level_up_building_at(driver, reqBdList[-1][0], forced=True, waitToFinish=True):
+                        if not level_up_building_at(sws, reqBdList[-1][0], forced=True, waitToFinish=True):
                             logger.error(f'In function check_requirements: Failed to level up {reqBd}')
                             break
-                        reqBdList = get_building_data(driver, reqBd)
+                        reqBdList = get_building_data(sws, reqBd)
                 else:
                     logger.warning(f'In function check_requirements: {reqBd} level is too low')
                     break
@@ -200,12 +200,12 @@ def check_requirements(driver, bdType, forced=False):
     return status
 
 
-def check_storage(driver, bdType, storageType, forced=False):
+def check_storage(sws : SWS, bdType, storageType, forced=False):
     """
     Checks if storage suffice.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
         - storageType (BuildingType): BuildingType.Warehouse or BuildingType.Granary.
         - forced (Boolean): If True bypass any inconvenience, False by default.
@@ -218,22 +218,22 @@ def check_storage(driver, bdType, storageType, forced=False):
         if storageType == BuildingType.Warehouse or storageType == BuildingType.Granary:
             storageXPATH = (XPATH.BUILDING_ERR_WH if storageType == BuildingType.Warehouse else XPATH.BUILDING_ERR_GR)
             propList = []
-            if isVisible(driver, XPATH.BUILDING_PAGE_EMPTY_TITLE):
+            if sws.isVisible(XPATH.BUILDING_PAGE_EMPTY_TITLE):
                 propList.append(XPATH.CONSTRUCT_BUILDING_NAME % BUILDINGS[bdType].name)
             propList.append(storageXPATH)
-            if isVisible(driver, propList):
+            if sws.isVisible(propList):
                 if forced:
-                    storageList = get_building_data(driver, storageType)
+                    storageList = get_building_data(sws, storageType)
                     if not storageList:
-                        if not construct_building(driver, storageType, forced=True, waitToFinish=True):
+                        if not construct_building(sws, storageType, forced=True, waitToFinish=True):
                             logger.error(f'In function check_storage: Failed to construct {storageType}')
                         else:  # Recheck storage
-                            status = check_storage(driver, bdType, storageType, forced=True)
+                            status = check_storage(sws, bdType, storageType, forced=True)
                     else:
-                        if not level_up_building_at(driver, storageList[-1][0], forced=True, waitToFinish=True):
+                        if not level_up_building_at(sws, storageList[-1][0], forced=True, waitToFinish=True):
                             logger.error(f'In function check_storage: Failed to level up {storageType}')
                         else:  # Recheck storage
-                            status = check_storage(driver, bdType, storageType, forced=True)
+                            status = check_storage(sws, bdType, storageType, forced=True)
                 else:
                     logger.warning(f'In function check_storage: {storageType} not big enough')
             else:
@@ -245,12 +245,12 @@ def check_storage(driver, bdType, storageType, forced=False):
     return status
 
 
-def check_resources(driver, bdType, forced=False):
+def check_resources(sws : SWS, bdType, forced=False):
     """
     Checks if resources suffice.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
         - forced (Boolean): If True bypass any inconvenience, False by default.
 
@@ -260,17 +260,17 @@ def check_resources(driver, bdType, forced=False):
     status = False
     if isinstance(bdType, BuildingType):
         propList = []
-        if isVisible(driver, XPATH.BUILDING_PAGE_EMPTY_TITLE):
+        if sws.isVisible(XPATH.BUILDING_PAGE_EMPTY_TITLE):
             propList.append(XPATH.CONSTRUCT_BUILDING_NAME % BUILDINGS[bdType].name)
         propList.append(XPATH.BUILDING_ERR_RESOURCES)
         propList.append(XPATH.INSIDE_TIMER)
-        requirementTimer = getElementAttribute(driver, propList, 'text')
+        requirementTimer = sws.getElementAttribute(propList, 'text')
         if requirementTimer:
             time_left = time_to_seconds(requirementTimer[0])
             if forced:
                 time.sleep(time_left)
-                if refresh(driver):
-                    status = check_resources(driver, bdType, forced=True)
+                if sws.refresh():
+                    status = check_resources(sws, bdType, forced=True)
                 else:
                     logger.error('In function check_resources: Failed to refresh page')
             else:
@@ -282,12 +282,12 @@ def check_resources(driver, bdType, forced=False):
     return status
 
 
-def check_busy_workers(driver, bdType, forced=False):
+def check_busy_workers(sws : SWS, bdType, forced=False):
     """
     Checks if workers are not busy.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
         - forced (Boolean): If True bypass any inconvenience, False by default.
 
@@ -296,12 +296,12 @@ def check_busy_workers(driver, bdType, forced=False):
     """
     status = False
     if isinstance(bdType, BuildingType):
-        if isVisible(driver, XPATH.BUILDING_ERR_BUSY_WORKERS):
+        if sws.isVisible(XPATH.BUILDING_ERR_BUSY_WORKERS):
             if forced:
-                time_left = get_busy_workers_timer(driver)
+                time_left = get_busy_workers_timer(sws)
                 time.sleep(time_left)
-                if refresh(driver):
-                    status = check_busy_workers(driver, bdType, forced=True)
+                if sws.refresh():
+                    status = check_busy_workers(sws, bdType, forced=True)
                 else:
                     logger.error('In function check_busy_workers: Failed to refresh page')
             else:
@@ -313,12 +313,12 @@ def check_busy_workers(driver, bdType, forced=False):
     return status
 
 
-def check_not_max_level(driver, bdType):
+def check_not_max_level(sws : SWS, bdType):
     """
     Checks if a building is below its max level.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -326,7 +326,7 @@ def check_not_max_level(driver, bdType):
     """
     status = False
     if isinstance(bdType, BuildingType):
-        if isVisible(driver, XPATH.BUILDING_ERR_MAX_LVL):
+        if sws.isVisible(XPATH.BUILDING_ERR_MAX_LVL):
             logger.info(f'In function check_not_max_level: {bdType} is at max level')
         else:
             status = True
@@ -336,12 +336,12 @@ def check_not_max_level(driver, bdType):
 
 
 # Methods
-def construct_building(driver, bdType, forced=False, waitToFinish=False):
+def construct_building(sws : SWS, bdType, forced=False, waitToFinish=False):
     """
     Constructs a new building.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
         - forced (Boolean): If True bypass any inconvenience, False by default.
         - waitToFinish (Boolean): If True, will wait for building to finish construct,
@@ -357,25 +357,25 @@ def construct_building(driver, bdType, forced=False, waitToFinish=False):
             status = True  # Resource fields are already constructed
             logger.info(f'In function construct_building: {BUILDINGS[bdType].name} is in resource fields')
         else:
-            if move_to_village(driver):
-                if check_requirements(driver, bdType, forced):
+            if move_to_village(sws):
+                if check_requirements(sws, bdType, forced):
                     # Check for empty place
-                    toBuildSite = find_building(driver, BuildingType.EmptyPlace)
+                    toBuildSite = find_building(sws, BuildingType.EmptyPlace)
                     if bdType is BuildingType.RallyPoint or bdType is bdType.Wall:
-                        buildings = get_building_data(driver, bdType)
+                        buildings = get_building_data(sws, bdType)
                         if buildings:
                             status = True  # Already built
                         else:
-                            toBuildSite = find_building(driver, bdType)
+                            toBuildSite = find_building(sws, bdType)
                     if not status:
                         if toBuildSite:
-                            if enter_building_menu(driver, toBuildSite):
-                                if check_storage(driver, bdType, BuildingType.Warehouse, forced) and \
-                                        check_storage(driver, bdType, BuildingType.Granary, forced) and \
-                                        check_resources(driver, bdType, forced) and \
-                                        check_busy_workers(driver, bdType, forced):
+                            if enter_building_menu(sws, toBuildSite):
+                                if check_storage(sws, bdType, BuildingType.Warehouse, forced) and \
+                                        check_storage(sws, bdType, BuildingType.Granary, forced) and \
+                                        check_resources(sws, bdType, forced) and \
+                                        check_busy_workers(sws, bdType, forced):
                                     # Upgrade
-                                    if press_upgrade_button(driver, bdType, waitToFinish=waitToFinish):
+                                    if press_upgrade_button(sws, bdType, waitToFinish=waitToFinish):
                                         logger.success('Success building %s' % BUILDINGS[bdType].name)
                                         status = True
                                     else:
@@ -398,12 +398,12 @@ def construct_building(driver, bdType, forced=False, waitToFinish=False):
     return status
 
 
-def level_up_building_at(driver, index, forced=False, waitToFinish=False):
+def level_up_building_at(sws, index, forced=False, waitToFinish=False):
     """
     Levels up a building existing at given index.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - index (Int): Denotes index of building site.
         - forced (Boolean): If True bypass any inconvenience, False by default.
         - waitToFinish (Boolean): If True, will wait for building to finish construct,
@@ -415,11 +415,11 @@ def level_up_building_at(driver, index, forced=False, waitToFinish=False):
     status = False
     if index > 0 and index <= LAST_BUILDING_SITE_VILLAGE:
         if index < FIRST_BUILDING_SITE_VILLAGE:
-            moveStatus = move_to_overview(driver)
+            moveStatus = move_to_overview(sws)
         else:
-            moveStatus = move_to_village(driver)
+            moveStatus = move_to_village(sws)
         if moveStatus:
-            buildingSiteElemText = getElementAttribute(driver, XPATH.BUILDING_SITE_ID % index, 'alt')
+            buildingSiteElemText = sws.getElementAttribute(XPATH.BUILDING_SITE_ID % index, 'alt')
             bdType = None
             if buildingSiteElemText:
                 buildingSiteRe = re.search('(.*) level', buildingSiteElemText[0])
@@ -432,15 +432,15 @@ def level_up_building_at(driver, index, forced=False, waitToFinish=False):
                 logger.error(f'In function level_up_building_at: Element not found')
             if bdType:
                 logger.info('Attempting to construct %s' % BUILDINGS[bdType].name)
-                if enter_building_menu(driver, index):
-                    if not check_building_page_title(driver, BuildingType.EmptyPlace):
-                        if check_not_max_level(driver, bdType) and \
-                                check_storage(driver, bdType, BuildingType.Warehouse, forced) and \
-                                check_storage(driver, bdType, BuildingType.Granary, forced) and \
-                                check_resources(driver, bdType, forced) and \
-                                check_busy_workers(driver, bdType, forced):
+                if enter_building_menu(sws, index):
+                    if not check_building_page_title(sws, BuildingType.EmptyPlace):
+                        if check_not_max_level(sws, bdType) and \
+                                check_storage(sws, bdType, BuildingType.Warehouse, forced) and \
+                                check_storage(sws, bdType, BuildingType.Granary, forced) and \
+                                check_resources(sws, bdType, forced) and \
+                                check_busy_workers(sws, bdType, forced):
                             # Upgrade
-                            if press_upgrade_button(driver, bdType, waitToFinish=waitToFinish):
+                            if press_upgrade_button(sws, bdType, waitToFinish=waitToFinish):
                                 logger.success('Success leveling up %s' % BUILDINGS[bdType].name)
                                 status = True
                             else:
@@ -458,12 +458,12 @@ def level_up_building_at(driver, index, forced=False, waitToFinish=False):
     return status
 
 
-def demolish_building_at(driver, index):
+def demolish_building_at(sws : SWS, index):
     """
     Reduces level of building at index to 0.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - index (Int or List of Int): Denotes index(indexes) of building site(s).
 
     Returns:
@@ -475,15 +475,15 @@ def demolish_building_at(driver, index):
         wrapper = index
     else:
         wrapper = [index]
-    mainBuildingIndex = find_building(driver, BuildingType.MainBuilding)
+    mainBuildingIndex = find_building(sws, BuildingType.MainBuilding)
     if mainBuildingIndex:
-        if enter_building_menu(driver, mainBuildingIndex) and \
-                check_building_page_title(driver, BuildingType.MainBuilding):
+        if enter_building_menu(sws, mainBuildingIndex) and \
+                check_building_page_title(sws, BuildingType.MainBuilding):
             for index in wrapper:
                 if index >= FIRST_BUILDING_SITE_VILLAGE and index < LAST_BUILDING_SITE_VILLAGE:
                     if mainBuildingIndex == index:
                         continue
-                    if not select_and_demolish_building(driver, index):
+                    if not select_and_demolish_building(sws, index):
                         logger.error(f'In function demolish_building: Failed to select/demolish')
                         break
                 else:
@@ -495,7 +495,7 @@ def demolish_building_at(driver, index):
             logger.error('In function demolish_building: Failed to enter main building')
     else:
         logger.warning('In function demolish_building: Main building not found')
-    if not move_to_village(driver):
+    if not move_to_village(sws):
         logger.error('In function demolish_building: Failed to move to village')
     else:
         print('Moved to village')

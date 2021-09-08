@@ -1,9 +1,9 @@
 from Framework.utils.Constants import BuildingType
 from Framework.VillageManagement.Utils import enter_building_menu, find_building
-from Framework.utils.Logger import ProjectLogger
+from Framework.utils.Logger import get_projectLogger
 
 
-logger = ProjectLogger()
+logger = get_projectLogger()
 
 
 # Entering functions

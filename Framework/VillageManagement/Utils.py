@@ -1,7 +1,7 @@
 import re
 from Framework.utils.Logger import get_projectLogger
 from Framework.utils.Constants import BuildingType, get_BUILDINGS, get_XPATH
-from Framework.utils.SeleniumUtils import get, getElementsAttribute, getCurrentUrl, isVisible
+from Framework.utils.SeleniumUtils import SWS
 from Framework.screen.Views import move_to_overview, move_to_village
 
 
@@ -22,12 +22,12 @@ FIRST_BUILDING_SITE_VILLAGE = 19
 LAST_BUILDING_SITE_VILLAGE = 40
 
 
-def find_buildings(driver, bdType):
+def find_buildings(sws : SWS, bdType):
     """
     Finds all building sites ids for requested type.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -36,12 +36,12 @@ def find_buildings(driver, bdType):
     ret = None
     if isinstance(bdType, BuildingType):
         if bdType in ResourceFields:
-            moveStatus = move_to_overview(driver)
+            moveStatus = move_to_overview(sws)
         else:
-            moveStatus = move_to_village(driver)
+            moveStatus = move_to_village(sws)
         if moveStatus:
             lst = []
-            elems = getElementsAttribute(driver, XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, 'href')
+            elems = sws.getElementsAttribute(XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, 'href')
             for elem in elems:
                 siteIndexText = re.search('id=[0-9]+', elem[0])
                 if siteIndexText:
@@ -60,19 +60,19 @@ def find_buildings(driver, bdType):
     return ret
 
 
-def find_building(driver, bdType):
+def find_building(sws : SWS, bdType):
     """
     Finds the highest level building with requested type.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
         - List of Ints if operation is successful, None otherwise.
     """
     ret = None
-    retList = find_buildings(driver, bdType)
+    retList = find_buildings(sws, bdType)
     if retList:
         ret = retList[0]
     else:
@@ -80,12 +80,12 @@ def find_building(driver, bdType):
     return ret
 
 
-def get_building_data(driver, bdType):
+def get_building_data(sws : SWS, bdType):
     """
     Finds building site id and level for requested buildin type ordered by level.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -94,13 +94,13 @@ def get_building_data(driver, bdType):
     ret = None
     if isinstance(bdType, BuildingType):
         if bdType in ResourceFields:
-            moveStatus = move_to_overview(driver)
+            moveStatus = move_to_overview(sws)
         else:
-            moveStatus = move_to_village(driver)
+            moveStatus = move_to_village(sws)
         if moveStatus:
             lst = []
             attributes = ['href', 'alt']
-            elems = getElementsAttribute(driver, XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, attributes)
+            elems = sws.getElementsAttribute(XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, attributes)
             for elem in elems:
                 elemId = None
                 siteIndexText = re.search('id=[0-9]+', elem[0])
@@ -129,12 +129,12 @@ def get_building_data(driver, bdType):
     return ret
 
 
-def enter_building_menu(driver, index):
+def enter_building_menu(sws : SWS, index):
     """
     Enters a building menu.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - index (Int): Denotes building site index.
 
     Returns:
@@ -143,15 +143,15 @@ def enter_building_menu(driver, index):
     status = False
     if index > 0 and index <= LAST_BUILDING_SITE_VILLAGE:
         if index > 0 and index < FIRST_BUILDING_SITE_VILLAGE:
-            moveStatus = move_to_overview(driver)
+            moveStatus = move_to_overview(sws)
         else:
-            moveStatus = move_to_village(driver)
+            moveStatus = move_to_village(sws)
         if moveStatus:
-            initialURL = getCurrentUrl(driver)
+            initialURL = sws.getCurrentUrl()
             if initialURL:
                 if initialURL.startswith(HTTP_STRING):
                     newURL = HTTP_STRING + initialURL[len(HTTP_STRING):].split('/', 1)[0] + BUILDING_SITE_PATTERN % index
-                    if get(driver, newURL):
+                    if sws.get(newURL):
                         status = True
                     else:
                         logger.error(f'In function enter_building_menu: Failed to load {newURL}')
@@ -166,12 +166,12 @@ def enter_building_menu(driver, index):
     return status
 
 
-def check_building_page_title(driver, bdType):
+def check_building_page_title(sws : SWS, bdType):
     """
     Checks if page title correspons to the building.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -180,17 +180,17 @@ def check_building_page_title(driver, bdType):
     status = False
     if isinstance(bdType, BuildingType):
         if bdType == BuildingType.EmptyPlace:
-            if isVisible(driver, XPATH.BUILDING_PAGE_EMPTY_TITLE):
+            if sws.isVisible(XPATH.BUILDING_PAGE_EMPTY_TITLE):
                 status = True
             else:
                 logger.info(f'In function check_building_page_title: Page does not correspond'
-                    f'to building {getCurrentUrl(driver)} and {BUILDINGS[bdType].name}')
+                    f'to building {sws.getCurrentUrl()} and {BUILDINGS[bdType].name}')
         else:
-            if isVisible(driver, XPATH.BUILDING_PAGE_TITLE % BUILDINGS[bdType].name):
+            if sws.isVisible(XPATH.BUILDING_PAGE_TITLE % BUILDINGS[bdType].name):
                 status = True
             else:
                 logger.info('In function check_building_page_title: Page does not correspond'
-                    f'to building {getCurrentUrl(driver)} and {BUILDINGS[bdType].name}')
+                    f'to building {sws.getCurrentUrl()} and {BUILDINGS[bdType].name}')
     else:
         logger.error('In function check_building_page_title: Invalid parameter bdType')
     return status

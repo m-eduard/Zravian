@@ -1,8 +1,7 @@
 from Framework.utils.Logger import get_projectLogger
 from contextlib import contextmanager
-from selenium import webdriver
-from Framework.utils.Constants import CHROME_DRIVER_PATH, get_ACCOUNT, get_XPATH
-from Framework.utils.SeleniumUtils import get, sendKeys, clickElement
+from Framework.utils.Constants import get_ACCOUNT, get_XPATH
+from Framework.utils.SeleniumUtils import SWS
 
 
 logger = get_projectLogger()
@@ -21,24 +20,14 @@ def login(travianURL=ACCOUNT.URL, headless=False, user=ACCOUNT.NAME, password=AC
         - user (String): User used to login, taken from account json by default.
         - password (String): Password used to login, taken from account json by default.
     """
-    options = webdriver.ChromeOptions()
-    if headless:  # Set headless = False in order to see the browser
-        options.add_argument("--headless")
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-gpu')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('start-maximized')
-    options.add_argument('disable-infobars')
-    options.add_argument("--disable-extensions")
-    options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    driver = webdriver.Chrome(chrome_options=options, executable_path=CHROME_DRIVER_PATH)
-    if get(driver, travianURL):
-        if sendKeys(driver, XPATH.LOGIN_USER_INPUT, user):
-            if sendKeys(driver, XPATH.LOGIN_PASS_INPUT, password):
-                if clickElement(driver, XPATH.LOGIN_SUBMIT_BTN, refresh=True):
+    sws = SWS(headless)
+    if sws.get(travianURL):
+        if sws.sendKeys(XPATH.LOGIN_USER_INPUT, user):
+            if sws.sendKeys(XPATH.LOGIN_PASS_INPUT, password):
+                if sws.clickElement(XPATH.LOGIN_SUBMIT_BTN, refresh=True):
                     initString = '<' + 25 * '-' + 'STARTED NEW SESSION' + 25 * '-' + '>'
                     logger.info(initString)
-                    yield driver
+                    yield sws
                 else:
                     logger.error('In function login: Failed to click LOGIN_SUBMIT_BTN!')
             else:
@@ -47,4 +36,4 @@ def login(travianURL=ACCOUNT.URL, headless=False, user=ACCOUNT.NAME, password=AC
             logger.error('In function login: Failed to type text in LOGIN_USER_INPUT!')
     else:
         logger.error('In function login: Failed to load {travianURL}!')
-    driver.close()
+    sws.close()
