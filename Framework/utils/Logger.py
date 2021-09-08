@@ -19,15 +19,14 @@ class ProjectLogger:
     def __init__(self):
         self.debugMode = False
 
-    def set_debugMode(self, status):
+    def set_debugMode(self, status : bool):
         """
         Sets debug mode to True or False.
 
         Parameters:
             - status (Boolean): Value to set debugMode to.
         """
-        if isinstance(status, bool):
-            self.debugMode = status
+        self.debugMode = status
 
     def success(self, text : str):
         """
