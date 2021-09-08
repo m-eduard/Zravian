@@ -7,7 +7,7 @@ from Framework.screen.Login import login
 
 if __name__ == "__main__":
     troop = TroopType.Imperian
-    with login(headless=True) as driver:
-        if enter_academy(driver):
-            research(driver, troop)
+    with login(headless=True) as sws:
+        if enter_academy(sws):
+            research(sws, troop)
 

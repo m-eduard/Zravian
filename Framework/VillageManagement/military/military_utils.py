@@ -1,3 +1,4 @@
+from Framework.utils.SeleniumUtils import SWS
 from Framework.utils.Constants import BuildingType
 from Framework.VillageManagement.Utils import enter_building_menu, find_building
 from Framework.utils.Logger import get_projectLogger
@@ -7,20 +8,20 @@ logger = get_projectLogger()
 
 
 # Entering functions
-def enter_academy(driver):
+def enter_academy(sws : SWS):
     """
     Enters Academy.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
 
     Returns:
         - True if operation was successful, False otherwise.    
     """
     status = False
-    academyId = find_building(driver, BuildingType.Academy)
+    academyId = find_building(sws, BuildingType.Academy)
     if academyId:
-        if enter_building_menu(driver, academyId):
+        if enter_building_menu(sws, academyId):
             status = True
         else:
             logger.error('In function enter_academy: Failed to enter building')
@@ -29,20 +30,20 @@ def enter_academy(driver):
     return status
 
 
-def enter_barracks(driver):
+def enter_barracks(sws : SWS):
     """
     Enters Barracks.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
 
     Returns:
         - True if operation was successful, False otherwise.    
     """
     status = False
-    barracksId = find_building(driver, BuildingType.Barracks)
+    barracksId = find_building(sws, BuildingType.Barracks)
     if barracksId:
-        if enter_building_menu(driver, barracksId):
+        if enter_building_menu(sws, barracksId):
             status = True
         else:
             logger.error('In function enter_barracks: Failed to enter building')
@@ -51,20 +52,20 @@ def enter_barracks(driver):
     return status
 
 
-def enter_stable(driver):
+def enter_stable(sws : SWS):
     """
     Enters Stable.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
 
     Returns:
         - True if operation was successful, False otherwise.    
     """
     status = False
-    stableId = find_building(driver, BuildingType.Stable)
+    stableId = find_building(sws, BuildingType.Stable)
     if stableId:
-        if enter_building_menu(driver, stableId):
+        if enter_building_menu(sws, stableId):
             status = True
         else:
             logger.error('In function enter_stable: Failed to enter building')
@@ -73,20 +74,20 @@ def enter_stable(driver):
     return status
 
 
-def enter_siegeworkshop(driver):
+def enter_siegeworkshop(sws : SWS):
     """
     Enters SiegeWorkshop.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
 
     Returns:
         - True if operation was successful, False otherwise.    
     """
     status = False
-    siegeworkshopId = find_building(driver, BuildingType.SiegeWorkshop)
+    siegeworkshopId = find_building(sws, BuildingType.SiegeWorkshop)
     if siegeworkshopId:
-        if enter_building_menu(driver, siegeworkshopId):
+        if enter_building_menu(sws, siegeworkshopId):
             status = True
         else:
             logger.error('In function enter_siegeworkshop: Failed to enter building')
@@ -95,20 +96,20 @@ def enter_siegeworkshop(driver):
     return status
 
 
-def enter_blacksmith(driver):
+def enter_blacksmith(sws : SWS):
     """
     Enters Blacksmith.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
 
     Returns:
         - True if operation was successful, False otherwise.    
     """
     status = False
-    blacksmithId = find_building(driver, BuildingType.Blacksmith)
+    blacksmithId = find_building(sws, BuildingType.Blacksmith)
     if blacksmithId:
-        if enter_building_menu(driver, blacksmithId):
+        if enter_building_menu(sws, blacksmithId):
             status = True
         else:
             logger.error('In function enter_blacksmith: Failed to enter building')
@@ -117,20 +118,20 @@ def enter_blacksmith(driver):
     return status
 
 
-def enter_armoury(driver):
+def enter_armoury(sws : SWS):
     """
     Enters Armoury.
 
     Parameters:
-        - driver (WebDriver): Used to interact with the webpage.
+        - sws (SWS): Selenium Web Scraper
 
     Returns:
         - True if operation was successful, False otherwise.    
     """
     status = False
-    armouryId = find_building(driver, BuildingType.Armoury)
+    armouryId = find_building(sws, BuildingType.Armoury)
     if armouryId:
-        if enter_building_menu(driver, armouryId):
+        if enter_building_menu(sws, armouryId):
             status = True
         else:
             logger.error('In function enter_armoury: Failed to enter building')

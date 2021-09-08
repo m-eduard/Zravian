@@ -29,7 +29,6 @@ class Region(Enum):
 
 class CreateZravianAccount:
     def __init__(self, headless):
-        # Webdriver
         self.sws = SWS(headless)
 
     def close(self):

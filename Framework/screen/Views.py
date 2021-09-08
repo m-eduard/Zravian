@@ -30,7 +30,6 @@ def getTribe(sws : SWS):
 
     Parameters:
         - sws (SWS): Selenium Web Scraper
-        - driver (WebDriver): Used to interact with the webpage.
 
     Returns:
         - Tribe if operation was successful, None otherwise.
