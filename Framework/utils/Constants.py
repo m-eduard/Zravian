@@ -52,6 +52,13 @@ class Account:
                 break
 
 
+class Server(Enum):
+    NONSTOP = 'https://nonstop.zravian.com/'
+    S1 = 'https://s1.zravian.com/'
+    S5 = 'https://s5.zravian.com/'
+    S10k = 'https://10k.zravian.com/'
+
+
 # Class to store all XPATH constants
 class XPATHCollection(dict):
     __getattr__ = dict.__getitem__
