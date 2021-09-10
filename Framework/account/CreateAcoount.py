@@ -257,9 +257,9 @@ class CreateZravianAccount:
                     if not self.store_new_account(username, UNDEFINED, server):
                         logger.error('In complete_registration_form: Failed to store account with unknown password')
                     else:
-                        logger.info('In complete_registration_form: Added unknown account')
+                        logger.warning('In complete_registration_form: Added unknown account')
                 elif err_code == RegistrationErrors.ERR_SHORT_PASS:
-                    logger.info('In complete_registration_form: Password too short')
+                    logger.warning('In complete_registration_form: Password too short')
                 else:
                     logger.error('In complete_registration_form: Unknown registration error')
             else:
@@ -362,12 +362,12 @@ class CreateZravianAccount:
                     logger.warning('In register: Failed to activate the new account')
                     if self.register_retrials > 0 and genericAccount:
                         self.register_retrials -= 1
-                        logger.info('In register: Retrying...')
+                        logger.warning('In register: Retrying...')
                         status = self.register(username, password, server, tribe, region)
                     elif self.register_retrials == 0:
                         logger.error('In register: 3 fails when retrying to activate account')
                     else:
-                        logger.info(f'In register: Could not retry register for {username} and {password}')
+                        logger.warning(f'In register: Could not retry register for {username} and {password}')
             else:
                 logger.warning('In register: Failed to complete the registration form')
         else:

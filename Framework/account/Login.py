@@ -50,7 +50,7 @@ def login(server : Server, username : str, headless=False, password=UNDEFINED):
             if sws.sendKeys(XPATH.LOGIN_PASS_INPUT, password):
                 if sws.clickElement(XPATH.LOGIN_SUBMIT_BTN, refresh=True):
                     initString = '<' + 25 * '-' + 'STARTED NEW SESSION' + 25 * '-' + '>'
-                    logger.info(initString)
+                    logger.success(initString)
                     yield sws
                 else:
                     logger.error('In login: Failed to click LOGIN_SUBMIT_BTN!')

@@ -102,7 +102,7 @@ def append_account(newAccount : dict, server : Server):
     if decodedJson:
         for acc in decodedJson[server.value]:
             if acc[JSON_USERNAME_KEY] == newAccount[JSON_USERNAME_KEY]:
-                logger.info('In append_account: Account already exists')
+                logger.warning('In append_account: Account already exists')
                 ret = True
                 break
         else:
