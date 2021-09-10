@@ -155,7 +155,7 @@ def __move_to_screen(sws : SWS, screen : Screens, forced : bool = False):
     Parameters:
         - sws (SWS): Selenium Web Scraper
         - screen (Screen): Desired screen.
-        - forced (Boolean): If True will refresh the screen even tho
+        - forced (bool): If True will refresh the screen even tho
             is the desired one, False by default
 
     Returns:
@@ -185,7 +185,7 @@ def move_to_overview(sws : SWS, forced : bool = False):
 
     Parameters:
         - sws (SWS): Selenium Web Scraper
-        - forced (Boolean): If true will refresh the page.
+        - forced (bool): If true will refresh the page.
 
     Returns:
         - True if operation is successful, False otherwise.
@@ -199,7 +199,7 @@ def move_to_village(sws : SWS, forced : bool = False):
 
     Parameters:
         - sws (SWS): Selenium Web Scraper
-        - forced (Boolean): If true will refresh the page.
+        - forced (bool): If true will refresh the page.
 
     Returns:
         - True if operation is successful, False otherwise.
@@ -213,7 +213,7 @@ def move_to_map(sws : SWS, forced : bool = False):
 
     Parameters:
         - sws (SWS): Selenium Web Scraper
-        - forced (Boolean): If true will refresh the page.
+        - forced (bool): If true will refresh the page.
 
     Returns:
         - True if operation is successful, False otherwise.
@@ -227,7 +227,7 @@ def move_to_stats(sws : SWS, forced : bool = False):
 
     Parameters:
         - sws (SWS): Selenium Web Scraper
-        - forced (Boolean): If true will refresh the page.
+        - forced (bool): If true will refresh the page.
 
     Returns:
         - True if operation is successful, False otherwise.

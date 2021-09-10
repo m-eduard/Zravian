@@ -86,7 +86,7 @@ def press_upgrade_button(sws : SWS, bdType : BuildingType, waitToFinish : bool =
     Parameters:
         - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
-        - waitToFinish (Boolean): If True, will wait for building to finish construct,
+        - waitToFinish (bool): If True, will wait for building to finish construct,
             False by default.
 
     Returns:
@@ -157,7 +157,7 @@ def check_requirements(sws : SWS, bdType : BuildingType, forced : bool = False):
     Parameters:
         - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
-        - forced (Boolean): If True bypass any inconvenience, False by default.
+        - forced (bool): If True bypass any inconvenience, False by default.
 
     Returns:
         - True if the operation is successful, False otherwise.
@@ -199,7 +199,7 @@ def check_storage(sws : SWS, bdType : BuildingType, storageType : BuildingType, 
         - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
         - storageType (BuildingType): BuildingType.Warehouse or BuildingType.Granary.
-        - forced (Boolean): If True bypass any inconvenience, False by default.
+        - forced (bool): If True bypass any inconvenience, False by default.
 
     Returns:
         - True if the requirement is fullfiled, False otherwise.
@@ -240,7 +240,7 @@ def check_resources(sws : SWS, bdType : BuildingType, forced : bool = False):
     Parameters:
         - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
-        - forced (Boolean): If True bypass any inconvenience, False by default.
+        - forced (bool): If True bypass any inconvenience, False by default.
 
     Returns:
         - True if the requirement is fullfiled, False otherwise.
@@ -274,7 +274,7 @@ def check_busy_workers(sws : SWS, bdType : BuildingType, forced : bool = False):
     Parameters:
         - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
-        - forced (Boolean): If True bypass any inconvenience, False by default.
+        - forced (bool): If True bypass any inconvenience, False by default.
 
     Returns:
         - True if the requirement is fullfiled, False otherwise.
@@ -322,8 +322,8 @@ def construct_building(sws : SWS, bdType : BuildingType, forced : bool = False, 
     Parameters:
         - sws (SWS): Selenium Web Scraper
         - bdType (BuildingType): Denotes a type of building.
-        - forced (Boolean): If True bypass any inconvenience, False by default.
-        - waitToFinish (Boolean): If True, will wait for building to finish construct,
+        - forced (bool): If True bypass any inconvenience, False by default.
+        - waitToFinish (bool): If True, will wait for building to finish construct,
             False by default.
 
     Returns:
@@ -381,8 +381,8 @@ def level_up_building_at(sws : SWS, index : int, forced : bool = False, waitToFi
     Parameters:
         - sws (SWS): Selenium Web Scraper
         - index (Int): Denotes index of building site.
-        - forced (Boolean): If True bypass any inconvenience, False by default.
-        - waitToFinish (Boolean): If True, will wait for building to finish construct,
+        - forced (bool): If True bypass any inconvenience, False by default.
+        - waitToFinish (bool): If True, will wait for building to finish construct,
             False by default.
 
     Returns:

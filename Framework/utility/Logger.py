@@ -24,7 +24,7 @@ class ProjectLogger:
         Sets debug mode to True or False.
 
         Parameters:
-            - status (Boolean): Value to set debugMode to.
+            - status (bool): Value to set debugMode to.
         """
         self.debugMode = status
 

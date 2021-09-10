@@ -40,7 +40,7 @@ def check_troop__bd_requirements(sws : SWS, tpType : TroopType, forced : bool = 
     Parameters:
         - sws (SWS): Used to interact with the webpage.
         - tpType (TroopType): Denotes troop.
-        - forced (Boolean): If True bypass any inconvenience, False by default.
+        - forced (bool): If True bypass any inconvenience, False by default.
 
     Returns:
         - True if the requirements are fulfilled.
@@ -81,7 +81,7 @@ def research(sws : SWS, tpType : TroopType, forced : bool = False):
     Parameters:
         - sws (SWS): Used to interact with the webpage.
         - tpType (TroopType): Denotes troop.
-        - forced (Boolean): If True bypass any inconvenience, False by default.
+        - forced (bool): If True bypass any inconvenience, False by default.
 
     Returns:
         - True if the operation is successful, False otherwise.

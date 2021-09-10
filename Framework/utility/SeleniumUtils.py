@@ -71,7 +71,7 @@ class SWS:
             - driver (WebDriver or WebElement): Used to perform find_element().
             - prop (str): Property to search for.
             - method (By): Method used to identify prop, By.XPATH by default.
-            - waitFor (Boolean): If True function will wait for element to load, False by default.
+            - waitFor (bool): If True function will wait for element to load, False by default.
         
         Returns:
             - WebElement if operation was successful, None otherwise.
@@ -96,7 +96,7 @@ class SWS:
             - driver (WebDriver or WebElement): Used to perform find_element().
             - prop (str): Property to search for.
             - method (By): Method used to identify prop, By.XPATH by default.
-            - waitFor (Boolean): If True function will wait for element to load, False by default.
+            - waitFor (bool): If True function will wait for element to load, False by default.
         
         Returns:
             - List of WebElements found.
@@ -142,7 +142,7 @@ class SWS:
 
         Parameters:
             - URL (str): String denoting URL to load.
-            - checkURL (Boolean): If True verifies the link once loaded, True by default.
+            - checkURL (bool): If True verifies the link once loaded, True by default.
         
         Returns:
             - True if operation was successful, False otherwise.
@@ -177,7 +177,7 @@ class SWS:
 
         Parameters:
             - URL (str): String denoting URL to load.
-            - switchTo (Boolean): If True will move to the new tab, False by default.
+            - switchTo (bool): If True will move to the new tab, False by default.
 
         Returns:
             - True if operation was successful, False otherwise.
@@ -230,7 +230,7 @@ class SWS:
         Parameters:
             - prop (String or list of strings): Property to search for.
             - method (By): Method used to identify prop, By.XPATH by default.
-            - waitFor (Boolean): If True function will wait for element to load, False by default.
+            - waitFor (bool): If True function will wait for element to load, False by default.
 
         Returns:
             - True if the element is visible, False otherwise.
@@ -261,7 +261,7 @@ class SWS:
             - prop (String or list of strings): Property to search for.
             - attr (String or list of strings): Attribute(s) whose value is requested.
             - method (By): Method used to identify prop, By.XPATH by default.
-            - waitFor (Boolean): If True function will wait for element to load, False by default.
+            - waitFor (bool): If True function will wait for element to load, False by default.
 
         Returns:
             - List of Strings with value of the attributes.
@@ -299,7 +299,7 @@ class SWS:
             - prop (String or list of strings): Property to search for.
             - attr (String or list of strings): Attribute(s) whose value is requested.
             - method (By): Method used to identify prop, By.XPATH by default.
-            - waitFor (Boolean): If True function will wait for element to load, False by default.
+            - waitFor (bool): If True function will wait for element to load, False by default.
 
         Returns:
             - List of Lists of Strings with value of the attributes.
@@ -332,16 +332,17 @@ class SWS:
 
     @__seleniumRefreshLock
     def clickElement(self, prop, refresh : bool = False, method : By = By.XPATH, waitFor : bool = False,
-                scrollIntoView : bool =False):
+                scrollIntoView : bool =False, javaScriptClick=False):
         """
         Clicks a WebElement.
 
         Parameters:
             - prop (String or list of strings): Property to search for.
-            - refresh (Boolean): If True, function will wait for page to reload.
+            - refresh (bool): If True, function will wait for page to reload.
             - method (By): Method used to identify prop, By.XPATH by default.
-            - waitFor (Boolean): If True function will wait for element to load, False by default.
-            - scrollIntoView (Boolean): If True function will scroll to element, False by default.
+            - waitFor (bool): If True function will wait for element to load, False by default.
+            - scrollIntoView (bool): If True function will scroll to element, False by default.
+            - javaScriptClick (bool): If True will click by using a JS script, False by default.
 
         Returns:
             - True if operation was successful, False otherwise.
@@ -362,10 +363,18 @@ class SWS:
                         tmp_driver.execute_script("arguments[0].scrollIntoView();", elem)
                     if refresh:
                         with self.__waitPageToLoad():
-                            elem.click()
+                            if javaScriptClick:
+                                self.driver.execute_script("arguments[0].click();", elem)
+                            else:
+                                elem.click()
                     else:
-                        elem.click()
-                success = True
+                        if javaScriptClick:
+                            self.driver.execute_script("arguments[0].click();", elem)
+                        else:
+                            elem.click()
+                    success = True
+                else:
+                    logger.error(f'In clickElement: Failed to click element identified by {prop}')
         else:
             logger.error('In clickElement: Invalid parameter prop')
         return success
@@ -379,7 +388,7 @@ class SWS:
             - prop (String or list of strings): Property to search for.
             - text (str): String to insert in the textbox.
             - method (By): Method used to identify prop, By.XPATH by default.
-            - waitFor (Boolean): If True function will wait for element to load, False by default.
+            - waitFor (bool): If True function will wait for element to load, False by default.
 
         Returns:
             - True if operation was successful, False otherwise.
@@ -398,6 +407,8 @@ class SWS:
                 if elem:
                     elem.send_keys(text)
                     success = True
+                else:
+                    logger.error(f'In sendKeys: Failed to send keys to element identified by {prop}')
         else:
             logger.error('In sendKeys: Invalid parameter prop')
         return success
