@@ -10,6 +10,8 @@ logger = get_projectLogger()
 XPATH = get_XPATH()
 # Notation for undefined field
 UNDEFINED = ''
+# Error for name in use
+ERR_NAME_IN_USE = 'Name in use!'
 # URL for temporary email generator site
 TEMP_EMAIL_URL = 'https://cryptogmail.com/'
 # Polling constants
@@ -24,11 +26,6 @@ class Region(Enum):
     PLUS_MINUS = '+|-'
     MINUS_PLUS = '-|+'
     MINUS_MINUS = '-|-'
-
-class RegistrationErrors(Enum):
-    ERR_OK = 'Ok.'
-    ERR_NAME_IN_USE = 'Name in use!'
-    ERR_SHORT_PASS = 'Password is too short!'
 
 
 class CreateZravianAccount:
@@ -67,7 +64,7 @@ class CreateZravianAccount:
                     else:
                         logger.error('In generate_email: Failed to generate new email address')
                 else:
-                    logger.error('In generate_email: Failed to click remove')
+                    logger.error('In generate_email: Failed to click remove button')
             else:
                 logger.error('In generate_email: Failed to get initial email')
         else:
@@ -96,7 +93,7 @@ class CreateZravianAccount:
                 time.sleep(DEFAULT_POLLING_TIME)
                 startTime = time.time()
             else:
-                logger.error('In activate_zravian_account: Failed to receive mail. ' \
+                logger.warning('In activate_zravian_account: Failed to receive mail. ' \
                             'This might be due to Temporary email problems')
         else:
             logger.error('In activate_zravian_account: Failed to switch to tab')
@@ -143,7 +140,7 @@ class CreateZravianAccount:
                 if acc[JSON_USERNAME_KEY].startswith(GENERIC_PHRASE):
                     try:
                         num = max(num, int(acc[JSON_USERNAME_KEY][len(GENERIC_PHRASE):]))
-                    except:
+                    except ValueError:
                         pass
             num += 1
             ret = GENERIC_PHRASE + str(num)
@@ -250,47 +247,28 @@ class CreateZravianAccount:
         if self.sws.newTab(server.value + REGISTER_SUFFIX, switchTo=True):
             if self.fill_registration_data(username, password, emailAddress) and \
                     self.select_tribe(tribe) and self.select_region(region) and self.agree_and_submit():
-                err_code = self.registration_error_checker()
-                if err_code == RegistrationErrors.ERR_OK:
-                    ret = True
-                elif err_code == RegistrationErrors.ERR_NAME_IN_USE:
-                    if not self.store_new_account(username, UNDEFINED, server):
-                        logger.error('In complete_registration_form: Failed to store account with unknown password')
+                if self.sws.isVisible(XPATH.ZRAVIAN_SUCCESS_STATUS):
+                    logger.success('Registration successful')
+                elif self.sws.isVisible(XPATH.ZRAVIAN_ERROR_STATUS):
+                    errorMsg = self.sws.getElementAttribute(XPATH.ZRAVIAN_ERROR_STATUS_MSG, 'text')
+                    if errorMsg:
+                        if errorMsg[0] == ERR_NAME_IN_USE.value:
+                            if not self.store_new_account(username, UNDEFINED, server):
+                                logger.error('In complete_registration_form: Failed to store account with\
+                                    unknown password')
+                            else:
+                                logger.warning('In complete_registration_form: Added unknown account')
+                        else:
+                            logger.error(f'In complete_registration_form: Failed with site error {errorMsg[0]}')
                     else:
-                        logger.warning('In complete_registration_form: Added unknown account')
-                elif err_code == RegistrationErrors.ERR_SHORT_PASS:
-                    logger.warning('In complete_registration_form: Password too short')
+                        logger.error('In complete_registration_form: Failed to get error message')
                 else:
-                    logger.error('In complete_registration_form: Unknown registration error')
+                    logger.error('In complete_registration_form: Unknown registration status')
             else:
                 logger.error('In complete_registration_form: Failed to complete registration process')
         else:
             logger.error('In complete_registration_form: Failed to open new tab')
         return ret
-
-    def registration_error_checker(self):
-        """
-        Checks for errors in the registration process.
-
-        Returns:
-            - True if the registration was successful, False otherwise.
-        """
-        status = RegistrationErrors.ERR_OK
-        if self.sws.isVisible(XPATH.ZRAVIAN_ERROR_STATUS):
-            errorMsg = self.sws.getElementAttribute(XPATH.ZRAVIAN_ERROR_STATUS_MSG, 'text')
-            if errorMsg:
-                if errorMsg[0] == RegistrationErrors.ERR_NAME_IN_USE.value:
-                    status = RegistrationErrors.ERR_NAME_IN_USE
-                elif errorMsg[0] == RegistrationErrors.ERR_SHORT_PASS.value:
-                    status = RegistrationErrors.ERR_SHORT_PASS
-                logger.warning('Registration failed with following message: %s' % errorMsg[0])
-            else:
-                logger.error('In registration_error_checker: Could not retrieve error message')
-        elif self.sws.isVisible(XPATH.ZRAVIAN_SUCCESS_STATUS):
-            logger.success('Registration successful')
-        else:
-            logger.error('In registration_error_checker: Failed to find status')
-        return status
 
     # Zravian first login
     def initial_setup(self):
