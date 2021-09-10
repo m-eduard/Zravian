@@ -1,0 +1,35 @@
+{
+    "https://nonstop.zravian.com/": [],
+    "https://s1.zravian.com/": [],
+    "https://s5.zravian.com/": [],
+    "https://10k.zravian.com/": [
+        {
+            "username": "0bomb1",
+            "password": "0bomb1"
+        },
+        {
+            "username": "0bomb2",
+            "password": ""
+        },
+        {
+            "username": "0bomb3",
+            "password": ""
+        },
+        {
+            "username": "0bomb4",
+            "password": ""
+        },
+        {
+            "username": "0bomb5",
+            "password": ""
+        },
+        {
+            "username": "0bomb6",
+            "password": ""
+        },
+        {
+            "username": "0bomb7",
+            "password": "0bomb7"
+        }
+    ]
+}

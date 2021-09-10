@@ -1,13 +1,12 @@
 import json
-from Framework.utils.Logger import get_projectLogger
 from contextlib import contextmanager
-from Framework.utils.Constants import ACCOUNT_LIBRARY_PATH, Server, get_ACCOUNT, get_XPATH
-from Framework.utils.SeleniumUtils import SWS
+from Framework.utility.Logger import get_projectLogger
+from Framework.utility.Constants import ACCOUNT_LIBRARY_PATH, Server, get_XPATH
+from Framework.utility.SeleniumUtils import SWS
 
 
 logger = get_projectLogger()
 XPATH = get_XPATH()
-ACCOUNT = get_ACCOUNT()
 # Notation for undefined field
 UNDEFINED = ''
 

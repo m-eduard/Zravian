@@ -14,8 +14,6 @@ CHROME_DRIVER_PATH = os.path.join(FRAMEWORK_PATH, 'files\chromedriver.exe')
 DATA_PATH = os.path.join(FRAMEWORK_PATH, 'files\\data.json')
 # Account library file path
 ACCOUNT_LIBRARY_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account_library.json')
-# Current account file path
-ACCOUNT_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account.json')
 # Log file path
 LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\execution.log')
 
@@ -34,22 +32,6 @@ def get_building_type_by_name(text : str):
             return bdType
     print(f'Nothing for {text}')
     return None
-
-
-class Account:
-    def __init__(self):
-        try:
-            with open(ACCOUNT_PATH, 'r') as f:
-                jsonData = f.read()
-        except IOError:
-            print(f'Please ensure that file {ACCOUNT_PATH} exists and contains the right data')
-        self.URL = json.loads(jsonData)['url']
-        self.NAME = json.loads(jsonData)['username']
-        self.PASS = json.loads(jsonData)['password']
-        for tribe in Tribe:
-            if tribe.name == str(json.loads(jsonData)['tribe']).upper():
-                self.TRIBE = tribe
-                break
 
 
 class Server(Enum):
@@ -267,7 +249,6 @@ class Troop:
 XPATHCollectionInstance = None
 BUILDINGSInstance = None
 TROOPSInstance = None
-ACCOUNTInstance = None
 
 
 def init_data():
@@ -334,16 +315,3 @@ def get_XPATH():
     if XPATHCollectionInstance is None:
         XPATHCollectionInstance = XPATHCollection()
     return XPATHCollectionInstance
-
-
-def get_ACCOUNT():
-    """
-    Instantiates TROOPSInstance if needed.
-    
-    Returns:
-        - Object containing account data extracted from account.json.
-    """
-    global ACCOUNTInstance
-    if ACCOUNTInstance is None:
-        ACCOUNTInstance = Account()
-    return ACCOUNTInstance

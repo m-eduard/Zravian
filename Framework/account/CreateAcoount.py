@@ -1,9 +1,9 @@
 import json
 import time
-from enum import Enum
-from Framework.utils.SeleniumUtils import SWS
-from Framework.utils.Logger import get_projectLogger
-from Framework.utils.Constants import ACCOUNT_LIBRARY_PATH, Server, Tribe, get_XPATH
+from enum import Enum, IntEnum
+from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Logger import get_projectLogger
+from Framework.utility.Constants import ACCOUNT_LIBRARY_PATH, Server, Tribe, get_XPATH
 
 logger = get_projectLogger()
 XPATH = get_XPATH()
@@ -20,6 +20,10 @@ class Region(Enum):
     PLUS_MINUS = '+|-'
     MINUS_PLUS = '-|+'
     MINUS_MINUS = '-|-'
+
+class RegistrationErrors(Enum):
+    ERR_OK = 'Ok.'
+    ERR_NAME = 1
 
 
 class CreateZravianAccount:
@@ -50,15 +54,16 @@ class CreateZravianAccount:
                         email = self.sws.getElementAttribute(XPATH.TE_EMAIL_BOX, 'text')
                         if email and email[0] != initialEmail[0]:
                             ret = str(email[0])
+                            logger.success(f'In generate_email: Generated email {email}')
                             break
                         time.sleep(DEFAULT_POLLING_TIME)
                         startTime = time.time()
                     else:
-                        logger.error('In get_email: Failed to generate new email address')
+                        logger.error('In generate_email: Failed to generate new email address')
                 else:
-                    logger.error('In get_email: Failed to click remove')
+                    logger.error('In generate_email: Failed to click remove')
             else:
-                logger.error('In get_email: Failed to get initial email')
+                logger.error('In generate_email: Failed to get initial email')
         else:
             logger.error('In generate_email: Failed to open new tab')
         return ret
@@ -114,7 +119,7 @@ class CreateZravianAccount:
         return ret
 
     # Zravian registration page
-    def generic_credentials_generator(server : Server):
+    def generic_credentials_generator(self, server : Server):
         """
         Creates generic credentials.
 
@@ -135,7 +140,7 @@ class CreateZravianAccount:
         except json.JSONDecodeError:
             logger.error(f'Invalid json format in file {ACCOUNT_LIBRARY_PATH}')
         num = 0
-        for acc in decodedJson[f'{server.value}']:
+        for acc in decodedJson[server.value]:
             if acc["username"].startswith(GENERIC_PHRASE):
                 try:
                     num = max(num, int(acc["username"][len(GENERIC_PHRASE):]))
@@ -243,8 +248,16 @@ class CreateZravianAccount:
         if self.sws.newTab(server.value + REGISTER_SUFFIX, switchTo=True):
             if self.fill_registration_data(username, password, emailAddress) and \
                     self.select_tribe(tribe) and self.select_region(region) and self.agree_and_submit():
-                if self.registration_error_checker():
+                err_code = self.registration_error_checker()
+                if err_code == RegistrationErrors.ERR_OK:
                     ret = True
+                elif err_code == RegistrationErrors.ERR_NAME:
+                    if not self.store_new_account(username, UNDEFINED, server):
+                        logger.error('In complete_registration_form: Failed to store account with unknown password')
+                    else:
+                        logger.info('In complete_registration_form: Added unknown account')
+                else:
+                    logger.error('In complete_registration_form: Unknown registration error')
             else:
                 logger.error('In complete_registration_form: Failed to complete registration process')
         else:
@@ -258,16 +271,17 @@ class CreateZravianAccount:
         Returns:
             - True if the registration was successful, False otherwise.
         """
-        status = False
+        status = RegistrationErrors.ERR_OK
         if self.sws.isVisible(XPATH.ZRAVIAN_ERROR_STATUS):
             errorMsg = self.sws.getElementAttribute(XPATH.ZRAVIAN_ERROR_STATUS_MSG, 'text')
             if errorMsg:
+                if errorMsg[0] == RegistrationErrors.ERR_NAME.value:
+                    status = RegistrationErrors.ERR_NAME
                 logger.warning('Registration failed with following message: %s' % errorMsg[0])
             else:
                 logger.error('In registration_error_checker: Could not retrieve error message')
         elif self.sws.isVisible(XPATH.ZRAVIAN_SUCCESS_STATUS):
             logger.success('Registration successful')
-            status = True
         else:
             logger.error('In registration_error_checker: Failed to find status')
         return status
@@ -331,7 +345,7 @@ class CreateZravianAccount:
         """
         status = False
         if username == '' or password == '':
-            username = password = self.generic_credentials_generator()
+            username = password = self.generic_credentials_generator(server)
         emailAddress = self.generate_email()
         if emailAddress:
             if self.complete_registration_form(username, password, server, emailAddress, tribe, region):
@@ -341,9 +355,11 @@ class CreateZravianAccount:
                     else:
                         logger.error('In register: Failed to store the new account')
                 else:
-                    logger.error('In register: Failed to activate the new account')
+                    if not self.store_new_account(username, UNDEFINED, server):
+                        logger.error('In register: Failed to store account with unknown password')
+                    logger.warning('In register: Failed to activate the new account')
             else:
-                logger.error('In register: Failed to complete the registration form')
+                logger.warning('In register: Failed to complete the registration form')
         else:
             logger.error('In register: Failed to generate an email address')
         return status

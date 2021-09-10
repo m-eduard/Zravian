@@ -1,7 +1,7 @@
-from Framework.utils.SeleniumUtils import SWS
-from Framework.utils.Constants import BuildingType
-from Framework.VillageManagement.Utils import enter_building_menu, find_building
-from Framework.utils.Logger import get_projectLogger
+from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import BuildingType
+from Framework.village.builder_utils import enter_building_menu, find_building
+from Framework.utility.Logger import get_projectLogger
 
 
 logger = get_projectLogger()

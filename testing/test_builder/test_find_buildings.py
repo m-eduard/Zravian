@@ -1,6 +1,6 @@
-from Framework.screen.Login import login
-from Framework.utils.Constants import BuildingType, get_BUILDINGS
-from Framework.VillageManagement.Builder import find_building
+from Framework.account.Login import login
+from Framework.utility.Constants import BuildingType, get_BUILDINGS
+from Framework.village.builder import find_building
 
 BUILDINGS = get_BUILDINGS()
 

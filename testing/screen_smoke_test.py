@@ -1,11 +1,7 @@
+from Framework.account.Login import login
 from selenium.webdriver.support.expected_conditions import staleness_of
-from Framework.utils.Constants import get_ACCOUNT
-from Framework.screen.Login import login
 from Framework.screen.Views import LevelUpMode, Screens, getTribe, get_current_screen, get_level_up_mode, get_production, get_storage,\
     set_level_up_mode, move_to_overview, move_to_village, move_to_map, move_to_stats
-
-
-ACCOUNT = get_ACCOUNT()
 
 
 """
@@ -13,8 +9,6 @@ This test checks the view management and logIns.
 """
 if __name__ == "__main__":
     with login(headless=False) as sws:
-        # Check tribe
-        assert ACCOUNT.TRIBE == getTribe(sws)
         # Check production
         assert get_production(sws) is not None
         # Check storage

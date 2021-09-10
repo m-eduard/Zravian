@@ -1,7 +1,7 @@
-from Framework.utils.Logger import get_projectLogger
-from Framework.utils.Constants import BuildingType, get_BUILDINGS
-from Framework.VillageManagement.Builder import construct_building, demolish_building_at, find_building
-from Framework.screen.Login import login
+from Framework.utility.Logger import get_projectLogger
+from Framework.utility.Constants import BuildingType, get_BUILDINGS
+from Framework.village.builder import construct_building, demolish_building_at, find_building
+from Framework.account.Login import login
 
 
 BUILDINGS = get_BUILDINGS()

@@ -1,9 +1,9 @@
-from Framework.utils.Logger import get_projectLogger
-from Framework.utils.Constants import get_BUILDINGS
+from Framework.village.builder import level_up_building_at
+from Framework.village.builder_utils import ResourceFields, get_building_data
+from Framework.utility.Logger import get_projectLogger
+from Framework.utility.Constants import get_BUILDINGS
 from Framework.screen.Views import get_production
-from Framework.screen.Login import login
-from Framework.VillageManagement.Utils import ResourceFields, get_building_data
-from Framework.VillageManagement.Builder import BUILDINGS, level_up_building_at
+from Framework.account.Login import login
 
 
 BUILDINGS = get_BUILDINGS()

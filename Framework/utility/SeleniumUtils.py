@@ -6,8 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.expected_conditions import staleness_of
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
-from Framework.utils.Constants import CHROME_DRIVER_PATH
-from Framework.utils.Logger import get_projectLogger
+from Framework.utility.Constants import CHROME_DRIVER_PATH
+from Framework.utility.Logger import get_projectLogger
 
 
 logger = get_projectLogger()
@@ -163,7 +163,7 @@ class SWS:
         Returns:
             - current URL as string.
         """
-        return self.driver.current_url
+        return str(self.driver.current_url)
 
     def refresh(self):
         """

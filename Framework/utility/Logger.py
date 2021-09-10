@@ -1,5 +1,5 @@
 from datetime import datetime
-from Framework.utils.Constants import LOGS_PATH
+from Framework.utility.Constants import LOGS_PATH
 
 
 # Format for log timestamp

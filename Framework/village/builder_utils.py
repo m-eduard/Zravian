@@ -1,7 +1,7 @@
 import re
-from Framework.utils.Logger import get_projectLogger
-from Framework.utils.Constants import BuildingType, get_BUILDINGS, get_XPATH
-from Framework.utils.SeleniumUtils import SWS
+from Framework.utility.Logger import get_projectLogger
+from Framework.utility.Constants import BuildingType, get_BUILDINGS, get_XPATH
+from Framework.utility.SeleniumUtils import SWS
 from Framework.screen.Views import move_to_overview, move_to_village
 
 

@@ -1,8 +1,8 @@
 import re
 import time
-from Framework.utils.Logger import get_projectLogger
-from Framework.utils.Constants import  BuildingType, get_XPATH, get_BUILDINGS, get_building_type_by_name
-from Framework.utils.SeleniumUtils import SWS
+from Framework.utility.Logger import get_projectLogger
+from Framework.utility.Constants import  BuildingType, get_XPATH, get_BUILDINGS, get_building_type_by_name
+from Framework.utility.SeleniumUtils import SWS
 from Framework.screen.Views import move_to_overview, move_to_village
 from Framework.village.builder_utils import FIRST_BUILDING_SITE_VILLAGE, LAST_BUILDING_SITE_VILLAGE, ResourceFields,\
     time_to_seconds, enter_building_menu, check_building_page_title, find_building, get_building_data

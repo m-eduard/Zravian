@@ -1,6 +1,6 @@
-from Framework.screen.Login import login
-from Framework.utils.Constants import BuildingType
-from Framework.VillageManagement.Builder import check_building_page_title, enter_building_menu, get_building_data
+from Framework.account.Login import login
+from Framework.utility.Constants import BuildingType
+from Framework.village.builder import check_building_page_title, enter_building_menu, get_building_data
 
 
 if __name__ == "__main__":

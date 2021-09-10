@@ -1,8 +1,8 @@
-from Framework.VillageManagement.Builder import construct_building, level_up_building_at
-from Framework.VillageManagement.Utils import check_building_page_title, get_building_data
-from Framework.utils.SeleniumUtils import SWS
-from Framework.utils.Constants import BuildingType, TroopType, get_TROOPS, get_XPATH
-from Framework.utils.Logger import get_projectLogger
+from Framework.village.builder import construct_building, level_up_building_at
+from Framework.village.builder_utils import check_building_page_title, get_building_data
+from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import BuildingType, TroopType, get_TROOPS, get_XPATH
+from Framework.utility.Logger import get_projectLogger
 
 
 logger = get_projectLogger()

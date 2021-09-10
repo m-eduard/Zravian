@@ -1,11 +1,10 @@
 from enum import IntEnum, Enum
-from Framework.utils.Constants import Tribe, get_ACCOUNT, get_XPATH
-from Framework.utils.Logger import get_projectLogger
-from Framework.utils.SeleniumUtils import SWS
+from Framework.utility.Constants import Tribe, get_XPATH
+from Framework.utility.Logger import get_projectLogger
+from Framework.utility.SeleniumUtils import SWS
 
 
 logger = get_projectLogger()
-ACCOUNT = get_ACCOUNT()
 XPATH = get_XPATH()
 TRIBE = None
 
@@ -44,7 +43,7 @@ def getTribe(sws : SWS):
             logger.warning('In getTribe: Could not identify the tribe by task manager')
     if not TRIBE:
         initialURL = sws.getCurrentUrl()
-        PROFILE_URL = f'{ACCOUNT.URL}profile.php'
+        PROFILE_URL = f'{initialURL.rsplit("/", 1)}/profile.php'
         if sws.get(PROFILE_URL):
             text = sws.getElementAttribute(XPATH.PROFILE_TRIBE, 'text')
             if text:
@@ -162,11 +161,12 @@ def __move_to_screen(sws : SWS, screen : Screens, forced : bool = False):
     Returns:
         - True if the operation was successful, False otherwise.
     """
+    BASE_URL = f'{sws.getCurrentUrl.rsplit("/", 1)}/'
     URLS = {
-        Screens.OVERVIEW: f'{ACCOUNT.URL}village1.php',
-        Screens.VILLAGE: f'{ACCOUNT.URL}village2.php',
-        Screens.MAP: f'{ACCOUNT.URL}map.php',
-        Screens.STATS: f'{ACCOUNT.URL}statistics.php'
+        Screens.OVERVIEW: BASE_URL + 'village1.php',
+        Screens.VILLAGE:  BASE_URL + 'village2.php',
+        Screens.MAP:  BASE_URL + 'map.php',
+        Screens.STATS:  BASE_URL + 'statistics.php'
     }
     status = False
     if screen != get_current_screen(sws) or forced:
