@@ -1,7 +1,7 @@
-import json
+from Framework.account.AccountLibraryManager import JSON_PASSWORD_KEY, get_account
 from contextlib import contextmanager
 from Framework.utility.Logger import get_projectLogger
-from Framework.utility.Constants import ACCOUNT_LIBRARY_PATH, Server, get_XPATH
+from Framework.utility.Constants import Server, get_XPATH
 from Framework.utility.SeleniumUtils import SWS
 
 
@@ -11,31 +11,23 @@ XPATH = get_XPATH()
 UNDEFINED = ''
 
 
-def get_account_password(server : Server, username : str):
+def get_account_password(username : str, server : Server):
     """
     Retrieves password for given account.
 
     Parameters:
-        - server (Server): URL to load, taken from account json by default.
         - username (str): username used to login, taken from account json by default.
+        - server (Server): URL to load, taken from account json by default.
     
     Returns:
         - String if account was found, None otherwise.
     """
     ret = None
-    try:
-        with open(ACCOUNT_LIBRARY_PATH, 'r') as f:
-            jsonData = f.read()
-    except IOError:
-        logger.error(f'Please ensure that file {ACCOUNT_LIBRARY_PATH} exists and contains the right data')
-    try:
-        decodedJson = json.loads(jsonData)
-    except json.JSONDecodeError:
-        logger.error(f'Invalid json format in file {ACCOUNT_LIBRARY_PATH}')
-    try:
-        ret = decodedJson[f'{server.value}'][f'{username}']["password"]
-    except:
-        logger.error(f'Failed to find password for {server.value}: {username}')
+    account = get_account(username, server)
+    if account:
+        ret = account[JSON_PASSWORD_KEY]
+    else:
+        logger.error('In get_account_password: Failed to get `account_library.json`')
     return ret
 
 
@@ -52,7 +44,7 @@ def login(server : Server, username : str, headless=False, password=UNDEFINED):
     """
     sws = SWS(headless)
     if password == UNDEFINED:
-        password = get_account_password(server, username)
+        password = get_account_password(username, server)
     if sws.get(server.value):
         if sws.sendKeys(XPATH.LOGIN_USER_INPUT, username):
             if sws.sendKeys(XPATH.LOGIN_PASS_INPUT, password):

@@ -1,18 +1,22 @@
+from Framework.account.AccountLibraryManager import JSON_PASSWORD_KEY, JSON_USERNAME_KEY, append_account, get_account_library
 import json
 import time
 from enum import Enum, IntEnum
 from Framework.utility.SeleniumUtils import SWS
 from Framework.utility.Logger import get_projectLogger
-from Framework.utility.Constants import ACCOUNT_LIBRARY_PATH, Server, Tribe, get_XPATH
+from Framework.utility.Constants import Server, Tribe, get_XPATH
 
 logger = get_projectLogger()
 XPATH = get_XPATH()
 # Notation for undefined field
 UNDEFINED = ''
-
+# URL for temporary email generator site
 TEMP_EMAIL_URL = 'https://cryptogmail.com/'
+# Polling constants
 DEFAULT_POLLING_TIME = 1
-MAX_POLLING_TIME = 20
+MAX_POLLING_TIME = 60
+# Generic phrase to include in all accounts
+GENERIC_PHRASE = '0bomb'
 
 
 class Region(Enum):
@@ -23,12 +27,14 @@ class Region(Enum):
 
 class RegistrationErrors(Enum):
     ERR_OK = 'Ok.'
-    ERR_NAME = 1
+    ERR_NAME_IN_USE = 'Name in use!'
+    ERR_SHORT_PASS = 'Password is too short!'
 
 
 class CreateZravianAccount:
     def __init__(self, headless : bool):
         self.sws = SWS(headless)
+        self.register_retrials = 3
 
     def close(self):
         if self.sws:
@@ -129,25 +135,21 @@ class CreateZravianAccount:
         Returns:
             - String
         """
-        GENERIC_PHRASE = '0bomb'
-        try:
-            with open(ACCOUNT_LIBRARY_PATH, 'r') as f:
-                jsonData = f.read()
-        except IOError:
-            logger.error(f'Please ensure that file {ACCOUNT_LIBRARY_PATH} exists and contains the right data')
-        try:
-            decodedJson = json.loads(jsonData)
-        except json.JSONDecodeError:
-            logger.error(f'Invalid json format in file {ACCOUNT_LIBRARY_PATH}')
-        num = 0
-        for acc in decodedJson[server.value]:
-            if acc["username"].startswith(GENERIC_PHRASE):
-                try:
-                    num = max(num, int(acc["username"][len(GENERIC_PHRASE):]))
-                except:
-                    pass
-        num += 1
-        return GENERIC_PHRASE + str(num)
+        ret = ''
+        decodedJson = get_account_library()
+        if decodedJson:
+            num = 0
+            for acc in decodedJson[server.value]:
+                if acc[JSON_USERNAME_KEY].startswith(GENERIC_PHRASE):
+                    try:
+                        num = max(num, int(acc[JSON_USERNAME_KEY][len(GENERIC_PHRASE):]))
+                    except:
+                        pass
+            num += 1
+            ret = GENERIC_PHRASE + str(num)
+        else:
+            logger.error('In generic_credentials_generator: Failed to open account library')
+        return ret
 
     def fill_registration_data(self, username : str, password : str, emailAddress : str):
         """
@@ -251,11 +253,13 @@ class CreateZravianAccount:
                 err_code = self.registration_error_checker()
                 if err_code == RegistrationErrors.ERR_OK:
                     ret = True
-                elif err_code == RegistrationErrors.ERR_NAME:
+                elif err_code == RegistrationErrors.ERR_NAME_IN_USE:
                     if not self.store_new_account(username, UNDEFINED, server):
                         logger.error('In complete_registration_form: Failed to store account with unknown password')
                     else:
                         logger.info('In complete_registration_form: Added unknown account')
+                elif err_code == RegistrationErrors.ERR_SHORT_PASS:
+                    logger.info('In complete_registration_form: Password too short')
                 else:
                     logger.error('In complete_registration_form: Unknown registration error')
             else:
@@ -275,8 +279,10 @@ class CreateZravianAccount:
         if self.sws.isVisible(XPATH.ZRAVIAN_ERROR_STATUS):
             errorMsg = self.sws.getElementAttribute(XPATH.ZRAVIAN_ERROR_STATUS_MSG, 'text')
             if errorMsg:
-                if errorMsg[0] == RegistrationErrors.ERR_NAME.value:
-                    status = RegistrationErrors.ERR_NAME
+                if errorMsg[0] == RegistrationErrors.ERR_NAME_IN_USE.value:
+                    status = RegistrationErrors.ERR_NAME_IN_USE
+                elif errorMsg[0] == RegistrationErrors.ERR_SHORT_PASS.value:
+                    status = RegistrationErrors.ERR_SHORT_PASS
                 logger.warning('Registration failed with following message: %s' % errorMsg[0])
             else:
                 logger.error('In registration_error_checker: Could not retrieve error message')
@@ -305,33 +311,23 @@ class CreateZravianAccount:
         """
         ret = False
         NEW_ACCOUNT_JSON = {
-            "username": f'{username}',
-            "password": f'{password}',
+            JSON_USERNAME_KEY: username,
+            JSON_PASSWORD_KEY: password,
         }
-        decodedJson = None
-        try:
-            with open(ACCOUNT_LIBRARY_PATH, 'r') as f:
-                jsonData = f.read()
-        except IOError:
-            logger.error(f'Please ensure that file {ACCOUNT_LIBRARY_PATH} exists and contains the right data')
-        try:
-            decodedJson = json.loads(jsonData)
-            decodedJson[f'{server.value}'].append(NEW_ACCOUNT_JSON)
-        except json.JSONDecodeError:
-            logger.error(f'Invalid json format in file {ACCOUNT_LIBRARY_PATH}')
-        try:
-            with open(ACCOUNT_LIBRARY_PATH, 'w') as f:
-                if decodedJson:
-                    f.write(json.dumps(decodedJson, indent=4, sort_keys=False))
-                    ret = True
-        except IOError:
-            logger.error(f'Please ensure that file {ACCOUNT_LIBRARY_PATH} exists and contains the right data')
+        if append_account(NEW_ACCOUNT_JSON, server):
+            ret = True
+        else:
+            logger.error('In store_new_account: Failed to append account to json')
         return ret
 
-    # Main method
+    # Register method
     def register(self, username : str, password : str, server : Server, tribe : Tribe, region : Region):
         """
         Attempts to complete registration process.
+
+        Note:
+            The process might fail due to errors regarding temporary email.
+            The minimal acceptable behavior of this function is to create a `default` account at any given time.
 
         Parameters:
             - username (str): Username of new account.
@@ -344,8 +340,14 @@ class CreateZravianAccount:
             - True if the operation was successful, False otherwise.
         """
         status = False
-        if username == '' or password == '':
+        genericAccount = False
+        if username == UNDEFINED and password == UNDEFINED:
+            genericAccount = True
             username = password = self.generic_credentials_generator(server)
+        elif username == UNDEFINED:
+            username = self.generic_credentials_generator(server)
+        elif password == UNDEFINED:
+            password = self.generic_credentials_generator(server)
         emailAddress = self.generate_email()
         if emailAddress:
             if self.complete_registration_form(username, password, server, emailAddress, tribe, region):
@@ -358,6 +360,14 @@ class CreateZravianAccount:
                     if not self.store_new_account(username, UNDEFINED, server):
                         logger.error('In register: Failed to store account with unknown password')
                     logger.warning('In register: Failed to activate the new account')
+                    if self.register_retrials > 0 and genericAccount:
+                        self.register_retrials -= 1
+                        logger.info('In register: Retrying...')
+                        status = self.register(username, password, server, tribe, region)
+                    elif self.register_retrials == 0:
+                        logger.error('In register: 3 fails when retrying to activate account')
+                    else:
+                        logger.info(f'In register: Could not retry register for {username} and {password}')
             else:
                 logger.warning('In register: Failed to complete the registration form')
         else:

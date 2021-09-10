@@ -1,6 +1,6 @@
+from Framework.account.AccountLibraryManager import JSON_PASSWORD_KEY, JSON_USERNAME_KEY, get_account_library, get_random_account
 import unittest
-import json
-from Framework.utility.Constants import ACCOUNT_LIBRARY_PATH, Server
+from Framework.utility.Constants import Server
 from Framework.utility.Logger import get_projectLogger
 from Framework.account.CreateAcoount import create_new_account
 
@@ -12,45 +12,33 @@ class Test_AccountCreation(unittest.TestCase):
     def setUp(self):
         logger.set_debugMode(True)
 
+    def test_account_library(self):
+        self.assertIsNotNone(get_account_library())
+
     def test_create_account(self):
         # Step 1: Read account_library.json before account creation
-        # Step 1.1: Read json from file
-        jsonData = None
-        try:
-            with open(ACCOUNT_LIBRARY_PATH, 'r') as f:
-                jsonData = f.read()
-        except IOError:
-            logger.error(f'Please ensure that file {ACCOUNT_LIBRARY_PATH} exists and contains the right data')
-        self.assertIsNotNone(jsonData)
-        # Step 1.2: Create json object
-        initialJson = None
-        try:
-            initialJson = json.loads(jsonData)
-        except json.JSONDecodeError:
-            logger.error(f'Invalid json format in file {ACCOUNT_LIBRARY_PATH}')
+        initialJson = get_account_library()
         self.assertIsNotNone(initialJson)
-        # Step 2: Create an account on each server
+        # Step 2: Create a default account on each server
         for sv in Server:
             self.assertTrue(create_new_account(server=sv))
         # Step 3: Read account_library.json after account creation
-        # Step 3.1: Read json from file
-        jsonData = None
-        try:
-            with open(ACCOUNT_LIBRARY_PATH, 'r') as f:
-                jsonData = f.read()
-        except IOError:
-            logger.error(f'Please ensure that file {ACCOUNT_LIBRARY_PATH} exists and contains the right data')
-        self.assertIsNotNone(jsonData)
-        # Step 3.2: Create json object
-        currentJson = None
-        try:
-            currentJson = json.loads(jsonData)
-        except json.JSONDecodeError:
-            logger.error(f'Invalid json format in file {ACCOUNT_LIBRARY_PATH}')
+        currentJson = get_account_library()
         self.assertIsNotNone(currentJson)
         # Step 4: Check differences
         for sv in Server:
             self.assertTrue(len(currentJson[str(sv.value)]) == len(initialJson[str(sv.value)]) + 1)
+
+    def test_create_account_dup_name(self):
+        # Step 1: Find existing account
+        credentials = None
+        for sv in Server:
+            credentials = get_random_account(sv)
+            if credentials:
+                break
+        self.assertIsNotNone(credentials)
+        # Step 2: Attempt to create identical account
+        self.assertFalse(create_new_account(credentials[JSON_USERNAME_KEY], credentials[JSON_PASSWORD_KEY]))
         
 
 if __name__ == '__main__':

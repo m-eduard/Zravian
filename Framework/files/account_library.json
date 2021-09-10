@@ -1,7 +1,38 @@
 {
-    "https://nonstop.zravian.com/": [],
-    "https://s1.zravian.com/": [],
-    "https://s5.zravian.com/": [],
+    "https://nonstop.zravian.com/": [
+        {
+            "username": "0bomb1",
+            "password": ""
+        },
+        {
+            "username": "0bomb2",
+            "password": "0bomb2"
+        },
+        {
+            "username": "0bomb3",
+            "password": ""
+        },
+        {
+            "username": "0bomb4",
+            "password": "0bomb4"
+        }
+    ],
+    "https://s1.zravian.com/": [
+        {
+            "username": "0bomb1",
+            "password": ""
+        },
+        {
+            "username": "0bomb2",
+            "password": "0bomb2"
+        }
+    ],
+    "https://s5.zravian.com/": [
+        {
+            "username": "0bomb1",
+            "password": "0bomb1"
+        }
+    ],
     "https://10k.zravian.com/": [
         {
             "username": "0bomb1",
@@ -30,6 +61,10 @@
         {
             "username": "0bomb7",
             "password": "0bomb7"
+        },
+        {
+            "username": "0bomb8",
+            "password": "0bomb8"
         }
     ]
 }

@@ -32,7 +32,7 @@ class SWS:
 
     def close(self):
         if self.driver:
-            self.driver.close()
+            self.driver.quit()
         self.driver = None
 
     def __seleniumRefreshLock(func):
