@@ -1,7 +1,7 @@
-from Framework.account.AccountLibraryManager import JSON_PASSWORD_KEY, JSON_USERNAME_KEY, append_account, get_account_library
-import json
+from Framework.account.Login import initial_setup, login
 import time
-from enum import Enum, IntEnum
+from enum import Enum
+from Framework.account.AccountLibraryManager import JSON_PASSWORD_KEY, JSON_USERNAME_KEY, append_account, get_account_library, get_last_account
 from Framework.utility.SeleniumUtils import SWS
 from Framework.utility.Logger import get_projectLogger
 from Framework.utility.Constants import Server, Tribe, get_XPATH
@@ -248,11 +248,12 @@ class CreateZravianAccount:
             if self.fill_registration_data(username, password, emailAddress) and \
                     self.select_tribe(tribe) and self.select_region(region) and self.agree_and_submit():
                 if self.sws.isVisible(XPATH.ZRAVIAN_SUCCESS_STATUS):
+                    ret = True
                     logger.success('Registration successful')
                 elif self.sws.isVisible(XPATH.ZRAVIAN_ERROR_STATUS):
                     errorMsg = self.sws.getElementAttribute(XPATH.ZRAVIAN_ERROR_STATUS_MSG, 'text')
                     if errorMsg:
-                        if errorMsg[0] == ERR_NAME_IN_USE.value:
+                        if errorMsg[0] == ERR_NAME_IN_USE:
                             if not self.store_new_account(username, UNDEFINED, server):
                                 logger.error('In complete_registration_form: Failed to store account with\
                                     unknown password')
@@ -269,10 +270,6 @@ class CreateZravianAccount:
         else:
             logger.error('In complete_registration_form: Failed to open new tab')
         return ret
-
-    # Zravian first login
-    def initial_setup(self):
-        pass
 
     # Local account management
     def store_new_account(self, username : str, password : str, server : Server):
@@ -317,7 +314,7 @@ class CreateZravianAccount:
         Returns:
             - True if the operation was successful, False otherwise.
         """
-        status = False
+        ret = False
         genericAccount = False
         if username == UNDEFINED and password == UNDEFINED:
             genericAccount = True
@@ -331,7 +328,9 @@ class CreateZravianAccount:
             if self.complete_registration_form(username, password, server, emailAddress, tribe, region):
                 if self.activate_zravian_account():
                     if self.store_new_account(username, password, server):
-                        status = True
+                        logger.success(f'In register: Created and saved account [{username}, {password}] on '\
+                            f'server {server.value}')
+                        ret = True
                     else:
                         logger.error('In register: Failed to store the new account')
                 else:
@@ -341,7 +340,7 @@ class CreateZravianAccount:
                     if self.register_retrials > 0 and genericAccount:
                         self.register_retrials -= 1
                         logger.warning('In register: Retrying...')
-                        status = self.register(username, password, server, tribe, region)
+                        ret = self.register(username, password, server, tribe, region)
                     elif self.register_retrials == 0:
                         logger.error('In register: 3 fails when retrying to activate account')
                     else:
@@ -350,24 +349,39 @@ class CreateZravianAccount:
                 logger.warning('In register: Failed to complete the registration form')
         else:
             logger.error('In register: Failed to generate an email address')
-        return status
+        return ret
 
 def create_new_account(username : str = UNDEFINED, password : str = UNDEFINED, server=Server.S10k, tribe=Tribe.TEUTONS,
-            region=Region.PLUS_PLUS, headless=True):
+            region=Region.PLUS_PLUS, doTasks=True, headless=True):
     """
     Creates and activates a new account.
 
     Parameters:
-        - username (str): username.
-        - password (str): password.
-        - server (Server): Server of new account.
-        - tribe (Tribe): Desired tribe.
+        - username (str): username, UNDEFINED by default.
+        - password (str): password, UNDEFINED by default.
+        - server (Server): Server of new account, 10K by default.
+        - tribe (Tribe): Desired tribe, Teutons by default.
+        - region (Region): Desired region, +|+ by default.
+        - doTasks (bool): If True will accept tasks, False by default.
 
     Returns:
         - True if the operation is successful, False otherwise.
     """
-    creator = CreateZravianAccount(headless)
-    status = creator.register(username, password, server, tribe, region)
-    creator.close()
-    return status
-
+    ret = False
+    newAcc = CreateZravianAccount(headless)
+    registerStatus = newAcc.register(username, password, server, tribe, region)
+    newAcc.close()
+    if registerStatus:
+        credentials = get_last_account(server)
+        if credentials:
+            with login(server=server, username=credentials[JSON_USERNAME_KEY], \
+                    password=credentials[JSON_PASSWORD_KEY], headless=True) as sws:
+                if initial_setup(sws, doTasks=doTasks):
+                    ret = True
+                else:
+                    logger.error('In create_new_account: Failed to do the initial setup')
+        else:
+            logger.error('In create_new_account: Failed to retrieve credentials of created account')
+    else:
+        logger.error('In create_new_account: Failed to register')
+    return ret

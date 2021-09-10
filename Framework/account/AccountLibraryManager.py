@@ -141,9 +141,9 @@ def get_account(username : str, server : Server):
     return ret
 
 
-def get_random_account(server : Server):
+def get_last_account(server : Server):
     """
-    Gets account from `account_library.json` if it exists.
+    Gets most recent account from `account_library.json` if it exists.
 
     Parameters:
         - username (String): Identifies the account.
