@@ -13,7 +13,7 @@ def enter_academy(sws : SWS):
     Enters Academy.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
 
     Returns:
         - True if operation was successful, False otherwise.    
@@ -35,7 +35,7 @@ def enter_barracks(sws : SWS):
     Enters Barracks.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
 
     Returns:
         - True if operation was successful, False otherwise.    
@@ -57,7 +57,7 @@ def enter_stable(sws : SWS):
     Enters Stable.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
 
     Returns:
         - True if operation was successful, False otherwise.    
@@ -79,7 +79,7 @@ def enter_siegeworkshop(sws : SWS):
     Enters SiegeWorkshop.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
 
     Returns:
         - True if operation was successful, False otherwise.    
@@ -101,7 +101,7 @@ def enter_blacksmith(sws : SWS):
     Enters Blacksmith.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
 
     Returns:
         - True if operation was successful, False otherwise.    
@@ -123,7 +123,7 @@ def enter_armoury(sws : SWS):
     Enters Armoury.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
 
     Returns:
         - True if operation was successful, False otherwise.    

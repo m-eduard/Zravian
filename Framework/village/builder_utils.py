@@ -27,7 +27,7 @@ def find_buildings(sws : SWS, bdType : BuildingType):
     Finds all building sites ids for requested type.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -62,7 +62,7 @@ def find_building(sws : SWS, bdType : BuildingType):
     Finds the highest level building with requested type.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -82,7 +82,7 @@ def get_building_data(sws : SWS, bdType : BuildingType):
     Finds building site id and level for requested buildin type ordered by level.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -128,7 +128,7 @@ def enter_building_menu(sws : SWS, index : int):
     Enters a building menu.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - index (Int): Denotes building site index.
 
     Returns:
@@ -165,7 +165,7 @@ def check_building_page_title(sws : SWS, bdType : BuildingType):
     Checks if page title correspons to the building.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:

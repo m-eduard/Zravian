@@ -19,7 +19,7 @@ def get_busy_workers_timer(sws : SWS):
     Verifies how long untill the workers finish the next building.
     
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
 
     Returns:
         - Int if operation was successful, None otherwise.
@@ -53,7 +53,7 @@ def get_time_to_build(sws : SWS, bdType : BuildingType):
     Get the necesary time to construct / upgrade a building.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -84,7 +84,7 @@ def press_upgrade_button(sws : SWS, bdType : BuildingType, waitToFinish : bool =
     Press level up building / construct building.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
         - waitToFinish (bool): If True, will wait for building to finish construct,
             False by default.
@@ -117,10 +117,10 @@ def press_upgrade_button(sws : SWS, bdType : BuildingType, waitToFinish : bool =
 
 def select_and_demolish_building(sws : SWS, index : int):
     """
-    On main building`s screen selects and demolishes one building.
+    On main building`s view selects and demolishes one building.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - index (Int): Denotes index of building site.
 
     Returns:
@@ -155,7 +155,7 @@ def check_requirements(sws : SWS, bdType : BuildingType, forced : bool = False):
     Verifies whether the requirements are fulfilled for building.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
         - forced (bool): If True bypass any inconvenience, False by default.
 
@@ -196,7 +196,7 @@ def check_storage(sws : SWS, bdType : BuildingType, storageType : BuildingType, 
     Checks if storage suffice.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
         - storageType (BuildingType): BuildingType.Warehouse or BuildingType.Granary.
         - forced (bool): If True bypass any inconvenience, False by default.
@@ -238,7 +238,7 @@ def check_resources(sws : SWS, bdType : BuildingType, forced : bool = False):
     Checks if resources suffice.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
         - forced (bool): If True bypass any inconvenience, False by default.
 
@@ -272,7 +272,7 @@ def check_busy_workers(sws : SWS, bdType : BuildingType, forced : bool = False):
     Checks if workers are not busy.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
         - forced (bool): If True bypass any inconvenience, False by default.
 
@@ -300,7 +300,7 @@ def check_not_max_level(sws : SWS, bdType : BuildingType):
     Checks if a building is below its max level.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
 
     Returns:
@@ -320,7 +320,7 @@ def construct_building(sws : SWS, bdType : BuildingType, forced : bool = False, 
     Constructs a new building.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - bdType (BuildingType): Denotes a type of building.
         - forced (bool): If True bypass any inconvenience, False by default.
         - waitToFinish (bool): If True, will wait for building to finish construct,
@@ -379,7 +379,7 @@ def level_up_building_at(sws : SWS, index : int, forced : bool = False, waitToFi
     Levels up a building existing at given index.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - index (Int): Denotes index of building site.
         - forced (bool): If True bypass any inconvenience, False by default.
         - waitToFinish (bool): If True, will wait for building to finish construct,
@@ -439,7 +439,7 @@ def demolish_building_at(sws : SWS, index : int):
     Reduces level of building at index to 0.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper
+        - sws (SWS): Selenium Web Scraper.
         - index (Int or List of Int): Denotes index(indexes) of building site(s).
 
     Returns:

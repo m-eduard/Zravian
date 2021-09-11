@@ -29,7 +29,7 @@ def select_and_research(sws : SWS, tpType : TroopType):
         else:
             logger.error('In select_and_research: Failed to press upgrade')
     else:
-        logger.error('In select_and_research: Not academy screen')
+        logger.error('In select_and_research: Not academy view')
     return status
 
 
