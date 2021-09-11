@@ -75,7 +75,7 @@ def initial_setup(sws : SWS, doTasks=False):
         First login setup.
 
         Parameters:
-            - sws (SWS): Selenium Web Scraper
+            - sws (SWS): Selenium Web Scraper.
             - doTasks (bool): If set account will do tasks, False by default.
 
         Returns:
