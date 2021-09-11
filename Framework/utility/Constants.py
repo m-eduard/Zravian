@@ -83,8 +83,10 @@ class XPATHCollection(dict):
             # Profile
             #
             'PROFILE_TRIBE': '//*[@class="details"]//*[contains(text(), "Tribe:")]/..',
+            'SELECT_VILLAGE': '//*[@id="side_info"]//*[contains(text(), "%s")]',
+            'VILLAGE_NAME': '//*[@id="content"]/h1',
             #
-            # Screens
+            # Views
             #
             'ROMAN_TASK_MASTER': '//*[@class="ql1"]',
             'TEUTON_TASK_MASTER': '//*[@class="ql2"]',
