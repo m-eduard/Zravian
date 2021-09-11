@@ -133,6 +133,40 @@ def get_village_name(sws : SWS):
     return ret
 
 
+def get_current_village(sws : SWS):
+    """
+    Gets the currently selected village.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+
+    Returns:
+        - String with village name if operation was successful, None otherwise.
+    """
+    ret = None
+    selectedVillage = sws.getElementsAttribute(XPATH.SELECTED_VILLAGE, 'text')
+    if selectedVillage:
+        ret = selectedVillage[0]
+    else:
+        logger.error('In get_current_village: Failed to get selected village')
+    return ret
+
+
+def get_all_villages_name(sws : SWS):
+    """
+    Gets the name of all villages:
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+
+    Returns:
+        - List of strings.
+    """
+    villages = sws.getElementsAttribute(XPATH.ALL_VILLAGES_LINKS, 'text')
+    villages = [village[0] for village in villages]
+    return villages
+
+
 def select_village(sws : SWS, villageName : str):
     """
     Attempts to select a village.
@@ -155,10 +189,39 @@ def select_village(sws : SWS, villageName : str):
     return ret
 
 
+def send_goods(sws : SWS, villageName : str, ammount : list):
+    """
+    Will send goods to desired village.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+        - villageName (str): Desired village.
+        - ammount (list): Contains 4 integers denoting how much resources to send.
+
+    Returns:
+        - True if operation was successful, None otherwise.
+    """
+    ret = False
+    if len(ammount) == 4 and all(isinstance(elem, int) for elem in ammount):
+        if get_current_village(sws) != villageName:
+            if sws.clickElement(XPATH.SEND_GOODS % villageName, refresh=True):
+                if sws.sendKeys(XPATH.SEND_LUMBER_INPUT_BOX, str(ammount[0])):
+                    pass
+                else:
+                    logger.error('In send_goods: Failed to send lumber')
+            else:
+                logger.warning('In send_goods: Failed to open send resources page. Ensure marketplace is built')
+        else:
+            logger.warning('In send_goods: Unable to send goods to the same village')
+    else:
+        logger.error('In send_goods: Ammount must contain exactly 4 integers')
+    return ret
+
+
 # Village dependent
 def get_storage(sws : SWS):
     """
-    Checks for storage for each resource.
+    Checks for storage for each resource for current village.
 
     Parameters:
         - sws (SWS): Selenium Web Scraper.
@@ -166,7 +229,6 @@ def get_storage(sws : SWS):
     Returns:
         - List of 4 Ints if operation was successful, None otherwise.
     """
-    # TODO: Select a village first
     storage = []
     if sws.isVisible(XPATH.PRODUCTION_LUMBER):
         lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'text')
@@ -196,7 +258,7 @@ def get_storage(sws : SWS):
 
 def get_production(sws : SWS):
     """
-    Checks for production for each resource.
+    Checks for production for each resource for current village.
 
     Parameters:
         - sws (SWS): Selenium Web Scraper.
@@ -204,7 +266,6 @@ def get_production(sws : SWS):
     Returns:
         - List of 4 Ints if operation was successful, None otherwise.
     """
-    # TODO: Select a village first
     production = []
     lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'title')
     if lumber:
@@ -222,5 +283,4 @@ def get_production(sws : SWS):
         production = None
         logger.error('In get_production: Less than 4 values found')
     return production
-
 

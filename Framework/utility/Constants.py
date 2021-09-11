@@ -84,7 +84,11 @@ class XPATHCollection(dict):
             #
             'PROFILE_TRIBE': '//*[@class="details"]//*[contains(text(), "Tribe:")]/..',
             'SELECT_VILLAGE': '//*[@id="side_info"]//*[contains(text(), "%s")]',
+            'SELECTED_VILLAGE': '//*[@id="side_info"]//*[@class="dot h1"]//a',
+            'ALL_VILLAGES_LINKS': '//*[@id="vlist"]//*[@class="link"]//a',
             'VILLAGE_NAME': '//*[@id="content"]/h1',
+            'SEND_GOODS': f'{self.objects.SELECT_VILLAGE}/../../../..//*[contains(text(), "Send goods")]',
+            'SEND_TROOPS': f'{self.objects.SELECT_VILLAGE}/../../../..//*[contains(text(), "Send troops!")]',
             #
             # Views
             #
@@ -126,6 +130,10 @@ class XPATHCollection(dict):
             # DEMOLITION
             'DEMOLITION_BUILDING_OPTION': '//*[contains(text(), "%s")]',
             'DEMOLITION_BTN': '//*[@id="btn_demolish"]',
+            #
+            # Marketplace
+            #
+            'SEND_LUMBER_INPUT_BOX': '//*[@id="send_select"]//*[contains(text(), "Lumber")]//input',
             #
             # Academy
             #
