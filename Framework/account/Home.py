@@ -218,6 +218,20 @@ def send_goods(sws : SWS, villageName : str, ammount : list):
     return ret
 
 
+def send_troops(sws : SWS, villageName : str):
+    """
+    Will send goods to desired village.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+        - villageName (str): Desired village.
+        - ammount (list): Contains 4 integers denoting how much resources to send.
+
+    Returns:
+        - True if operation was successful, None otherwise.
+    """
+    return True
+
 # Village dependent
 def get_storage(sws : SWS):
     """

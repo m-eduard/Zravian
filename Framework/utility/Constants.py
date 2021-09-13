@@ -87,8 +87,8 @@ class XPATHCollection(dict):
             'SELECTED_VILLAGE': '//*[@id="side_info"]//*[@class="dot h1"]//a',
             'ALL_VILLAGES_LINKS': '//*[@id="vlist"]//*[@class="link"]//a',
             'VILLAGE_NAME': '//*[@id="content"]/h1',
-            'SEND_GOODS': f'{self.objects.SELECT_VILLAGE}/../../../..//*[contains(text(), "Send goods")]',
-            'SEND_TROOPS': f'{self.objects.SELECT_VILLAGE}/../../../..//*[contains(text(), "Send troops!")]',
+            'SEND_GOODS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send goods")]',
+            'SEND_TROOPS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send troops!")]',
             #
             # Views
             #
