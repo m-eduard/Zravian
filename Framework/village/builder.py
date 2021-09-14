@@ -366,7 +366,7 @@ def construct_building(sws : SWS, bdType : BuildingType, forced : bool = False, 
                     else:
                         logger.error('In construct_building: Village is full')
                 else:
-                    logger.info(f'In construct_building: {BUILDINGS[bdType].name} is already constructed')
+                    logger.warning(f'In construct_building: {BUILDINGS[bdType].name} is already constructed')
             else:
                 logger.error('In construct_building: Requirements check failed')
         else:

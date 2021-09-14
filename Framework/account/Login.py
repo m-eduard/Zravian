@@ -71,40 +71,40 @@ def login(server : Server, username : str, headless=False, password=UNDEFINED):
 
 
 def initial_setup(sws : SWS, doTasks=False):
-        """
-        First login setup.
+    """
+    First login setup.
 
-        Parameters:
-            - sws (SWS): Selenium Web Scraper.
-            - doTasks (bool): If set account will do tasks, False by default.
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+        - doTasks (bool): If set account will do tasks, False by default.
 
-        Returns:
-            - True if operation was succesful, False otherwise.
-        """
-        ret = False
-        if sws.isVisible(XPATH.STRING_ON_SCREEN % 'Welcome to Zravian!'):
-            print('PLM')
-        if sws.clickElement(XPATH.STRING_ON_SCREEN % CONTINUE_BTN_TEXT, refresh=True, waitFor=True):
-            if doTasks:
-                if sws.clickElement(XPATH.STRING_ON_SCREEN % ACCEPT_TASKS_TEXT, waitFor=True, javaScriptClick=True):
-                    logger.success('In initial_setup: Accepted tasks')
-                    ret = True
-                else:
-                    logger.error('In initial_setup: Failed to accept tasks')
+    Returns:
+        - True if operation was succesful, False otherwise.
+    """
+    ret = False
+    if sws.isVisible(XPATH.STRING_ON_SCREEN % 'Welcome to Zravian!'):
+        print('PLM')
+    if sws.clickElement(XPATH.STRING_ON_SCREEN % CONTINUE_BTN_TEXT, refresh=True, waitFor=True):
+        if doTasks:
+            if sws.clickElement(XPATH.STRING_ON_SCREEN % ACCEPT_TASKS_TEXT, waitFor=True, javaScriptClick=True):
+                logger.success('In initial_setup: Accepted tasks')
+                ret = True
             else:
-                if sws.clickElement(XPATH.STRING_ON_SCREEN % REFUSE_TASKS_TEXT, waitFor=True, javaScriptClick=True):
+                logger.error('In initial_setup: Failed to accept tasks')
+        else:
+            if sws.clickElement(XPATH.STRING_ON_SCREEN % REFUSE_TASKS_TEXT, waitFor=True, javaScriptClick=True):
+                if sws.clickElement(XPATH.STRING_ON_SCREEN % REFUSE_TASKS_TEXT, waitFor=True, \
+                        javaScriptClick=True):
                     if sws.clickElement(XPATH.STRING_ON_SCREEN % REFUSE_TASKS_TEXT, waitFor=True, \
                             javaScriptClick=True):
-                        if sws.clickElement(XPATH.STRING_ON_SCREEN % REFUSE_TASKS_TEXT, waitFor=True, \
-                                javaScriptClick=True):
-                            logger.success('In initial_setup: Refused tasks')
-                            ret = True
-                        else:
-                            logger.error('In initial_setup: Failed to press "Skip tasks" third time')
+                        logger.success('In initial_setup: Refused tasks')
+                        ret = True
                     else:
-                        logger.error('In initial_setup: Failed to press "Skip tasks" second time')
+                        logger.error('In initial_setup: Failed to press "Skip tasks" third time')
                 else:
-                    logger.error('In initial_setup: Failed to press "Skip tasks" first time')
-        else:
-            logger.error('In initial_setup: Failed to click continue button')
-        return ret
+                    logger.error('In initial_setup: Failed to press "Skip tasks" second time')
+            else:
+                logger.error('In initial_setup: Failed to press "Skip tasks" first time')
+    else:
+        logger.error('In initial_setup: Failed to click continue button')
+    return ret
