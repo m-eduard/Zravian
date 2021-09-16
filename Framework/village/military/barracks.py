@@ -40,5 +40,5 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
         logger.error('In function make_troops_by_amount: Not barracks screen')
 
     return status
-
+##
     
