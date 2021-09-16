@@ -42,7 +42,7 @@ def find_buildings(sws : SWS, bdType : BuildingType):
         lst = []
         elems = sws.getElementsAttribute(XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, 'href')
         for elem in elems:
-            siteIndexText = re.search('id=[0-9]+', elem[0])
+            siteIndexText = re.search('id=[0-9]+', elem)
             if siteIndexText:
                 lst.append(int(siteIndexText.group()[3:]))
             else:
@@ -96,7 +96,7 @@ def get_building_data(sws : SWS, bdType : BuildingType):
     if moveStatus:
         lst = []
         attributes = ['href', 'alt']
-        elems = sws.getElementsAttribute(XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, attributes)
+        elems = sws.getElementsAttributes(XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, attributes)
         for elem in elems:
             elemId = None
             siteIndexText = re.search('id=[0-9]+', elem[0])

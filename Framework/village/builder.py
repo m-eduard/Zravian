@@ -31,14 +31,14 @@ def get_busy_workers_timer(sws : SWS):
             propList = [XPATH.FINISH_DIALOG, XPATH.INSIDE_TIMER]
             workingTimer = sws.getElementAttribute(propList, 'text')
             if workingTimer:
-                while re.search('[^0-9]', workingTimer[0]):
+                while re.search('[^0-9]', workingTimer):
                     workingTimer = sws.getElementAttribute(propList, 'text')
                     time.sleep(1)
             if not sws.get(initialURL):
                 logger.error('In get_busy_workers_timer: Failed to return to initial URL')
             else:
                 if workingTimer:
-                    ret = time_to_seconds(workingTimer[0])
+                    ret = time_to_seconds(workingTimer)
                 else:
                     ret = 0
         else:
@@ -62,17 +62,15 @@ def get_time_to_build(sws : SWS, bdType : BuildingType):
     time_left = None
     if sws.isVisible(XPATH.BUILDING_PAGE_EMPTY_TITLE):
         propList = [XPATH.CONSTRUCT_BUILDING_NAME % BUILDINGS[bdType].name, XPATH.CONSTRUCT_COSTS]
-        costsTag = sws.getElementAttribute(propList, 'text')
-        if costsTag:
-            costs = costsTag[0]
+        costs = sws.getElementAttribute(propList, 'text')
+        if costs:
             time_left = time_to_seconds(costs.split('|')[-1])
         else:
             logger.error('In get_time_to_build: Could not find construct costs')
     else:
         propList = [XPATH.LEVEL_UP_COSTS]
-        costsTag = sws.getElementAttribute(propList, 'text')
-        if costsTag:
-            costs = costsTag[0]
+        costs = sws.getElementAttribute(propList, 'text')
+        if costs:
             time_left = time_to_seconds(costs.split('|')[-1].split()[0])
         else:
             logger.error('In get_time_to_build: Could not find upgrade costs')
@@ -136,7 +134,7 @@ def select_and_demolish_building(sws : SWS, index : int):
                 while demolitionTimer:
                     demolitionTimer = sws.getElementAttribute(propList, 'text')
                     if demolitionTimer:
-                        dmTime = max(1, time_to_seconds(demolitionTimer[0]))
+                        dmTime = max(1, time_to_seconds(demolitionTimer))
                         time.sleep(dmTime)
                 status = True
                 logger.success(f'In select_and_demolish_building: Successfully demolished {index}')
@@ -253,7 +251,7 @@ def check_resources(sws : SWS, bdType : BuildingType, forced : bool = False):
     propList.append(XPATH.INSIDE_TIMER)
     requirementTimer = sws.getElementAttribute(propList, 'text')
     if requirementTimer:
-        time_left = time_to_seconds(requirementTimer[0])
+        time_left = time_to_seconds(requirementTimer)
         if forced:
             time.sleep(time_left)
             if sws.refresh():
@@ -398,7 +396,7 @@ def level_up_building_at(sws : SWS, index : int, forced : bool = False, waitToFi
             buildingSiteElemText = sws.getElementAttribute(XPATH.BUILDING_SITE_ID % index, 'alt')
             bdType = None
             if buildingSiteElemText:
-                buildingSiteRe = re.search('(.*) level', buildingSiteElemText[0])
+                buildingSiteRe = re.search('(.*) level', buildingSiteElemText)
                 if buildingSiteRe:
                     buildingSiteName = buildingSiteRe.group()[:-len('level')]
                     bdType = get_building_type_by_name(buildingSiteName)

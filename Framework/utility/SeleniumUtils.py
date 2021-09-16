@@ -310,7 +310,7 @@ class SWS:
                             ret.append(elem.get_attribute(at))
                     ret = [str(e) for e in ret]
         else:
-            logger.error('In getElementAttribute: Invalid parameter prop')
+            logger.error('In getElementAttributes: Invalid parameter prop')
         return ret
 
     @__seleniumRefreshLock
@@ -369,7 +369,7 @@ class SWS:
                             tmpList.append(elem.get_attribute(at))
                     ret.append(tmpList)
         else:
-            logger.error('In getElementsAttribute: Invalid parameter prop')
+            logger.error('In getElementsAttributes: Invalid parameter prop')
         return ret
 
     @__seleniumRefreshLock
