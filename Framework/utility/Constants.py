@@ -138,6 +138,17 @@ class XPATHCollection(dict):
             # Academy
             #
             'RESEARCH_TROOP': '//*[contains(text(), "%s")]/../../..//*[contains(text(), "Research")]',
+            #
+            # Barracks
+            #
+            'TROOP_INPUT_BOX': '//*[@class="build_details"]//*[@alt="%s"]/../../..//input',
+            'TROOP_MAX_UNITS': '//*[@alt="%s"]/../../../..//*[@class="max"]/a',
+            'TROOP_TRAIN_BTN': '//*[@id="btn_train"]',
+            #
+            # Hero's Mansion
+            #
+            'HERO_TRAIN_BTN': '//*[@class="build_details"]//*[@alt="%s"]/../../..//*[contains(text(), "Train")]',
+            'HERO_EXISTING': '//*[contains(text(), "Experience")]',
             # Research errors
             'RESEARCH_ERR_RESOURCES': '//*[contains(text(), "%s")]/../../..//*[contains(text(), "Not enough resources")]',
         }

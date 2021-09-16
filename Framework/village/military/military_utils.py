@@ -139,3 +139,23 @@ def enter_armoury(sws : SWS):
         logger.warning('In enter_armoury: Armoury not found')
     return status
 
+def enter_heromansion(sws : SWS):
+    """
+    Enters Hero's Mansion.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+
+    Returns:
+        - True if operation was successful, False otherwise.    
+    """
+    status = False
+    heromansionId = find_building(sws, BuildingType.HeroMansion)
+    if heromansionId:
+        if enter_building_menu(sws, heromansionId):
+            status = True
+        else:
+            logger.error('In enter_heromansion: Failed to enter building')
+    else:
+        logger.warning('In enter_heromansion: Hero Mansion not found')
+    return status

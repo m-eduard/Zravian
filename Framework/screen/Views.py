@@ -53,7 +53,7 @@ def __move_to_view(sws : SWS, view : Views, forced : bool = False):
         - True if the operation was successful, False otherwise.
     """
     ret = False
-    BASE_URL = sws.getCurrentUrl.rsplit("/", 1) + '/'
+    BASE_URL = sws.getCurrentUrl().rsplit("/", 1)[0] + '/'
     if view != get_current_view(sws) or forced:
         if sws.get(BASE_URL + view.value):
             ret = True
