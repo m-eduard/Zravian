@@ -238,6 +238,14 @@ class TroopType(Enum):
     GSettler = 30
 
 
+# Enum with all resource types
+class ResourceType(Enum):
+    LUMBER = 'lumber'
+    CLAY = 'clay'
+    IRON = 'iron'
+    CROP = 'crop'
+
+
 # Class containing building properties
 class Building:
     def __init__(self, data):

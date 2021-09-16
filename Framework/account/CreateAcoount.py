@@ -55,8 +55,8 @@ class CreateZravianAccount:
                     endTime = startTime + MAX_POLLING_TIME
                     while startTime < endTime:
                         email = self.sws.getElementAttribute(XPATH.TE_EMAIL_BOX, 'text')
-                        if email and email[0] != initialEmail[0]:
-                            ret = str(email[0])
+                        if email and email != initialEmail:
+                            ret = str(email)
                             logger.success(f'In generate_email: Generated email {email}')
                             break
                         time.sleep(DEFAULT_POLLING_TIME)
@@ -100,9 +100,9 @@ class CreateZravianAccount:
         if email_opened:
             ACTIVATE_TEXT = 'activate.php?'
             link = None
-            elems = self.sws.getElementAttribute(XPATH.STRING_ON_SCREEN % ACTIVATE_TEXT, 'text', waitFor=True)
-            if elems:
-                for potential_link in elems[0].split():
+            elem = self.sws.getElementAttribute(XPATH.STRING_ON_SCREEN % ACTIVATE_TEXT, 'text', waitFor=True)
+            if elem:
+                for potential_link in elem.split():
                     if ACTIVATE_TEXT in potential_link:
                         link = potential_link
                         break
@@ -253,14 +253,14 @@ class CreateZravianAccount:
                 elif self.sws.isVisible(XPATH.ZRAVIAN_ERROR_STATUS):
                     errorMsg = self.sws.getElementAttribute(XPATH.ZRAVIAN_ERROR_STATUS_MSG, 'text')
                     if errorMsg:
-                        if errorMsg[0] == ERR_NAME_IN_USE:
+                        if errorMsg == ERR_NAME_IN_USE:
                             if not self.store_new_account(username, UNDEFINED, server):
                                 logger.error('In complete_registration_form: Failed to store account with\
                                     unknown password')
                             else:
                                 logger.warning('In complete_registration_form: Added unknown account')
                         else:
-                            logger.error(f'In complete_registration_form: Failed with site error {errorMsg[0]}')
+                            logger.error(f'In complete_registration_form: Failed with site error {errorMsg}')
                     else:
                         logger.error('In complete_registration_form: Failed to get error message')
                 else:

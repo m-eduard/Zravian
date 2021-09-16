@@ -1,7 +1,7 @@
 from enum import IntEnum
 from Framework.screen.Views import Views, get_current_view, move_to_profile
 from Framework.utility.Logger import get_projectLogger
-from Framework.utility.Constants import Tribe, get_XPATH
+from Framework.utility.Constants import BuildingType, ResourceType, Tribe, get_XPATH
 from Framework.utility.SeleniumUtils import SWS
 
 
@@ -30,7 +30,7 @@ def getTribe(sws : SWS):
         if move_to_profile(sws):
             text = sws.getElementAttribute(XPATH.PROFILE_TRIBE, 'text')
             if text:
-                text = text[0].split()[-1].upper()
+                text = text.split()[-1].upper()
                 for tribe in Tribe:
                     if tribe.value == text:
                         TRIBE = tribe
@@ -62,7 +62,6 @@ def get_level_up_mode(sws : SWS):
     if currentView == Views.OVERVIEW or currentView == Views.VILLAGE:
         coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
         if coneTitle:
-            coneTitle = coneTitle[0]
             if "enable" in coneTitle:
                 status = LevelUpMode.OFF
             elif 'disable' in coneTitle:
@@ -93,7 +92,6 @@ def set_level_up_mode(sws : SWS, levelUpMode : LevelUpMode):
     if currentView == Views.OVERVIEW or currentView == Views.VILLAGE:
         coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
         if coneTitle:
-            coneTitle = coneTitle[0]
             if (levelUpMode == LevelUpMode.ON and "enable" in coneTitle) or \
                     (levelUpMode == LevelUpMode.OFF and "disable" in coneTitle):
                 if sws.clickElement(XPATH.LEVEL_UP_CONE, refresh=True):
@@ -125,9 +123,9 @@ def get_village_name(sws : SWS):
     if currentView == Views.OVERVIEW or currentView == Views.VILLAGE:
         villageName = sws.getElementAttribute(XPATH.VILLAGE_NAME, 'text')
         if villageName:
-            ret = villageName[0]
+            ret = villageName
         else:
-            logger.error('In get_village_name: Failed to get village name')
+            logger.error('In get_village_name: Failed to get village name from element')
     else:
         logger.error('In get_village_name: Unable to get village name in this view')
     return ret
@@ -146,7 +144,7 @@ def get_current_village(sws : SWS):
     ret = None
     selectedVillage = sws.getElementsAttribute(XPATH.SELECTED_VILLAGE, 'text')
     if selectedVillage:
-        ret = selectedVillage[0]
+        ret = selectedVillage
     else:
         logger.error('In get_current_village: Failed to get selected village')
     return ret
@@ -163,7 +161,6 @@ def get_all_villages_name(sws : SWS):
         - List of strings.
     """
     villages = sws.getElementsAttribute(XPATH.ALL_VILLAGES_LINKS, 'text')
-    villages = [village[0] for village in villages]
     return villages
 
 
@@ -241,32 +238,53 @@ def get_storage(sws : SWS):
         - sws (SWS): Selenium Web Scraper.
     
     Returns:
-        - List of 4 Ints if operation was successful, None otherwise.
+        - Dictionary mapping each resource field to tuple.
     """
-    storage = []
-    if sws.isVisible(XPATH.PRODUCTION_LUMBER):
-        lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'text')
-        if lumber:
-            lumber = lumber[0].split('/')
-            storage.append((int(lumber[0]), int(lumber[1])))
-    if sws.isVisible(XPATH.PRODUCTION_CLAY):
-        clay =  sws.getElementAttribute(XPATH.PRODUCTION_CLAY, 'text')
-        if clay:
-            clay = clay[0].split('/')
-            storage.append((int(clay[0]), int(clay[1])))
-    if sws.isVisible(XPATH.PRODUCTION_IRON):
-        iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, 'text')
-        if iron:
-            iron = iron[0].split('/')
-            storage.append((int(iron[0]), int(iron[1])))
-    if sws.isVisible(XPATH.PRODUCTION_CROP):
-        crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, 'text')
-        if crop:
-            crop = crop[0].split('/')
-            storage.append((int(crop[0]), int(crop[1])))
-    if len(storage) != 4:
-        storage = None
-        logger.error('In get_storage: Less than 4 values found')
+    storage = {}
+    # Extract lumber storage
+    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'text')
+    if lumber:
+        try:
+            lumber_curr = int(lumber.split('/')[0])
+            lumber_cap = int(lumber.split('/')[1])
+            storage[ResourceType.LUMBER] = (lumber_curr, lumber_cap)
+        except ValueError as e:
+            logger.error('In get_storage: Failed to convert to int. Error: %s' % e)
+    else:
+        logger.error('In get_storage: Failed to get lumber storage')
+    # Extract clay storage
+    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, 'text')
+    if clay:
+        try:
+            clay_curr = int(clay.split('/')[0])
+            clay_cap = int(clay.split('/')[1])
+            storage[ResourceType.CLAY] = (clay_curr, clay_cap)
+        except ValueError as e:
+            logger.error('In get_storage: Failed to convert to int. Error: %s' % e)
+    else:
+        logger.error('In get_storage: Failed to get clay storage')
+    # Extract iron storage
+    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, 'text')
+    if iron:
+        try:
+            iron_curr = int(iron.split('/')[0])
+            iron_cap = int(iron.split('/')[1])
+            storage[ResourceType.IRON] = (iron_curr, iron_cap)
+        except ValueError as e:
+            logger.error('In get_storage: Failed to convert to int. Error: %s' % e)
+    else:
+        logger.error('In get_storage: Failed to get iron storage')
+    # Extract crop storage
+    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, 'text')
+    if crop:
+        try:
+            crop_curr = int(crop.split('/')[0])
+            crop_cap = int(crop.split('/')[1])
+            storage[ResourceType.CROP] = (crop_curr, crop_cap)
+        except ValueError as e:
+            logger.error('In get_storage: Failed to convert to int. Error: %s' % e)
+    else:
+        logger.error('In get_storage: Failed to get crop storage')
     return storage
 
 
@@ -278,23 +296,44 @@ def get_production(sws : SWS):
         - sws (SWS): Selenium Web Scraper.
     
     Returns:
-        - List of 4 Ints if operation was successful, None otherwise.
+        - Dictionary mapping each resource to its production value.
     """
-    production = []
+    production = {}
+    # Extract lumber production
     lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'title')
     if lumber:
-        production.append(int(lumber[0]))
+        try:
+            production[ResourceType.LUMBER] = int(lumber)
+        except ValueError as e:
+            logger.error('In get_production: Failed to convert to int. Error: %s' % e)
+    else:
+        logger.error('In get_storage: Failed to get lumber storage')
+    # Extract clay production
     clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, 'title')
     if clay:
-        production.append(int(clay[0]))
+        try:
+            production[ResourceType.CLAY] = int(clay)
+        except ValueError as e:
+            logger.error('In get_production: Failed to convert to int. Error: %s' % e)
+    else:
+        logger.error('In get_storage: Failed to get clay storage')
+    # Extract iron production
     iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, 'title')
     if iron:
-        production.append(int(iron[0]))
+        try:
+            production[ResourceType.IRON] = int(iron)
+        except ValueError as e:
+            logger.error('In get_production: Failed to convert to int. Error: %s' % e)
+    else:
+        logger.error('In get_storage: Failed to get iron storage')
+    # Extract crop production
     crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, 'title')
     if crop:
-        production.append(int(crop[0]))
-    if len(production) != 4:
-        production = None
-        logger.error('In get_production: Less than 4 values found')
+        try:
+            production[ResourceType.CROP] = int(crop)
+        except ValueError as e:
+            logger.error('In get_production: Failed to convert to int. Error: %s' % e)
+    else:
+        logger.error('In get_storage: Failed to get crop storage')
     return production
 
