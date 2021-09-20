@@ -1,5 +1,6 @@
-from Framework.village.builder import construct_building, level_up_building_at
-from Framework.village.builder_utils import check_building_page_title, get_building_data
+from Framework.military.military_utils import enter_academy
+from Framework.build.builder import construct_building, level_up_building_at
+from Framework.build.builder_utils import check_building_page_title, get_building_data
 from Framework.utility.SeleniumUtils import SWS
 from Framework.utility.Constants import BuildingType, TroopType, get_TROOPS, get_XPATH
 from Framework.utility.Logger import get_projectLogger
@@ -24,7 +25,6 @@ def select_and_research(sws : SWS, tpType : TroopType):
     status = False
     if check_building_page_title(sws, BuildingType.Academy):
         if sws.clickElement(XPATH.RESEARCH_TROOP % TROOPS[tpType].name):
-            logger.success(f'In select_and_research: {TROOPS[tpType].name} was researched')
             status = True
         else:
             logger.error('In select_and_research: Failed to press upgrade')
@@ -33,7 +33,7 @@ def select_and_research(sws : SWS, tpType : TroopType):
     return status
 
 
-def check_troop__bd_requirements(sws : SWS, tpType : TroopType, forced : bool = False):
+def check_troop_bd_requirements(sws : SWS, tpType : TroopType, forced : bool = False):
     """
     Verifies requirements for troup.
 
@@ -46,7 +46,7 @@ def check_troop__bd_requirements(sws : SWS, tpType : TroopType, forced : bool = 
         - True if the requirements are fulfilled.
     """
     status = False
-    requirements = TROOPS[type].requirements
+    requirements = TROOPS[tpType].requirements
     for reqBd, reqLevel in requirements:
         reqBdList = get_building_data(sws, reqBd)
         if not reqBdList:  # Construct
@@ -87,8 +87,9 @@ def research(sws : SWS, tpType : TroopType, forced : bool = False):
         - True if the operation is successful, False otherwise.
     """
     status = False
-    if check_troop__bd_requirements(sws, TroopType, True):
-        if select_and_research(sws, TroopType):
+    if check_troop_bd_requirements(sws, tpType, forced):
+        enter_academy(sws)
+        if select_and_research(sws, tpType):
             logger.success(f'In function research: {TROOPS[tpType].name} was researched.')
             status = True
         else:

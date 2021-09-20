@@ -1,4 +1,4 @@
-from Framework.village.builder_utils import check_building_page_title
+from Framework.build.builder_utils import check_building_page_title
 from Framework.utility.Logger import get_projectLogger
 from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH
 from Framework.utility.SeleniumUtils import SWS
