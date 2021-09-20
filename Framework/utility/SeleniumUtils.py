@@ -328,7 +328,7 @@ class SWS:
         """
         ret = []
         if prop:
-            retList = self.getElementsAttribute(prop, attr, waitFor)
+            retList = self.getElementsAttributes(prop, [attr], waitFor)
             if retList:
                 ret = retList[0]
         else:
@@ -352,7 +352,6 @@ class SWS:
         if prop:
             tmp_driver = self.driver
             if isinstance(prop, list):
-                elems = []
                 for currProp in prop[:-1]:
                     tmp_driver = SWS.__findElement(tmp_driver, currProp, waitFor=waitFor)
                     if not tmp_driver:
