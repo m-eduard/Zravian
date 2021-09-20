@@ -41,4 +41,3 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 
     return status
 ##
-    

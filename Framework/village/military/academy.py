@@ -87,7 +87,21 @@ def research(sws : SWS, tpType : TroopType, forced : bool = False):
         - True if the operation is successful, False otherwise.
     """
     status = False
+    if check_troop__bd_requirements(sws, TroopType, True):
+        if select_and_research(sws, TroopType):
+            logger.success(f'In function research: {TROOPS[tpType].name} was researched.')
+            status = True
+        else:
+            logger.error('In function research: Failed to research troop.')
+    else:
+        logger.error('In function research: Failed to check and resolve requirements.')
     return status
+    
+    """
 
+    -Check requirements -> reference construct_bulding
+    --error checking
+    -press button
 
+    """
 
