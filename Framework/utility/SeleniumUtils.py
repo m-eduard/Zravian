@@ -42,7 +42,7 @@ class SWS:
         Decorator used to avoid "StaleElementReferenceException" in SeleniumUtils functions.
 
         Parameters:
-            - func (Function): Function to call untill the result does not generate StaleElementReferenceException.
+            - func (Function): Function to call until the result does not generate StaleElementReferenceException.
         
         Returns:
             - Function wrapper

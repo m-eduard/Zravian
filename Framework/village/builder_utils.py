@@ -79,7 +79,7 @@ def find_building(sws : SWS, bdType : BuildingType):
 
 def get_building_data(sws : SWS, bdType : BuildingType):
     """
-    Finds building site id and level for requested buildin type ordered by level.
+    Finds building site id and level for requested building type ordered by level.
 
     Parameters:
         - sws (SWS): Selenium Web Scraper.
@@ -198,6 +198,6 @@ def time_to_seconds(currTime : str):
         - Equivalent time in seconds.
     """
     SECONDS_IN_HOUR = 3600
-    SECONDS_IN_MIN = 3600
+    SECONDS_IN_MIN = 60
     h, m, s = currTime.split(':')
     return int(h) * SECONDS_IN_HOUR + int(m) * SECONDS_IN_MIN + int(s)
