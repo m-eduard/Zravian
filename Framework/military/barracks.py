@@ -101,29 +101,27 @@ def get_total_training_time(sws: SWS):
 	# iterate through the lines of the table, by xpath
 	# table = sws._SWS__findElement(sws.driver, XPATH.TROOP_TABLE, False)
 	i = 1
-	for row in sws.driver.find_elements_by_xpath('//*[@class="under_progress"]/tbody//tr/td[@class="dur"]/span[@id="timer1"]'):
-		if not status:
-			status = True
+	# for row in sws.driver.find_elements_by_xpath('//*[@class="under_progress"]//tr '):
+	# 	if not status:
+	# 		status = True
 
-		# make a constant with table's XPATH
-		tmpTime = sws.getElementAttribute(f'//*[@class="under_progress"]/tbody//tr[{i}]/td[@class="dur"]/span[@id="timer1"]', 'text')
+	# 	# make a constant with table's XPATH
+	# 	tmpTime = sws.getElementAttribute(f'//*[@class="under_progress"]/tbody//tr[{i}]/td[@class="dur"]/span[@id="timer1"]', 'text')
 
-		if tmpTime[-1] == '?':
-			logger.error('In get_total_training_time: zravian undefined time error (00:00:00?)')
-			tmpTime = 0
-		else:
-			# next update: add troop type
-			logger.success(f'In function get_total_training_time: {tmpTime}s.')
+	# 	if tmpTime[-1] == '?':
+	# 		logger.error('In get_total_training_time: zravian undefined time error (00:00:00?)')
+	# 		tmpTime = 0
+	# 	else:
+	# 		# next update: add troop type
+	# 		logger.success(f'In function get_total_training_time: {tmpTime}s.')
 
-			tmpTime = time_to_seconds(tmpTime)
+	# 		tmpTime = time_to_seconds(tmpTime)
 
-		totalTime += tmpTime
-		i += 1
-	
-	# for row in sws.getElementsAttribute('//*[@class="under_progress"]/tbody//tr/td[@class="dur"]/span[@id="timer1"]', 'text'):
-	# 	print(row)
-	# table = sws._SWS__findElement('//*[@class="under_progress"]/tbody//tr/td[@class="dur"]/span[@id="timer1"]')
-	# print("yes" + table.text)
+	# 	totalTime += tmpTime
+	# 	i += 1
+
+	for row in sws.getElementsAttribute('//*[@class="under_progress"]//tr' , 'text'):
+		print(row)
 
 
 	if status == False:
