@@ -1,7 +1,7 @@
+from Framework.screen.HomeUI import move_to_reports, move_to_overview
 from Framework.utility.Constants import get_XPATH
 from Framework.utility.Logger import get_projectLogger
 from Framework.utility.SeleniumUtils import SWS
-from Framework.screen.Views import Views, get_current_view, move_to_reports
 
 
 # Project constants
@@ -21,17 +21,23 @@ def read_all_new_reports(sws : SWS):
     """
     ret = False
     UNREAD_REPORT_TEXT = '(unread)'
-    if get_current_view(sws) == Views.REPORTS:
+    if move_to_reports(sws):
         while sws.isVisible(XPATH.STRING_ON_SCREEN % UNREAD_REPORT_TEXT):
             if sws.clickElement(f"{XPATH.STRING_ON_SCREEN % UNREAD_REPORT_TEXT}/*", refresh=True):
                 if not move_to_reports(sws, forced=True):
-                    logger.error('In read_all_new_reports: Failed to return to reports')
+                    logger.error('In read_all_new_reports: Failed to return to Reports')
                     break
             else:
-                logger.error('In read_all_new_reports: Failed to open new message')
+                logger.error('In read_all_new_reports: Failed to open new report')
                 break
         else:
             ret = True
     else:
-        logger.error('In get_rank: View is not reports')
+        logger.error('In read_all_new_reports: Failed to move to Reports')
+    # Return to Overview
+    if move_to_overview(sws) and ret:
+        logger.success('In read_all_new_reports: All new reports were read')
+    else:
+        ret = False
+        logger.error('In read_all_new_reports: Failed to move to Overview')
     return ret

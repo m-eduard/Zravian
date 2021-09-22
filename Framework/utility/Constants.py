@@ -18,6 +18,23 @@ ACCOUNT_LIBRARY_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account_library.json
 LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\execution.log')
 
 
+# General purpose functions
+def time_to_seconds(currTime : str):
+    """
+    Converts time in format hh:mm:ss to seconds
+
+    Parameters:
+        - currTime (str): Time in format hh:mm:ss.
+
+    Returns:
+        - Equivalent time in seconds.
+    """
+    SECONDS_IN_HOUR = 3600
+    SECONDS_IN_MIN = 3600
+    h, m, s = currTime.split(':')
+    return int(h) * SECONDS_IN_HOUR + int(m) * SECONDS_IN_MIN + int(s)
+
+
 def get_building_type_by_name(text : str):
     """
     Finds BuildingType based on text.
@@ -34,6 +51,7 @@ def get_building_type_by_name(text : str):
     return None
 
 
+# Servers list
 class Server(Enum):
     NONSTOP = 'https://nonstop.zravian.com/'
     S1 = 'https://s1.zravian.com/'

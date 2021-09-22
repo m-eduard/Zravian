@@ -32,7 +32,7 @@ def get_account_password(username : str, server : Server):
     ret = None
     account = get_account(username, server)
     if account:
-        ret = account[JSON_PASSWORD_KEY]
+        ret = str(account[JSON_PASSWORD_KEY])
     else:
         logger.error('In get_account_password: Failed to get `account_library.json`')
     return ret
@@ -52,21 +52,24 @@ def login(server : Server, username : str, headless=False, password=UNDEFINED):
     sws = SWS(headless)
     if password == UNDEFINED:
         password = get_account_password(username, server)
-    if sws.get(server.value):
-        if sws.sendKeys(XPATH.LOGIN_USER_INPUT, username):
-            if sws.sendKeys(XPATH.LOGIN_PASS_INPUT, password):
-                if sws.clickElement(XPATH.LOGIN_SUBMIT_BTN, refresh=True):
-                    initString = '<' + 25 * '-' + 'STARTED NEW SESSION' + 25 * '-' + '>'
-                    logger.success(initString)
-                    yield sws
+    if password:
+        if sws.get(server.value):
+            if sws.sendKeys(XPATH.LOGIN_USER_INPUT, username):
+                if sws.sendKeys(XPATH.LOGIN_PASS_INPUT, password):
+                    if sws.clickElement(XPATH.LOGIN_SUBMIT_BTN, refresh=True):
+                        initString = '<' + 25 * '-' + 'STARTED NEW SESSION' + 25 * '-' + '>'
+                        logger.success(initString)
+                        yield sws
+                    else:
+                        logger.error('In login: Failed to click LOGIN_SUBMIT_BTN!')
                 else:
-                    logger.error('In login: Failed to click LOGIN_SUBMIT_BTN!')
+                    logger.error('In login: Failed to type text in LOGIN_PASS_INPUT!')
             else:
-                logger.error('In login: Failed to type text in LOGIN_PASS_INPUT!')
+                logger.error('In login: Failed to type text in LOGIN_USER_INPUT!')
         else:
-            logger.error('In login: Failed to type text in LOGIN_USER_INPUT!')
+            logger.error('In login: Failed to load {server.value}!')
     else:
-        logger.error('In login: Failed to load {server.value}!')
+        logger.error(f'In login: Failed to get password for {username}')
     sws.close()
 
 
