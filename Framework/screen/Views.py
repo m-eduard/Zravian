@@ -1,13 +1,12 @@
-from enum import IntEnum, Enum
-from Framework.utility.Constants import Tribe, get_XPATH
+from enum import Enum
+from Framework.utility.Constants import get_XPATH
 from Framework.utility.Logger import get_projectLogger
 from Framework.utility.SeleniumUtils import SWS
 
 
+# Project constants
 logger = get_projectLogger()
 XPATH = get_XPATH()
-TRIBE = None
-
 
 
 class Views(Enum):
@@ -16,6 +15,8 @@ class Views(Enum):
     MAP = 'map.php'
     STATS = 'statistics.php'
     PROFILE = 'profile.php'
+    MESSAGES = 'msg.php'
+    REPORTS = 'report.php'
 
 
 def get_current_view(sws : SWS):
@@ -120,9 +121,37 @@ def move_to_stats(sws : SWS, forced : bool = False):
     return __move_to_view(sws, Views.STATS, forced)
 
 
+def move_to_messages(sws : SWS, forced : bool = False):
+    """
+    Changes current view to messages.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+        - forced (bool): If true will refresh the page.
+
+    Returns:
+        - True if operation is successful, False otherwise.
+    """
+    return __move_to_view(sws, Views.MESSAGES, forced)
+
+
+def move_to_reports(sws : SWS, forced : bool = False):
+    """
+    Changes current view to reports.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+        - forced (bool): If true will refresh the page.
+
+    Returns:
+        - True if operation is successful, False otherwise.
+    """
+    return __move_to_view(sws, Views.REPORTS, forced)
+
+
 def move_to_profile(sws : SWS, forced : bool = False):
     """
-    Changes current view to stats.
+    Changes current view to profile.
 
     Parameters:
         - sws (SWS): Selenium Web Scraper.

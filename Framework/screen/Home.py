@@ -1,17 +1,98 @@
-from enum import IntEnum
-from Framework.screen.Views import Views, get_current_view, move_to_profile
+from enum import IntEnum, Enum
+from Framework.utility.Constants import ResourceType, Tribe, get_XPATH
 from Framework.utility.Logger import get_projectLogger
-from Framework.utility.Constants import BuildingType, ResourceType, Tribe, get_XPATH
 from Framework.utility.SeleniumUtils import SWS
+from Framework.screen.Views import Views, get_current_view, move_to_profile
 
 
-TRIBE = None
+# Project constants
 logger = get_projectLogger()
 XPATH = get_XPATH()
+# Tribe
+TRIBE = None
+
+
+class InstructionsSearchItem(Enum):
+    COSTS = XPATH.INSTRUCTIONS_COSTS
+
 
 class LevelUpMode(IntEnum):
     OFF = 0
     ON = 1
+
+
+def press_continue_btn(sws : SWS):
+    """
+    Presses the continue button after first ever login.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+
+    Returns:
+        - True if the operation was successful, False otherwise.
+    """
+    ret = False
+    CONTINUE_BTN_TEXT = 'Continue'
+    if sws.clickElement(XPATH.STRING_ON_SCREEN % CONTINUE_BTN_TEXT, refresh=True, waitFor=True):
+        ret = True
+    else:
+        logger.error('In press_continue_btn: Failed to press continue button')
+    return ret
+
+
+def search_in_instructions(sws : SWS, locators : list, item : InstructionsSearchItem):
+    """
+    Searches information in instructions menu.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+        - locators ([str]): List with names to incrementally search for instructions page.
+        - item (InstructionsSearchItem): Property to extract from last name.
+
+    Returns:
+        - String with requested value, None if error occured.
+    """
+    ret = None
+    INSTRUCTIONS_MENU = 'Instructions'
+    INSTRUCTIONS_IFRAME = 'Frame'
+    # Open instructions menu
+    if sws.clickElement(XPATH.STRING_ON_SCREEN % INSTRUCTIONS_MENU):
+        sws.enter_iframe(INSTRUCTIONS_IFRAME)
+        for locator in locators:
+            if sws.isVisible(XPATH.STRING_ON_SCREEN % locator):
+                if not sws.clickElement(XPATH.STRING_ON_SCREEN % locator):
+                    logger.error(f'In search_in_instructions: Failed to click {locator}')
+                    break
+            else:
+                logger.error(f'In search_in_instructions: Failed to find {locator}')
+                break
+        else:
+            ret = sws.getElementAttribute(item.value, 'text')
+        sws.exit_iframe()
+    else:
+        logger.error('In search_in_instructions: Failed to open instructions')
+    return ret
+
+
+def instructions_get_costs(sws : SWS, locators : list):
+    """
+    Searches costs information for building/troop.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+        - locators ([str]): List with names to incrementally search for instructions page.
+
+    Returns:
+        - List containing: Lumber, Clay, Iron, Crop and Upkeep or None if error encountered.
+    """
+    ret = None
+    costsText = search_in_instructions(sws, locators, InstructionsSearchItem.COSTS)
+    if costsText:
+        # Take second row and split at each '|', leaving out the last one
+        ret = costsText.split('\n')[1].split('|')[:-1]
+    else:
+        logger.error('In instructions_get_costs: Failed to find required page and get costs')
+    return ret
 
 
 def getTribe(sws : SWS):
@@ -142,7 +223,7 @@ def get_current_village(sws : SWS):
         - String with village name if operation was successful, None otherwise.
     """
     ret = None
-    selectedVillage = sws.getElementsAttribute(XPATH.SELECTED_VILLAGE, 'text')
+    selectedVillage = sws.getElementAttribute(XPATH.SELECTED_VILLAGE, 'text')
     if selectedVillage:
         ret = selectedVillage
     else:
