@@ -49,3 +49,39 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
     ## Dupa ce se apasa train, 2 functii suplimentare ce obtin total duration si refresh time-ul
     ## O functie care apasa pe reduce troop training time
     ## La final, un test pt barracks->
+
+def reduce_train_time(sws : SWS):
+    """
+    Presses the "Reduce the troop training time" button on Barracks screen.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+
+    Returns:
+        - True if the operation is successful, False otherwise.
+    """
+    status = False
+    if check_building_page_title(sws, BuildingType.Barracks):
+        if sws.isVisible(XPATH.TROOP_REDUCE_TIME_BTN):
+            gold = sws.getElementAttribute(XPATH.GOLD_AMOUNT, 'text')
+            print(gold)
+            if gold:
+                try:
+                    gold = int(gold)
+                except ValueError:
+                    logger.error(f'In reduce_train_time: {gold} is not int')
+                    gold = None
+            goldReq = 10
+            if gold and gold >= goldReq:
+                if sws.clickElement(XPATH.TROOP_REDUCE_TIME_BTN, refresh=True):
+                    logger.success('In reduce_train_time: Succesfuly reduced training time.')
+                    status = True
+                else:
+                    logger.error('In reduce_train_time: Failed to press the button.')
+            else:
+                logger.warning(f'In reduce_train_time: 10 gold needed to reduce time, but {gold} gold available')
+        else:
+            logger.warning('In reduce_train_time: Not training any troops.')
+    else:
+        logger.error('In reduce_train_time: Not barracks screen.')
+    return status

@@ -18,7 +18,7 @@ TEMP_EMAIL_URL = 'https://cryptogmail.com/'
 DEFAULT_POLLING_TIME = 1
 MAX_POLLING_TIME = 60
 # Generic phrase to include in all accounts
-GENERIC_PHRASE = '0bomb'
+GENERIC_PHRASE = 'TRDSB'
 
 
 class Region(Enum):

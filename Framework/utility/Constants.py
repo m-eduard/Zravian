@@ -90,6 +90,10 @@ class XPATHCollection(dict):
             'SEND_GOODS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send goods")]',
             'SEND_TROOPS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send troops!")]',
             #
+            # Zravian Plus
+            #
+            'GOLD_AMOUNT': '//*[@class="gold"]/..',
+            #
             # Views
             #
             'ROMAN_TASK_MASTER': '//*[@class="ql1"]',
@@ -144,6 +148,7 @@ class XPATHCollection(dict):
             'TROOP_INPUT_BOX': '//*[@class="build_details"]//*[@alt="%s"]/../../..//input',
             'TROOP_MAX_UNITS': '//*[@alt="%s"]/../../../..//*[@class="max"]/a',
             'TROOP_TRAIN_BTN': '//*[@id="btn_train"]',
+            'TROOP_REDUCE_TIME_BTN': '//*[@class="under_progress"]/../../../..//*[contains(text(), "Reduce the troop training time")]/a',
             #
             # Hero's Mansion
             #
