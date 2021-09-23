@@ -1,6 +1,6 @@
 from Framework.military.military_utils import enter_academy
-from Framework.build.builder import construct_building, level_up_building_at
-from Framework.build.builder_utils import check_building_page_title, get_building_data
+from Framework.infrastructure.builder import construct_building, level_up_building_at
+from Framework.infrastructure.builder import check_building_page_title, get_building_data
 from Framework.utility.SeleniumUtils import SWS
 from Framework.utility.Constants import BuildingType, TroopType, get_TROOPS, get_XPATH
 from Framework.utility.Logger import get_projectLogger

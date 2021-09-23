@@ -330,7 +330,7 @@ class SWS:
         if prop:
             retList = self.getElementsAttributes(prop, [attr], waitFor)
             if retList:
-                ret = retList[0]
+                ret = [retElem[0] for retElem in retList]
         else:
             logger.error('In getElementsAttribute: Invalid parameter prop')
         return ret
