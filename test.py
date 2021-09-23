@@ -23,29 +23,29 @@ if __name__ == "__main__":
 		for i in ls:
 		    print(i)
 
-		for i in range(5):
+		# for i in range(5):
 
 			# reduce_train_time(sws)
 
-			make_troops_by_amount(sws, TroopType.Axeman, 250)
-			print(str(get_total_training_time(sws)) + ' s')
+		make_troops_by_amount(sws, TroopType.Axeman, 250)
+		print(str(get_total_training_time(sws)) + ' s')
+		sleep(1)
+		make_troops_by_amount(sws, TroopType.Spearman, 250)
+		print(str(get_total_training_time(sws)) + ' s')
+		sleep(1)
+
+		if not make_troops_by_amount(sws, TroopType.Scout, 250):
 			sleep(1)
-			make_troops_by_amount(sws, TroopType.Spearman, 250)
-			print(str(get_total_training_time(sws)) + ' s')
+			make_troops_by_amount(sws, TroopType.Scout, 250)
+		print(str(get_total_training_time(sws)) + ' s')
+
+
+		if not make_troops_by_amount(sws, TroopType.Clubswinger, 250):
 			sleep(1)
+			make_troops_by_amount(sws, TroopType.Clubswinger, 250)
 
-			if not make_troops_by_amount(sws, TroopType.Scout, 250):
-				sleep(1)
-				make_troops_by_amount(sws, TroopType.Scout, 250)
-			print(str(get_total_training_time(sws)) + ' s')
-
-
-			if not make_troops_by_amount(sws, TroopType.Clubswinger, 250):
-				sleep(1)
-				make_troops_by_amount(sws, TroopType.Clubswinger, 250)
-
-			print(str(get_total_training_time(sws)) + ' s')
-			sleep(1)
+		print(str(get_total_training_time(sws)) + ' s')
+		sleep(1)
 
 		# make_troops_by_amount(sws, TroopType.Clubswinger, 1000)
 		# sleep(1)

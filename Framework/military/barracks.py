@@ -125,7 +125,7 @@ def get_total_training_time(sws: SWS):
 	else:
 		status = False
 
-		for line in sws.getElementsAttribute(f'//*[@class="under_progress"]/tbody//tr/td[@class="dur"]/span[@id="timer1"]', 'text'):
+		for line in sws.getElementsAttribute(f'//*[@class="under_progress"]//*[@class="dur"]', 'text'):
 			if status == False:
 				status = True
 			
