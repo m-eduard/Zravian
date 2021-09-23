@@ -4,8 +4,5 @@
 # vsCode config
 .vscode/
 
-# Accounts library
-Framework/files/account_library.json
-
 # File containing logs
 Framework/files/execution.log
