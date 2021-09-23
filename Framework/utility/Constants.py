@@ -116,15 +116,11 @@ class XPATHCollection(dict):
             'SEND_GOODS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send goods")]',
             'SEND_TROOPS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send troops!")]',
             #
-<<<<<<< HEAD
             # Zravian Plus
             #
             'GOLD_AMOUNT': '//*[@class="gold"]/..',
             #
             # Views
-=======
-            # Home
->>>>>>> 944335d2f08cfb6b4112f6b1f5289423c8b9b584
             #
             'LEVEL_UP_CONE': '//*[@id="cone"]',
             'INSTRUCTIONS_COSTS': '//*[@CLASS="dur"]/..',
