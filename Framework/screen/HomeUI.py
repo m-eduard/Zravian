@@ -142,11 +142,13 @@ def get_server(sws : SWS):
     """
     ret = None
     try:
-        serverURL = re.search('https:\/\/(.*)\/(.*)', sws.getCurrentUrl()).group(1) + '/'
+        serverURL = re.match(r'(.*)\/(.*)', sws.getCurrentUrl()).group(1) + '/'
         for server in Server:
             if server.value == serverURL:
                 ret = server
                 break
+        else:
+            logger.error(f'In get_server: No server matched {sws.getCurrentUrl()}')
     except AttributeError as err:
         logger.error(f'In get_server: Regex failed to get server: {err}')
     return ret

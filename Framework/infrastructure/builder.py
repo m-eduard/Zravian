@@ -34,7 +34,7 @@ def enter_building_site(sws : SWS, index : int):
     """
     status = False
     # Building site pattern
-    BUILDING_SITE_PATTERN = '/build.php?id=%d'
+    BUILDING_SITE_PATTERN = 'build.php?id=%d'
     if index > 0 and index <= LAST_BUILDING_SITE_VILLAGE:
         if index > 0 and index < FIRST_BUILDING_SITE_VILLAGE:
             moveStatus = move_to_overview(sws)
