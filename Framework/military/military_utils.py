@@ -1,6 +1,6 @@
 from Framework.utility.SeleniumUtils import SWS
 from Framework.utility.Constants import BuildingType
-from Framework.build.builder_utils import enter_building_menu, find_building
+from Framework.infrastructure.builder import enter_building_site, find_building
 from Framework.utility.Logger import get_projectLogger
 
 
@@ -21,7 +21,7 @@ def enter_academy(sws : SWS):
     status = False
     academyId = find_building(sws, BuildingType.Academy)
     if academyId:
-        if enter_building_menu(sws, academyId):
+        if enter_building_site(sws, academyId):
             status = True
         else:
             logger.error('In enter_academy: Failed to enter building')
@@ -43,7 +43,7 @@ def enter_barracks(sws : SWS):
     status = False
     barracksId = find_building(sws, BuildingType.Barracks)
     if barracksId:
-        if enter_building_menu(sws, barracksId):
+        if enter_building_site(sws, barracksId):
             status = True
         else:
             logger.error('In enter_barracks: Failed to enter building')
@@ -65,7 +65,7 @@ def enter_stable(sws : SWS):
     status = False
     stableId = find_building(sws, BuildingType.Stable)
     if stableId:
-        if enter_building_menu(sws, stableId):
+        if enter_building_site(sws, stableId):
             status = True
         else:
             logger.error('In enter_stable: Failed to enter building')
@@ -87,7 +87,7 @@ def enter_siegeworkshop(sws : SWS):
     status = False
     siegeworkshopId = find_building(sws, BuildingType.SiegeWorkshop)
     if siegeworkshopId:
-        if enter_building_menu(sws, siegeworkshopId):
+        if enter_building_site(sws, siegeworkshopId):
             status = True
         else:
             logger.error('In enter_siegeworkshop: Failed to enter building')
@@ -109,7 +109,7 @@ def enter_blacksmith(sws : SWS):
     status = False
     blacksmithId = find_building(sws, BuildingType.Blacksmith)
     if blacksmithId:
-        if enter_building_menu(sws, blacksmithId):
+        if enter_building_site(sws, blacksmithId):
             status = True
         else:
             logger.error('In enter_blacksmith: Failed to enter building')
@@ -131,7 +131,7 @@ def enter_armoury(sws : SWS):
     status = False
     armouryId = find_building(sws, BuildingType.Armoury)
     if armouryId:
-        if enter_building_menu(sws, armouryId):
+        if enter_building_site(sws, armouryId):
             status = True
         else:
             logger.error('In enter_armoury: Failed to enter building')
@@ -152,7 +152,7 @@ def enter_heromansion(sws : SWS):
     status = False
     heromansionId = find_building(sws, BuildingType.HeroMansion)
     if heromansionId:
-        if enter_building_menu(sws, heromansionId):
+        if enter_building_site(sws, heromansionId):
             status = True
         else:
             logger.error('In enter_heromansion: Failed to enter building')
