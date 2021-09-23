@@ -73,7 +73,7 @@ def check_building_page_title(sws : SWS, bdType : BuildingType):
             bdType != BuildingType.EmptyPlace and sws.isVisible(XPATH.BUILDING_PAGE_TITLE % BUILDINGS[bdType].name):
         status = True
     else:
-        logger.warning('In check_building_page_title: Page does not correspond'
+        logger.info('In check_building_page_title: Page does not correspond'
             f'to building {sws.getCurrentUrl()} and {BUILDINGS[bdType].name}')
     return status
 
@@ -226,10 +226,11 @@ def check_requirements(sws : SWS, bdType : BuildingType, forced : bool = False):
         if not reqBdList:  # Construct
             if forced:
                 if not construct_building(sws, reqBd, forced=True, waitToFinish=True):
-                    logger.error(f'In check_requirements: Failed to construct {reqBd}')
+                    logger.error(f'In check_requirements: Failed to construct{BUILDINGS[reqBd].name} at'
+                        '{reqBd[-1][0]}')
                     break
             else:
-                logger.warning(f'In check_requirements: {reqBd} not found')
+                logger.warning(f'In check_requirements: {BUILDINGS[reqBd].name} not found')
                 break
         reqBdList = get_building_data(sws, reqBd)
         # Check level
@@ -237,14 +238,15 @@ def check_requirements(sws : SWS, bdType : BuildingType, forced : bool = False):
             if forced:
                 while reqBdList[-1][1] < reqLevel:
                     if not level_up_building_at(sws, reqBdList[-1][0], forced=True, waitToFinish=True):
-                        logger.error(f'In check_requirements: Failed to level up {reqBd}')
+                        logger.error(f'In check_requirements: Failed to level up {BUILDINGS[reqBd].name} at'
+                            '{reqBd[-1][0]}')
                         break
                     reqBdList = get_building_data(sws, reqBd)
                 else:
                     continue  # While finished successfully so the for-iteration did too
                 break  # The while failed so the for-iteration failed as well
             else:
-                logger.warning(f'In check_requirements: {reqBd} level is too low')
+                logger.warning(f'In check_requirements: {BUILDINGS[reqBd].name}`s` level is too low')
                 break
     else:  # If not break encountered, all requirements are fulfilled
         status = True
@@ -265,6 +267,7 @@ def check_storage(sws : SWS, bdType : BuildingType, storageType : BuildingType, 
         - True if the requirement is fullfiled, False otherwise.
     """
     status = False
+    initialURL = sws.getCurrentUrl()
     if storageType == BuildingType.Warehouse or storageType == BuildingType.Granary:
         storageXPATH = (XPATH.BUILDING_ERR_WH if storageType == BuildingType.Warehouse else XPATH.BUILDING_ERR_GR)
         propList = []
@@ -278,7 +281,10 @@ def check_storage(sws : SWS, bdType : BuildingType, storageType : BuildingType, 
                     if not construct_building(sws, storageType, forced=True, waitToFinish=True):
                         logger.error(f'In check_storage: Failed to construct {storageType}')
                     else:  # Recheck storage
-                        status = check_storage(sws, bdType, storageType, forced=True)
+                        if sws.get(initialURL):
+                            status = check_storage(sws, bdType, storageType, forced=True)
+                        else:
+                            logger.error('In check_storage: Failed to go back to building')
                 else:
                     if not level_up_building_at(sws, storageList[-1][0], forced=True, waitToFinish=True):
                         logger.error(f'In check_storage: Failed to level up {storageType}')
@@ -383,11 +389,18 @@ def find_building(sws : SWS, bdType : BuildingType):
         - List of Ints if operation is successful, None otherwise.
     """
     ret = None
-    retList = get_building_data(sws, bdType)
-    if retList:
-        ret = retList[-1]
+    if bdType != BuildingType.EmptyPlace and bdType != BuildingType.Wall and bdType != BuildingType.RallyPoint:
+        retList = get_building_data(sws, bdType)
+        if retList:
+            ret = retList[-1][0]
+        else:
+            logger.warning('In find_building: No buildings of required type')
     else:
-        logger.warning('In find_building: No buildings of required type')
+        retList = find_buildings(sws, bdType)
+        if retList:
+            ret = retList[0]
+        else:
+            logger.warning('In find_building: No buildings of required type')
     return ret
 
 
@@ -438,6 +451,8 @@ def get_building_data(sws : SWS, bdType : BuildingType):
         - List of tuples(Int, Int) if operation is successful, None otherwise.
     """
     ret = None
+    # Some buildings contain phrase 'Build a' in their name
+    NOT_CONSTRUCTED = 'Build a'
     if bdType in ResourceFields:
         moveStatus = move_to_overview(sws)
     else:
@@ -457,8 +472,13 @@ def get_building_data(sws : SWS, bdType : BuildingType):
             try:
                 elemLvl = int(re.search('[0-9]+', alt).group())
             except (AttributeError, ValueError) as err:
-                logger.error(f'In get_building_data: "alt" regex failed to return value: {err}')
-                break
+                if bdType == BuildingType.EmptyPlace:
+                    elemLvl = 0
+                elif NOT_CONSTRUCTED in alt:
+                    continue
+                else:
+                    logger.error(f'In get_building_data: "alt" regex failed to return value: {err}')
+                    break
             # Reached only if both are not None
             lst.append((elemId, elemLvl))
         else:
@@ -483,12 +503,21 @@ def get_village_data(sws : SWS):
     """
     ret = None
     buildingsDict = {}
-    for bdType in BuildingType:
+    # First get all resource fields
+    for bdType in ResourceFields:
         buildingsDict[bdType] = get_building_data(sws, bdType)
         if buildingsDict[bdType] is None:
             break
     else:
-        ret = buildingsDict
+        # Get all buildings
+        for bdType in BuildingType:
+            if bdType in ResourceFields:
+                continue
+            buildingsDict[bdType] = get_building_data(sws, bdType)
+            if buildingsDict[bdType] is None:
+                break
+        else:
+            ret = buildingsDict
     return ret
 
 
@@ -546,7 +575,7 @@ def construct_building(sws : SWS, bdType : BuildingType, forced : bool = False, 
                 if not status:
                     if toBuildSite:
                         if enter_building_site(sws, toBuildSite):
-                            logger.info(f'Attempting to construct {bdType} at {toBuildSite}')
+                            logger.info(f'Attempting to construct {BUILDINGS[bdType].name} at {toBuildSite}')
                             if check_storage(sws, bdType, BuildingType.Warehouse, forced) and \
                                     check_storage(sws, bdType, BuildingType.Granary, forced) and \
                                     check_resources(sws, bdType, forced) and \
