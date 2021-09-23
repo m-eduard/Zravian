@@ -1,6 +1,11 @@
+from Framework.infrastructure.builder import enter_building_site
 from Framework.utility.SeleniumUtils import SWS
 from Framework.utility.Constants import BuildingType
+<<<<<<< HEAD
 from Framework.infrastructure.builder import enter_building_site, find_building
+=======
+from Framework.infrastructure.builder import find_building
+>>>>>>> 8a2d65e3b4d3b07a00ece9ca4d1f7252b4de4fd6
 from Framework.utility.Logger import get_projectLogger
 
 

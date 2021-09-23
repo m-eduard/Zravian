@@ -1,9 +1,10 @@
 from Framework.infrastructure.builder import enter_building
 from time import sleep
-from Framework.military.academy import research
+# from Framework.military.academy import research
 from Framework.utility.Logger import get_projectLogger
-from Framework.military.military_utils import enter_academy, enter_barracks
-from Framework.utility.Constants import BuildingType, Server, TroopType
+from Framework.military.military_utils import enter_barracks
+# enter_academy
+from Framework.utility.Constants import Server, TroopType
 from Framework.account.Login import login
 from Framework.military.barracks import get_total_training_time, reduce_train_time, make_troops_by_amount
 
