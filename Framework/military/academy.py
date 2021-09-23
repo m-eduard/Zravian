@@ -47,6 +47,7 @@ def check_troop_bd_requirements(sws : SWS, tpType : TroopType, forced : bool = F
     """
     status = False
     requirements = TROOPS[tpType].requirements
+    
     for reqBd, reqLevel in requirements:
         reqBdList = get_building_data(sws, reqBd)
         if not reqBdList:  # Construct

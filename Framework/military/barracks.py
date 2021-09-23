@@ -47,40 +47,40 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
     return status
 
 def reduce_train_time(sws : SWS):
-    """
-    Presses the "Reduce the troop training time" button on Barracks screen.
+	"""
+	Presses the "Reduce the troop training time" button on Barracks screen.
 
-    Parameters:
-        - sws (SWS): Selenium Web Scraper.
+	Parameters:
+		- sws (SWS): Selenium Web Scraper.
 
-    Returns:
-        - True if the operation is successful, False otherwise.
-    """
-    status = False
-    if check_building_page_title(sws, BuildingType.Barracks):
-        if sws.isVisible(XPATH.TROOP_REDUCE_TIME_BTN):
-            gold = sws.getElementAttribute(XPATH.GOLD_AMOUNT, 'text')
-            print(gold)
-            if gold:
-                try:
-                    gold = int(gold)
-                except ValueError:
-                    logger.error(f'In reduce_train_time: {gold} is not int')
-                    gold = None
-            goldReq = 10
-            if gold and gold >= goldReq:
-                if sws.clickElement(XPATH.TROOP_REDUCE_TIME_BTN, refresh=True):
-                    logger.success('In reduce_train_time: Succesfuly reduced training time.')
-                    status = True
-                else:
-                    logger.error('In reduce_train_time: Failed to press the button.')
-            else:
-                logger.warning(f'In reduce_train_time: 10 gold needed to reduce time, but {gold} gold available')
-        else:
-            logger.warning('In reduce_train_time: Not training any troops.')
-    else:
-        logger.error('In reduce_train_time: Not barracks screen.')
-    return status
+	Returns:
+		- True if the operation is successful, False otherwise.
+	"""
+	status = False
+	if check_building_page_title(sws, BuildingType.Barracks):
+		if sws.isVisible(XPATH.TROOP_REDUCE_TIME_BTN):
+			gold = sws.getElementAttribute(XPATH.GOLD_AMOUNT, 'text')
+			print(gold)
+			if gold:
+				try:
+					gold = int(gold)
+				except ValueError:
+					logger.error(f'In reduce_train_time: {gold} is not int')
+					gold = None
+			goldReq = 10
+			if gold and gold >= goldReq:
+				if sws.clickElement(XPATH.TROOP_REDUCE_TIME_BTN, refresh=True):
+					logger.success('In reduce_train_time: Succesfuly reduced training time.')
+					status = True
+				else:
+					logger.error('In reduce_train_time: Failed to press the button.')
+			else:
+				logger.warning(f'In reduce_train_time: 10 gold needed to reduce time, but {gold} gold available')
+		else:
+			logger.warning('In reduce_train_time: Not training any troops.')
+	else:
+		logger.error('In reduce_train_time: Not barracks screen.')
+	return status
 
 ##################### Training time extraction ################################
 def get_individual_training_time(sws: SWS, tpType: TroopType):
@@ -129,27 +129,34 @@ def get_total_training_time(sws: SWS):
 	# iterate through the lines of the table, by xpath
 	# table = sws._SWS__findElement(sws.driver, XPATH.TROOP_TABLE, False)
 	i = 1
-	for row in sws.getElementsAttribute('//*[@class="under_progress"]//tr ', 'text'):
+	
+	ls = sws.driver.find_elements_by_xpath('//*[@class="under_progress"]//tr')
+
+
+	for j in range(len(ls) - 3):
 		if not status:
 			status = True
 
 		# make a constant with table's XPATH
 		tmpTime = sws.getElementAttribute(f'//*[@class="under_progress"]/tbody//tr[{i}]/td[@class="dur"]/span[@id="timer1"]', 'text')
 
-		if tmpTime[-1] == '?':
-			logger.error('In get_total_training_time: zravian undefined time error (00:00:00?)')
+		if not tmpTime:
 			tmpTime = 0
 		else:
-			# next update: add troop type
-			logger.success(f'In function get_total_training_time: {tmpTime}s.')
+			if tmpTime[-1] == '?':
+				logger.error('In get_total_training_time: zravian undefined time error (00:00:00?)')
+				tmpTime = 0
+			else:
+				# next update: add troop type
+				logger.success(f'In function get_total_training_time: {tmpTime}s.')
 
-			tmpTime = time_to_seconds(tmpTime)
+				tmpTime = time_to_seconds(tmpTime)
 
 		totalTime += tmpTime
 		i += 1
 
-	for row in sws.getElementsAttribute('//*[@class="under_progress"]//tr' , 'text'):
-		print(row)
+	# for row in sws.getElementsAttribute('//*[@class="under_progress"]//tr' , 'text'):
+	# 	print(row)
 
 
 	# if status == False:
