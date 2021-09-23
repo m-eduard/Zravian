@@ -86,7 +86,7 @@ def reduce_train_time(sws : SWS):
 		logger.error('In reduce_train_time: Not barracks screen.')
 	return status
 
-##################### Training time extraction ################################
+
 def get_total_training_time(sws: SWS):
 	"""
 	Gets the execution time needed for the current queued troops to be trained
@@ -100,7 +100,7 @@ def get_total_training_time(sws: SWS):
 	else:
 		status = False
 
-		for line in sws.getElementsAttribute(f'//*[@class="under_progress"]//*[@class="dur"]', 'text'):
+		for line in sws.getElementsAttribute(XPATH.TROOP_TRAIN_TIME, 'text'):
 			if status == False:
 				status = True
 			
@@ -114,6 +114,6 @@ def get_total_training_time(sws: SWS):
 				logger.error(f'In function get_total_training_time: no text could be extracted from the table')
 			
 		if status == False:
-			logger.error('In get_training_time: no troops are queued for training')
+			logger.warning('In get_training_time: no troops are queued for training')
 	
 	return totalTime

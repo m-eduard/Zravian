@@ -30,7 +30,7 @@ def time_to_seconds(currTime : str):
         - Equivalent time in seconds.
     """
     SECONDS_IN_HOUR = 3600
-    SECONDS_IN_MIN = 3600
+    SECONDS_IN_MIN = 60
     h, m, s = currTime.split(':')
     return int(h) * SECONDS_IN_HOUR + int(m) * SECONDS_IN_MIN + int(s)
 
@@ -212,6 +212,8 @@ class XPATHCollection(dict):
             'TROOP_MAX_UNITS': '//*[@alt="%s"]/../../../..//*[@class="max"]/a',
             'TROOP_TRAIN_BTN': '//*[@id="btn_train"]',
             'TROOP_REDUCE_TIME_BTN': '//*[@class="under_progress"]/../../../..//*[contains(text(), "Reduce the troop training time")]/a',
+            'TROOP_TRAIN_TIME': '//*[@class="under_progress"]//*[@class="dur"]',
+            'TROOP_TYPE_TIME': '//*[@class="under_progress"]//*[@class="desc"]',
             #
             # Hero's Mansion
             #
