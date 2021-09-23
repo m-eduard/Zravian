@@ -98,9 +98,17 @@ class XPATHCollection(dict):
             'LOGIN_PASS_INPUT': '//*[@id="pass"]',
             'LOGIN_SUBMIT_BTN': '//input[@type="submit"][@value="Log in"]',
             #
+            # General
+            #
+            'FINISH_DIALOG': '//*[contains(text(), "Finished in")]',
+            'INSIDE_TIMER': './/*[contains(@id, "timer")]',
+            #
             # Profile
             #
+            'EDIT_PROFILE': '//a[text()="Edit profile"]',
+            'PROFILE_DESCR': '//*[@id="edit"]//textarea[@name="be2"]',
             'PROFILE_TRIBE': '//*[@class="details"]//*[contains(text(), "Tribe:")]/..',
+            'PROFILE_OK_BTN': '//*[@id="btn_ok"]',
             'SELECT_VILLAGE': '//*[@id="side_info"]//*[contains(text(), "%s")]',
             'SELECTED_VILLAGE': '//*[@id="side_info"]//*[@class="dot h1"]//a',
             'ALL_VILLAGES_LINKS': '//*[@id="vlist"]//*[@class="link"]//a',
@@ -108,14 +116,51 @@ class XPATHCollection(dict):
             'SEND_GOODS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send goods")]',
             'SEND_TROOPS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send troops!")]',
             #
-            # Views
+            # Home
             #
-            'ROMAN_TASK_MASTER': '//*[@class="ql1"]',
-            'TEUTON_TASK_MASTER': '//*[@class="ql2"]',
-            'GAUL_TASK_MASTER': '//*[@class="ql3"]',
             'LEVEL_UP_CONE': '//*[@id="cone"]',
-            'FINISH_DIALOG': '//*[contains(text(), "Finished in")]',
-            'INSIDE_TIMER': './/*[contains(@id, "timer")]',
+            'INSTRUCTIONS_COSTS': '//*[@CLASS="dur"]/..',
+            #
+            # Alliance
+            #
+            'ALLIANCE_TAG_INPUT': '//input[@name="ally1"]',
+            'ALLIANCE_NAME_INPUT': '//input[@name="ally2"]',
+            'ALLIANCE_OK_BTN': '//*[@id="btn_ok"]',
+            'ALLIANCE_ACCEPT_BTN': '//a[text()="%s"]/../../*[@class="acc"]/a',
+            'ALLIANCE_TAG': '//*[contains(text(), the Alliance)]/../../..//*[contains(text(), "%s")]',
+            #
+            # Overview
+            #
+            'OVERVIEW_TROOPS': '//*[@id="troops"]',
+            #
+            # Statistics
+            #
+            'MY_RANKING': '//*[@id="player"]//*[@class="hl"]//*[@class="ra"]',
+            #
+            # Map
+            #
+            'VILLAGE_BY_NAME': '//area[contains(@alt, "%s")]',
+            #
+            # Missions
+            #
+            'TASK_MASTER': '//*[@id="qgei"]',
+            'MISSION_DIALOG': '//*[@class="popup3 quest"]',
+            'MISSION_DIALOG_STATUS': '//*[@id="anm"]',
+            'MISSION_CLOSE_BTN': '//*[@class="popup4"]',
+            'MISSION_NAME': '//*[@id="qstd"]/h1',
+            'MISSION_TEXT_BOX': '//*[@id="qst_val"]',
+            'MISSION_CONFIRM': '//*[@id="qstd"]//input[@value="Confirm"]',
+            'MISSION_COORD_X': '//*[@id="qst_val_x"]',
+            'MISSION_COORD_Y': '//*[@id="qst_val_y"]',
+            'MISSION_SEND_WHEAT_BTN': '//*[@id="qstd"]//input[@value="Send wheat"]',
+            'MISSION_REINFORCEMENT_RAT': '//*[@id="troops"]//*[@alt="Rat"]',
+            'MISSION_CHOOSE_ARMY': '//*[@id="qstd"]/input[@value="Army"]',
+            'MISSION_CHOOSE_ECONOMY': '//*[@id="qstd"]/input[@value="Economy"]',
+            'ACCOMPLISH_MISSION': '//*[contains(text(), "Continue with the next task")]',
+            'SKIPPED_MISSION_INVOKE_BTN': '//*[text()="invoke"]',
+            'SKIPPED_MISSION_REWARD_DESC': '//*[text()="invoke"]/../../..//*[@class="desc"]',
+            'SKIPPED_MISSION_REWARD_RESOURCES': '//*[text()="invoke"]/../../..//*[@class="desc"]',
+            'SKIPPED_MISSION_REWARD_TIMEOUT': '//*[text()="invoke"]/../../..//*[@class="dur"]',
             #
             # Buildings
             #
