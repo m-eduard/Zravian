@@ -98,11 +98,3 @@ def research(sws : SWS, tpType : TroopType, forced : bool = False):
         logger.error('In function research: Failed to check and resolve requirements.')
     return status
     
-    """
-
-    -Check requirements -> reference construct_bulding
-    --error checking
-    -press button
-
-    """
-

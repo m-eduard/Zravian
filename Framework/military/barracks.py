@@ -46,10 +46,6 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 
     return status
 
-    ## Dupa ce se apasa train, 2 functii suplimentare ce obtin total duration si refresh time-ul
-    ## O functie care apasa pe reduce troop training time
-    ## La final, un test pt barracks->
-
 def reduce_train_time(sws : SWS):
     """
     Presses the "Reduce the troop training time" button on Barracks screen.
@@ -156,8 +152,8 @@ def get_total_training_time(sws: SWS):
 		print(row)
 
 
-	if status == False:
-		totalTime = None
-		logger.error('In get_training_time: no troops are queued for training')
+	# if status == False:
+	# 	totalTime = None
+	# 	logger.error('In get_training_time: no troops are queued for training')
 
 	return totalTime

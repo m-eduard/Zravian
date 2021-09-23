@@ -11,7 +11,5 @@ logger = get_projectLogger()
 if __name__ == "__main__":
     logger.set_debugMode(True)
     with login(Server.S10k, username="0bomb8", headless=False) as sws:
-        assert enter_barracks(sws)
-        make_troops_by_amount(sws, TroopType.Clubswinger, 100)
-        sleep(1)
-        reduce_train_time(sws)
+        assert enter_academy(sws)
+        research(sws, TroopType.RRam, forced=True)
