@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from time import sleep
 from Framework.military.academy import research
 from Framework.utility.Logger import get_projectLogger
@@ -64,3 +65,16 @@ if __name__ == "__main__":
 
 		
 		reduce_train_time(sws)
+=======
+from Framework.utility.Logger import get_projectLogger
+from Framework.utility.Constants import BuildingType, Server
+from Framework.infrastructure.builder import construct_building
+from Framework.account.Login import login
+
+
+logger = get_projectLogger()
+logger.set_debugMode(True)
+with login(Server.S10k, '0bomb13', headless=False) as sws:
+    assert construct_building(sws, BuildingType.Stable, forced=True, waitToFinish=True)
+
+>>>>>>> 85fda610f7fc026c0b469a7edb681a9aa68b0067
