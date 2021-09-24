@@ -2,7 +2,7 @@ from Framework.military.military_utils import enter_academy
 from Framework.infrastructure.builder import construct_building, level_up_building_at
 from Framework.infrastructure.builder import check_building_page_title, get_building_data
 from Framework.utility.SeleniumUtils import SWS
-from Framework.utility.Constants import BuildingType, TroopType, get_TROOPS, get_XPATH
+from Framework.utility.Constants import BuildingType, Troop, TroopType, get_TROOPS, get_XPATH
 from Framework.utility.Logger import get_projectLogger
 
 
@@ -107,3 +107,29 @@ def research(sws : SWS, tpType : TroopType, forced : bool = False):
 
     """
 
+def research_all_possible_troops(sws):
+    """
+    Researches and upgrades buildings such as all prerequisites for researching any troops are met.
+
+    Parameters:
+        - sws (SWS): Used to interact with the webpage.
+
+    Returns:
+        - True if the operation is successful, False otherwise.
+    """
+    status = True
+
+    # go inside the academy and extract all researchable troops names
+    enter_academy(sws)
+
+    # XPATH.RESEARCH_UNIT_NAME is a generic xpath associated with all
+    # images of troops that can be currently researched or researched
+    # after some prerequisites are met
+    for troop in sws.getElementsAttribute(XPATH.RESEARCH_UNIT_NAME, 'alt'):
+        if troop == 'Ram':
+            troop = 'RRam'
+
+        if not research(sws, getattr(TroopType, troop), True):
+            status = False
+
+    return status

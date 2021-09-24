@@ -204,6 +204,7 @@ class XPATHCollection(dict):
             #
             # Academy
             #
+            'RESEARCH_UNIT_NAME': '//table/tbody//*[@class="tit"]/img',
             'RESEARCH_TROOP': '//*[contains(text(), "%s")]/../../..//*[contains(text(), "Research")]',
             #
             # Barracks
@@ -212,8 +213,8 @@ class XPATHCollection(dict):
             'TROOP_MAX_UNITS': '//*[@alt="%s"]/../../../..//*[@class="max"]/a',
             'TROOP_TRAIN_BTN': '//*[@id="btn_train"]',
             'TROOP_REDUCE_TIME_BTN': '//*[@class="under_progress"]/../../../..//*[contains(text(), "Reduce the troop training time")]/a',
-            'TROOP_TRAIN_TIME': '//*[@class="under_progress"]//*[@class="dur"]',
-            'TROOP_TYPE_TIME': '//*[@class="under_progress"]//*[@class="desc"]',
+            'TRAINING_TROOPS_TIME': '//*[@class="under_progress"]//*[@class="dur"]',
+            'TRAINING_TROOPS_TYPE': '//*[@class="under_progress"]//*[@class="desc"]',
             #
             # Hero's Mansion
             #

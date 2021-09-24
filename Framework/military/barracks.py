@@ -64,7 +64,7 @@ def reduce_train_time(sws : SWS):
 	if check_building_page_title(sws, BuildingType.Barracks):
 		if sws.isVisible(XPATH.TROOP_REDUCE_TIME_BTN):
 			gold = sws.getElementAttribute(XPATH.GOLD_AMOUNT, 'text')
-			print(gold)
+
 			if gold:
 				try:
 					gold = int(gold)
@@ -114,6 +114,6 @@ def get_total_training_time(sws: SWS):
 				logger.error(f'In function get_total_training_time: no text could be extracted from the table')
 			
 		if status == False:
-			logger.warning('In get_training_time: no troops are queued for training')
+			logger.warning('In get_total_training_time: no troops are queued for training')
 	
 	return totalTime

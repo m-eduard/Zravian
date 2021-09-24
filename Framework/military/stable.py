@@ -50,6 +50,71 @@ def make_stable_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 
 	return status
 
+def reduce_stable_train_time(sws : SWS):
+	"""
+	Presses the "Reduce the troop training time" button on Barracks screen.
+
+	Parameters:
+		- sws (SWS): Selenium Web Scraper.
+
+	Returns:
+		- True if the operation is successful, False otherwise.
+	"""
+	status = False
+	if check_building_page_title(sws, BuildingType.Stable):
+		if sws.isVisible(XPATH.TROOP_REDUCE_TIME_BTN):
+			gold = sws.getElementAttribute(XPATH.GOLD_AMOUNT, 'text')
+
+			if gold:
+				try:
+					gold = int(gold)
+				except ValueError:
+					logger.error(f'In {reduce_stable_train_time.__name__}: {gold} is not int')
+					gold = None
+
+			goldReq = 0
+
+			# rtt = reduce training time
+			rtt_button_text = sws.getElementAttribute(XPATH.TROOP_REDUCE_TIME_BTN, 'title')
+
+			if rtt_button_text:
+				rtt_button_text = rtt_button_text.split()
+
+				for i in range(len(rtt_button_text)):
+					if rtt_button_text[i] == 'Gold' or rtt_button_text[i] == 'gold':
+						if i >= 1:
+							try:
+								goldReq = int(rtt_button_text[i - 1])
+								print(goldReq)
+								
+							except:
+								logger.error(f'In {reduce_stable_train_time.__name__}: {rtt_button_text[i - 1]} is not int')
+
+
+				if goldReq == 0:
+					logger.error(f'In {reduce_stable_train_time.__name__}: The requested amount of gold for speedup couldn\'t be found')
+					# use a default value for gold (the last known value of gold needed to reduce train time by 4 hours)
+					goldReq = 10
+			else:
+				logger.error(f'In {reduce_stable_train_time.__name__}: Reduce training time button doesn\'t have a title attribute')
+				# use a default value for gold (the last known value of gold needed to reduce train time by 4 hours)
+				goldReq = 10
+
+			if gold and gold >= goldReq:
+				if sws.clickElement(XPATH.TROOP_REDUCE_TIME_BTN, refresh=True):
+					logger.success(f'In {reduce_stable_train_time.__name__}: Succesfuly reduced training time.')
+					status = True
+				else:
+					logger.error(f'In {reduce_stable_train_time.__name__}: Failed to press the button.')
+			else:
+				logger.warning(f'In {reduce_stable_train_time.__name__}: {goldReq} gold needed to reduce time, but {gold} gold available')
+		else:
+			logger.warning(f'In {reduce_stable_train_time.__name__}: Not training any troops.')
+	else:
+		logger.error(f'In {reduce_stable_train_time.__name__}: Not {BuildingType.Stable} screen.')
+	return status
+
+
 def get_stable_total_training_time(sws: SWS):
 	"""
 	Gets the execution time needed for the current queued troops to be trained inside the Stable
@@ -63,8 +128,8 @@ def get_stable_total_training_time(sws: SWS):
 	else:
 		status = False
 
-		trainingUnits = sws.getElementsAttribute(XPATH.TROOP_TYPE_TIME, 'text')
-		trainingTimes = sws.getElementsAttribute(XPATH.TROOP_TRAIN_TIME, 'text')
+		trainingUnits = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TYPE, 'text')
+		trainingTimes = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TIME, 'text')
 
 		if len(trainingTimes) == len(trainingUnits):
 			for i in range(len(trainingTimes)):
