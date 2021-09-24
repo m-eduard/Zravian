@@ -1,3 +1,4 @@
+from os import spawnl
 from Framework.infrastructure.builder import check_building_page_title
 from Framework.utility.Logger import get_projectLogger
 from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH, time_to_seconds
@@ -62,52 +63,15 @@ def reduce_stable_train_time(sws : SWS):
 	"""
 	status = False
 	if check_building_page_title(sws, BuildingType.Stable):
-		if sws.isVisible(XPATH.TROOP_REDUCE_TIME_BTN):
-			gold = sws.getElementAttribute(XPATH.GOLD_AMOUNT, 'text')
-
-			if gold:
-				try:
-					gold = int(gold)
-				except ValueError:
-					logger.error(f'In {reduce_stable_train_time.__name__}: {gold} is not int')
-					gold = None
-
-			goldReq = 0
-
-			# rtt = reduce training time
-			rtt_button_text = sws.getElementAttribute(XPATH.TROOP_REDUCE_TIME_BTN, 'title')
-
-			if rtt_button_text:
-				rtt_button_text = rtt_button_text.split()
-
-				for i in range(len(rtt_button_text)):
-					if rtt_button_text[i] == 'Gold' or rtt_button_text[i] == 'gold':
-						if i >= 1:
-							try:
-								goldReq = int(rtt_button_text[i - 1])
-								print(goldReq)
-								
-							except:
-								logger.error(f'In {reduce_stable_train_time.__name__}: {rtt_button_text[i - 1]} is not int')
-
-
-				if goldReq == 0:
-					logger.error(f'In {reduce_stable_train_time.__name__}: The requested amount of gold for speedup couldn\'t be found')
-					# use a default value for gold (the last known value of gold needed to reduce train time by 4 hours)
-					goldReq = 10
-			else:
-				logger.error(f'In {reduce_stable_train_time.__name__}: Reduce training time button doesn\'t have a title attribute')
-				# use a default value for gold (the last known value of gold needed to reduce train time by 4 hours)
-				goldReq = 10
-
-			if gold and gold >= goldReq:
+		if sws.isVisible(XPATH.TRAINING_TROOPS_TABLE):
+			if sws.isVisible(XPATH.TROOP_REDUCE_TIME_BTN):
 				if sws.clickElement(XPATH.TROOP_REDUCE_TIME_BTN, refresh=True):
 					logger.success(f'In {reduce_stable_train_time.__name__}: Succesfuly reduced training time.')
 					status = True
 				else:
 					logger.error(f'In {reduce_stable_train_time.__name__}: Failed to press the button.')
 			else:
-				logger.warning(f'In {reduce_stable_train_time.__name__}: {goldReq} gold needed to reduce time, but {gold} gold available')
+				logger.warning(f'In {reduce_stable_train_time.__name__}: Not enough gold for speedup.')
 		else:
 			logger.warning(f'In {reduce_stable_train_time.__name__}: Not training any troops.')
 	else:
@@ -115,7 +79,7 @@ def reduce_stable_train_time(sws : SWS):
 	return status
 
 
-def get_stable_total_training_time(sws: SWS):
+def get_stable_training_time(sws: SWS):
 	"""
 	Gets the execution time needed for the current queued troops to be trained inside the Stable
 	Parameters:
@@ -124,7 +88,7 @@ def get_stable_total_training_time(sws: SWS):
 	totalTime = 0
 
 	if not check_building_page_title(sws, BuildingType.Stable):
-		logger.error(f'In {get_stable_total_training_time.__name__}: Not Stable screen')
+		logger.error(f'In {get_stable_training_time.__name__}: Not Stable screen')
 	else:
 		status = False
 
@@ -138,16 +102,16 @@ def get_stable_total_training_time(sws: SWS):
 				
 				if trainingTimes[i] and trainingUnits[i]:
 					if trainingTimes[i][-1] != '?':
-						logger.success(f'In {get_stable_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+						logger.success(f'In {get_stable_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
 						totalTime += time_to_seconds(trainingTimes[i])
 					else:
-						logger.error(f'In {get_stable_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+						logger.warning(f'In {get_stable_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
 				else:
-					logger.error(f'In {get_stable_total_training_time.__name__}: no text could be extracted from the table')
+					logger.error(f'In {get_stable_training_time.__name__}: No text could be extracted from the table')
 		else:
-			logger.error(f'In {get_stable_total_training_time.__name__}: lists of attributes for time and queued troop type have different sizes')
+			logger.error(f'In {get_stable_training_time.__name__}: Lists of attributes for time and queued troop type have different sizes')
 		
 		if status == False:
-			logger.warning(f'In {get_stable_total_training_time.__name__}: no troops are queued for training')
+			logger.warning(f'In {get_stable_training_time.__name__}: No troops are queued for training')
 	
 	return totalTime

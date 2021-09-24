@@ -213,6 +213,7 @@ class XPATHCollection(dict):
             'TROOP_MAX_UNITS': '//*[@alt="%s"]/../../../..//*[@class="max"]/a',
             'TROOP_TRAIN_BTN': '//*[@id="btn_train"]',
             'TROOP_REDUCE_TIME_BTN': '//*[@class="under_progress"]/../../../..//*[contains(text(), "Reduce the troop training time")]/a',
+            'TRAINING_TROOPS_TABLE': '//*[@class="under_progress"]',
             'TRAINING_TROOPS_TIME': '//*[@class="under_progress"]//*[@class="dur"]',
             'TRAINING_TROOPS_TYPE': '//*[@class="under_progress"]//*[@class="desc"]',
             #
