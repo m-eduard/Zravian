@@ -18,7 +18,7 @@ if __name__ == "__main__":
 		ls = ['Clubswinger', 'Axeman', 'Spearman', 'Scout']
 		for i in ls:
 		    print(i)
-
+	
 
 		make_troops_by_amount(sws, TroopType.Axeman, 1000)
 		print(str(get_total_training_time(sws)) + ' s')
