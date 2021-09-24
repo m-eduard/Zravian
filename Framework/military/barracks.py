@@ -82,7 +82,6 @@ def reduce_train_time(sws : SWS):
 		logger.error('In reduce_train_time: Not barracks screen.')
 	return status
 
-##################### Training time extraction ################################
 def get_total_training_time(sws: SWS):
 	"""
 	Gets the execution time needed for the current queued troops to be trained
