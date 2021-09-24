@@ -1,8 +1,4 @@
-# Python auto generated directories
-*__pycache__*
-
-# vsCode config
-.vscode/
-
-# File containing logs
-Framework/files/execution.log
+# Ignore everything except Framework
+/*
+/*/
+!/Framework/

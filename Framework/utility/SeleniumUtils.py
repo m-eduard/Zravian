@@ -1,16 +1,17 @@
-import time
 from contextlib import contextmanager
+import time
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException, InvalidSelectorException
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.expected_conditions import staleness_of
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException, InvalidSelectorException
 from Framework.utility.Constants import CHROME_DRIVER_PATH
 from Framework.utility.Logger import get_projectLogger
 
 
+# Project constants
 logger = get_projectLogger()
 
 # Max time for a page to load
@@ -169,11 +170,20 @@ class SWS:
         """
         return str(self.driver.current_url)
 
-    def refresh(self):
+    def refresh(self, hardRefesh : bool = False):
         """
         Reloads current page.
+
+        Parameters:
+            - hardRefresh (bool): Closes and reopens tab.
         """
-        self.driver.refresh()
+        if not hardRefesh:
+            self.driver.refresh()
+        else:
+            initialURL = self.getCurrentUrl()
+            self.newTab(initialURL)
+            self.driver.close()
+            self.switchToTab(initialURL)
 
     def newTab(self, URL : str, switchTo : bool = False):
         """
@@ -226,6 +236,19 @@ class SWS:
             logger.error('In switchToTab: Invalid parameter identifier')
         return success
 
+    def enter_iframe(self, frameIdentifier : str):
+        """
+        Enters a frame identified by string.
+
+        Parameters:
+            - frameIdentifier (str): String to identify frame. 
+        """
+        self.driver.switch_to_frame(frameIdentifier)
+
+    def exit_iframe(self):
+        """Exits iframe(s)."""
+        self.driver.switch_to_default_content()
+
     @__seleniumRefreshLock
     def isVisible(self, prop, waitFor : bool = False):
         """
@@ -238,7 +261,7 @@ class SWS:
         Returns:
             - True if the element is visible, False otherwise.
         """
-        ret = None
+        ret = False
         if prop:
             tmp_driver = self.driver
             if isinstance(prop, list):
@@ -250,7 +273,8 @@ class SWS:
                 prop = prop[-1]
             if tmp_driver:
                 elem = SWS.__findElement(tmp_driver, prop, waitFor=waitFor)
-                ret = (elem != None)
+                if elem != None:
+                    ret = True
         else:
             logger.error('In isVisible: Invalid parameter prop')
         return ret
@@ -444,7 +468,10 @@ class SWS:
             if tmp_driver:
                 elem = SWS.__findElement(tmp_driver, prop, waitFor=waitFor)
                 if elem:
-                    elem.send_keys(text)
+                    if text is None:
+                        elem.clear()
+                    else:
+                        elem.send_keys(text)
                     success = True
                 else:
                     logger.error(f'In sendKeys: Failed to send keys to element identified by {prop}')

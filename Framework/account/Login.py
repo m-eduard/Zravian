@@ -1,45 +1,18 @@
-import time
-from Framework.account.AccountLibraryManager import JSON_PASSWORD_KEY, get_account
 from contextlib import contextmanager
-from Framework.utility.Logger import get_projectLogger
+from Framework.account.AccountLibraryManager import get_account_password
+from Framework.missions.missions import accept_missions, skip_missions
 from Framework.utility.Constants import Server, get_XPATH
+from Framework.utility.Logger import get_projectLogger
 from Framework.utility.SeleniumUtils import SWS
 
 
+# Project constants
 logger = get_projectLogger()
 XPATH = get_XPATH()
-# Notation for undefined field
-UNDEFINED = ''
-# Continue button
-CONTINUE_BTN_TEXT = 'Continue'
-# Accept tasks text
-ACCEPT_TASKS_TEXT = 'To the first task!'
-# Refuse tasks text
-REFUSE_TASKS_TEXT = 'Skip tasks'
-
-
-def get_account_password(username : str, server : Server):
-    """
-    Retrieves password for given account.
-
-    Parameters:
-        - username (str): username used to login, taken from account json by default.
-        - server (Server): URL to load, taken from account json by default.
-    
-    Returns:
-        - String if account was found, None otherwise.
-    """
-    ret = None
-    account = get_account(username, server)
-    if account:
-        ret = str(account[JSON_PASSWORD_KEY])
-    else:
-        logger.error('In get_account_password: Failed to get `account_library.json`')
-    return ret
 
 
 @contextmanager
-def login(server : Server, username : str, headless=False, password=UNDEFINED):
+def login(server : Server, username : str, password=None, headless=False):
     """
     Opens travian and logs in based on given credentials.
 
@@ -48,17 +21,20 @@ def login(server : Server, username : str, headless=False, password=UNDEFINED):
         - username (str): username used to login, taken from account json by default.
         - headless (bool): Set to False in order to see browser, False by default.
         - password (str): Password used to login, taken from account json by default.
+
+    Returns:
+        - Yields a SWS object if the operation was successful, None otherwise.
     """
+    status = False
     sws = SWS(headless)
-    if password == UNDEFINED:
-        password = get_account_password(username, server)
+    if not password:
+        password = get_account_password(server, username)
     if password:
         if sws.get(server.value):
             if sws.sendKeys(XPATH.LOGIN_USER_INPUT, username):
                 if sws.sendKeys(XPATH.LOGIN_PASS_INPUT, password):
                     if sws.clickElement(XPATH.LOGIN_SUBMIT_BTN, refresh=True):
-                        initString = '<' + 25 * '-' + 'STARTED NEW SESSION' + 25 * '-' + '>'
-                        logger.success(initString)
+                        status = True
                         yield sws
                     else:
                         logger.error('In login: Failed to click LOGIN_SUBMIT_BTN!')
@@ -69,7 +45,9 @@ def login(server : Server, username : str, headless=False, password=UNDEFINED):
         else:
             logger.error('In login: Failed to load {server.value}!')
     else:
-        logger.error(f'In login: Failed to get password for {username}')
+        logger.error(f'In login: Failed to identify password for {username} on {server.value}')
+    if not status:
+        yield None
     sws.close()
 
 
@@ -84,30 +62,4 @@ def initial_setup(sws : SWS, doTasks=False):
     Returns:
         - True if operation was succesful, False otherwise.
     """
-    ret = False
-    if sws.isVisible(XPATH.STRING_ON_SCREEN % 'Welcome to Zravian!'):
-        print('PLM')
-    if sws.clickElement(XPATH.STRING_ON_SCREEN % CONTINUE_BTN_TEXT, refresh=True, waitFor=True):
-        if doTasks:
-            if sws.clickElement(XPATH.STRING_ON_SCREEN % ACCEPT_TASKS_TEXT, waitFor=True, javaScriptClick=True):
-                logger.success('In initial_setup: Accepted tasks')
-                ret = True
-            else:
-                logger.error('In initial_setup: Failed to accept tasks')
-        else:
-            if sws.clickElement(XPATH.STRING_ON_SCREEN % REFUSE_TASKS_TEXT, waitFor=True, javaScriptClick=True):
-                if sws.clickElement(XPATH.STRING_ON_SCREEN % REFUSE_TASKS_TEXT, waitFor=True, \
-                        javaScriptClick=True):
-                    if sws.clickElement(XPATH.STRING_ON_SCREEN % REFUSE_TASKS_TEXT, waitFor=True, \
-                            javaScriptClick=True):
-                        logger.success('In initial_setup: Refused tasks')
-                        ret = True
-                    else:
-                        logger.error('In initial_setup: Failed to press "Skip tasks" third time')
-                else:
-                    logger.error('In initial_setup: Failed to press "Skip tasks" second time')
-            else:
-                logger.error('In initial_setup: Failed to press "Skip tasks" first time')
-    else:
-        logger.error('In initial_setup: Failed to click continue button')
-    return ret
+    return (doTasks and accept_missions(sws)) or (not doTasks and skip_missions(sws))
