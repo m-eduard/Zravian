@@ -1,6 +1,5 @@
 from Framework.infrastructure.builder import enter_building
 from time import sleep
-
 from Framework.utility.Logger import get_projectLogger
 from Framework.utility.Constants import Server, TroopType, BuildingType
 from Framework.account.Login import login

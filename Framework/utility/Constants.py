@@ -275,7 +275,7 @@ class BuildingType(IntEnum):
 
 
 # Enum of all existing units
-class TroopType(Enum):
+class TroopType(IntEnum):
     Legionnaire = 1
     Praetorian = 2
     Imperian = 3
