@@ -18,6 +18,9 @@ class TextColors:
 class ProjectLogger:
     def __init__(self):
         self.debugMode = False
+        START_SESSION = '<' + 25 * '-' + 'STARTED NEW SESSION' + 25 * '-' + '>'
+        # Print start message
+        self.success(START_SESSION)
 
     def set_debugMode(self, status : bool):
         """

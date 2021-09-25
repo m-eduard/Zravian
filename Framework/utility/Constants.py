@@ -71,23 +71,24 @@ class XPATHCollection(dict):
             #
             # Temporary email
             #
-            'TE_DISABLED_EMAIL_BOX': '//*[@id="mail"][contains(@class, "disabledText")]',
-            'TE_COPY_MAIL_BTN': '//*[contains(@class, "copyIconGreenBtn")]',
-            'TE_EMAIL_BOX': '//*[contains(@class, "field--value")]',
-            'TE_REMOVE_BTN': '//*[contains(@class, "button--remove")]',
-            'TE_ZRAVIAN_MAIL': '//*[contains(@class, "inbox__content")]//*[contains(text(), "Welcome to Zravian!")]',
+            'TE_RANDOM_BTN': '//input[@type="submit"][@value="Random"]',
+            'TE_REFRESH_BTN': '//*[@class="action-item refresh"]',
+            'TE_EMAIL_ADDRESS': '//*[@id="current-id"]',
+            'TE_ZRAVIAN_MAIL': '//*[@class="subject"][contains(text(), "Welcome to Zravian!")]/..',
+            'TE_ZRAVIAN_RECOVERY_MAIL': '//*[@class="subject"][contains(text(), "Zravian password reset")]',
+            'TE_EMAIL_TEXT': '//*[contains(@id, "content-%s")]//*[@class="message"]',
             #
             # Create account
             #
             'STRING_ON_SCREEN': '//*[contains(text(), "%s")]',
-            'REGISTER_USER_INPUT': '//*[@id="name"]',
-            'REGISTER_PASS1_INPUT': '//*[@id="pw1"]',
-            'REGISTER_PASS2_INPUT': '//*[@id="pw2"]',
-            'REGISTER_MAIL_INPUT': '//*[@id="mail"]',
-            'REGISTER_MAIL2_INPUT': '//*[@id="mail2"]',
-            'REGISTER_AGREE_1_CHKBOX': '//*[@id="chk"]',
-            'REGISTER_AGREE_2_CHKBOX': '//*[@id="spon"]',
-            'REGISTER_SUBMIT_BTN': '//input[@type="submit"][@value="Continue"]',
+            'NEW_ACC_USER_INPUT': '//*[@id="name"]',
+            'NEW_ACC_PASS1_INPUT': '//*[@id="pw1"]',
+            'NEW_ACC_PASS2_INPUT': '//*[@id="pw2"]',
+            'NEW_ACC_MAIL_INPUT': '//*[@id="mail"]',
+            'NEW_ACC_MAIL2_INPUT': '//*[@id="mail2"]',
+            'NEW_ACC_AGREE_1_CHKBOX': '//*[@id="chk"]',
+            'NEW_ACC_AGREE_2_CHKBOX': '//*[@id="spon"]',
+            'NEW_ACC_SUBMIT_BTN': '//input[@type="submit"][@value="Continue"]',
             'ZRAVIAN_SUCCESS_STATUS': '//legend[contains(text(), "Success")]',
             'ZRAVIAN_ERROR_STATUS': '//legend[contains(text(), "Error")]',
             'ZRAVIAN_ERROR_STATUS_MSG': '//legend[contains(text(), "Error")]/../div',
