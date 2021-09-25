@@ -72,21 +72,18 @@ def get_total_training_time(sws : SWS):
     trainingUnits = sws.getElementsAttribute(XPATH.TROOP_TYPE_TIME, 'text')
     trainingTimes = sws.getElementsAttribute(XPATH.TROOP_TRAIN_TIME, 'text')
 
-    if len(trainingTimes) == len(trainingUnits):
-        for i in range(len(trainingTimes)):
-            if status == False:
-                status = True
+    for i in range(len(trainingTimes)):
+        if status == False:
+            status = True
 
-            if trainingTimes[i] and trainingUnits[i]:
-                if trainingTimes[i][-1] != '?':
-                    logger.success(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
-                    totalTime += time_to_seconds(trainingTimes[i])
-                else:
-                    logger.error(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+        if trainingTimes[i] and trainingUnits[i]:
+            if trainingTimes[i][-1] != '?':
+                logger.success(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+                totalTime += time_to_seconds(trainingTimes[i])
             else:
-                logger.error(f'In {get_total_training_time.__name__}: no text could be extracted from the table')
-    else:
-        logger.error(f'In {get_total_training_time.__name__}: lists of attributes for time and queued troop type have different sizes')
+                logger.error(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+        else:
+            logger.error(f'In {get_total_training_time.__name__}: no text could be extracted from the table')
 
     if status == False:
         logger.warning(f'In {get_total_training_time.__name__}: no troops are queued for training')

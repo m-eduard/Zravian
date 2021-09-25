@@ -95,7 +95,6 @@ def get_stable_training_time(sws: SWS, tpType : TroopType):
 		trainingUnits = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TYPE, 'text')
 		trainingTimes = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TIME, 'text')
 
-		# if len(trainingTimes) == len(trainingUnits):
 		for i in range(len(trainingTimes)):
 			if status == False:
 				status = True
@@ -108,8 +107,6 @@ def get_stable_training_time(sws: SWS, tpType : TroopType):
 					logger.warning(f'In {get_stable_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
 			else:
 				logger.error(f'In {get_stable_training_time.__name__}: No text could be extracted from the table')
-		# else:
-		# 	logger.error(f'In {get_stable_training_time.__name__}: Lists of attributes for time and queued troop type have different sizes')
 		
 		if status == False:
 			logger.warning(f'In {get_stable_training_time.__name__}: No troops are queued for training')
