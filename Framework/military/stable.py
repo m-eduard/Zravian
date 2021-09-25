@@ -1,7 +1,6 @@
-from os import spawnl
-from Framework.infrastructure.builder import check_building_page_title
+from Framework.infrastructure.builder import check_building_page_title, enter_building
 from Framework.utility.Logger import get_projectLogger
-from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH, time_to_seconds
+from Framework.utility.Constants import  BuildingType, Troop, TroopType, get_TROOPS, get_XPATH, time_to_seconds
 from Framework.utility.SeleniumUtils import SWS
 
 
@@ -53,7 +52,7 @@ def make_stable_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 
 def reduce_stable_train_time(sws : SWS):
 	"""
-	Presses the "Reduce the troop training time" button on Barracks screen.
+	Presses the "Reduce the troop training time" button on Stable screen.
 
 	Parameters:
 		- sws (SWS): Selenium Web Scraper.
@@ -79,7 +78,7 @@ def reduce_stable_train_time(sws : SWS):
 	return status
 
 
-def get_stable_training_time(sws: SWS):
+def get_stable_training_time(sws: SWS, tpType : TroopType):
 	"""
 	Gets the execution time needed for the current queued troops to be trained inside the Stable
 	Parameters:
@@ -87,6 +86,7 @@ def get_stable_training_time(sws: SWS):
 	"""
 	totalTime = 0
 
+	# enter_building()
 	if not check_building_page_title(sws, BuildingType.Stable):
 		logger.error(f'In {get_stable_training_time.__name__}: Not Stable screen')
 	else:
@@ -95,21 +95,21 @@ def get_stable_training_time(sws: SWS):
 		trainingUnits = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TYPE, 'text')
 		trainingTimes = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TIME, 'text')
 
-		if len(trainingTimes) == len(trainingUnits):
-			for i in range(len(trainingTimes)):
-				if status == False:
-					status = True
-				
-				if trainingTimes[i] and trainingUnits[i]:
-					if trainingTimes[i][-1] != '?':
-						logger.success(f'In {get_stable_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
-						totalTime += time_to_seconds(trainingTimes[i])
-					else:
-						logger.warning(f'In {get_stable_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+		# if len(trainingTimes) == len(trainingUnits):
+		for i in range(len(trainingTimes)):
+			if status == False:
+				status = True
+			
+			if trainingTimes[i] and trainingUnits[i]:
+				if trainingTimes[i][-1] != '?':
+					logger.success(f'In {get_stable_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+					totalTime += time_to_seconds(trainingTimes[i])
 				else:
-					logger.error(f'In {get_stable_training_time.__name__}: No text could be extracted from the table')
-		else:
-			logger.error(f'In {get_stable_training_time.__name__}: Lists of attributes for time and queued troop type have different sizes')
+					logger.warning(f'In {get_stable_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+			else:
+				logger.error(f'In {get_stable_training_time.__name__}: No text could be extracted from the table')
+		# else:
+		# 	logger.error(f'In {get_stable_training_time.__name__}: Lists of attributes for time and queued troop type have different sizes')
 		
 		if status == False:
 			logger.warning(f'In {get_stable_training_time.__name__}: No troops are queued for training')
