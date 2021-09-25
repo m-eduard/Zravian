@@ -51,13 +51,13 @@ def login(server : Server, username : str, password=None, headless=False):
     sws.close()
 
 
-def initial_setup(sws : SWS, doTasks=False):
+def initial_setup(sws : SWS, doTasks):
     """
     First login setup.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper.
-        - doTasks (bool): If set account will do tasks, False by default.
+    - sws (SWS): Selenium Web Scraper.
+    - doTasks (bool): If set account will do tasks, False by default.
 
     Returns:
         - True if operation was succesful, False otherwise.

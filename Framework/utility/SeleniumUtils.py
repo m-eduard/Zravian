@@ -2,11 +2,11 @@ from contextlib import contextmanager
 import time
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException, InvalidSelectorException
-from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.expected_conditions import staleness_of
+from selenium.webdriver.support.ui import WebDriverWait
 from Framework.utility.Constants import CHROME_DRIVER_PATH
 from Framework.utility.Logger import get_projectLogger
 
@@ -15,7 +15,7 @@ from Framework.utility.Logger import get_projectLogger
 logger = get_projectLogger()
 
 # Max time for a page to load
-MAX_PAGE_LOAD_TIME = 30
+MAX_PAGE_LOAD_TIME = 3
 
 
 class SWS:
@@ -30,7 +30,7 @@ class SWS:
         options.add_argument('disable-infobars')
         options.add_argument("--disable-extensions")
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        self.driver = webdriver.Chrome(chrome_options=options, executable_path=CHROME_DRIVER_PATH)
+        self.driver = webdriver.Chrome(options=options, executable_path=CHROME_DRIVER_PATH)
 
     def close(self):
         """Close WebDriver."""

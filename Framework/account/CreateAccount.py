@@ -12,7 +12,6 @@ from Framework.utility.SeleniumUtils import SWS
 # Project constants
 logger = get_projectLogger()
 XPATH = get_XPATH()
-
 # Generic phrase to include in all accounts (At least 5 characters long)
 GENERIC_PHRASE = '0bomb'
 # URL for temporary email generator site
@@ -37,18 +36,17 @@ class _AccountCreator:
     def __init__(self, headless : bool):
         self.sws = SWS(headless)
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, exc_traceback): 
-        if self.sws:
-            self.sws.close()
-        self.sws = None
-
     def close(self):
         if self.sws:
             self.sws.close()
         self.sws = None
+
+    # Required in order to use 'with' keyword
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback): 
+        self.close()
 
     # Temporary email page
     def generate_email(self):
@@ -60,7 +58,7 @@ class _AccountCreator:
         """
         ret = None
         if self.sws.newTab(TEMP_EMAIL_URL, switchTo=True):
-            # Initially generated email
+            # Generate a new email
             if self.sws.clickElement(XPATH.TE_RANDOM_BTN, refresh=True, scrollIntoView=True, javaScriptClick=True):
                 email = self.sws.getElementAttribute(XPATH.TE_EMAIL_ADDRESS, 'value')
                 if email:
@@ -84,13 +82,15 @@ class _AccountCreator:
         ret = False
         email_id = None
         if self.sws.switchToTab(TEMP_EMAIL_URL):
+            # Wait for zravian activation mail
             startTime = time.time()
             endTime = startTime + MAX_POLLING_TIME
             while startTime < endTime:
-                # Wait for zravian activation mail
                 if self.sws.isVisible(XPATH.TE_ZRAVIAN_MAIL):
+                    # Extract the email id in order to see its content
                     email_id = self.sws.getElementAttribute(XPATH.TE_ZRAVIAN_MAIL, 'id')
                     if email_id:
+                        # Open email
                         if not self.sws.clickElement(XPATH.TE_ZRAVIAN_MAIL, scrollIntoView=True, javaScriptClick=True):
                             email_id = None
                             logger.error('In activate_zravian_account: Failed to click email')
@@ -106,14 +106,15 @@ class _AccountCreator:
                 logger.warning('In activate_zravian_account: Failed to receive mail.')
         else:
             logger.error('In activate_zravian_account: Failed to switch to tab')
+        # If email id was retrieved and email is open
         if email_id:
-            # Seacrh the activation link
             ACTIVATE_TEXT = r'activate\.php\?'
             link = None
             # Extract text from the activation email
             text = self.sws.getElementAttribute(XPATH.TE_EMAIL_TEXT % email_id, 'text', waitFor=True)
             if text:
                 try:
+                    # Seacrh the activation link
                     link = re.search(f'[^ \n]*{ACTIVATE_TEXT}[^ \n]*', text).group()
                 except AttributeError:
                     logger.error('In activate_zravian_account: Failed to extract activation link')
@@ -141,7 +142,7 @@ class _AccountCreator:
             - server (Server): Server of new account.
 
         Returns:
-            - String
+            - String if operation is successful, None otherwise.
         """
         ret = None
         # Generic phrase min length
@@ -177,7 +178,7 @@ class _AccountCreator:
             - server (Server): Server of new account.
             - emailAddress (str): Email of new account.
             - tribe (Tribe): Tribe of new account.
-            - region (_Region): _Region of new account.
+            - region (_Region): Region of new account.
 
         Returns:
             - True if the input is valid, False otherwise.
@@ -193,15 +194,15 @@ class _AccountCreator:
                         if region:
                             ret = True
                         else:
-                            logger.error('In complete_registration_form: _Region is missing')
+                            logger.error('In validate_input: Region is missing')
                     else:
-                        logger.error('In complete_registration_form: Tribe is missing')
+                        logger.error('In validate_input: Tribe is missing')
                 else:
-                    logger.error('In complete_registration_form: Email address bad format')
+                    logger.error('In validate_input: Email address bad format')
             else:
-                logger.error('In complete_registration_form: Password is too short')
+                logger.error('In validate_input: Password is too short')
         else:
-            logger.error('In complete_registration_form: Username is missing')
+            logger.error('In validate_input: Username is missing')
         return ret
 
     def complete_registration_form(self, username : str, password : str, server : Server, emailAddress : str,
@@ -218,7 +219,7 @@ class _AccountCreator:
             - password (str): Password of new account.
             - emailAddress (str): Email of new account.
             - tribe (Tribe): Tribe of new account.
-            - region (_Region): _Region of new account.
+            - region (_Region): Region of new account.
 
         Returns:
             - True if the operation was successful, False otherwise.
@@ -240,6 +241,8 @@ class _AccountCreator:
                     personalContentDone = True
                 else:
                     logger.error('In complete_registration_form: Error while entering data')
+            else:
+                logger.error('In complete_registration_form: Failed to open new tab')
         # Enter tribe and region
         if personalContentDone:
             if self.sws.clickElement(XPATH.STRING_ON_SCREEN % tribe.name.title()[:-1]):
@@ -275,14 +278,13 @@ class _AccountCreator:
                 if errorMsg:
                     # If the name is in use, add the account to `account_library.json` and marked password
                     # as unknown
+                    logger.error(f'In complete_registration_form: Failed with site error {errorMsg}')
                     if errorMsg == ERR_NAME_IN_USE:
                         if not self.store_new_account(server, username, UNKNOWN):
                             logger.error('In complete_registration_form: Failed to store account with \
                                 unknown password')
                         else:
                             logger.warning('In complete_registration_form: Added unknown account')
-                    else:
-                        logger.error(f'In complete_registration_form: Failed with site error {errorMsg}')
                 else:
                     logger.error('In complete_registration_form: Failed to get error message')
             else:
@@ -319,7 +321,7 @@ class _AccountCreator:
             - password (str): Password of new account.
             - server (Server): Server of new account.
             - tribe (Tribe): Tribe of new account.
-            - region (_Region): _Region of new account.
+            - region (_Region): Region of new account.
 
         Returns:
             - True if the operation was successful, False otherwise.

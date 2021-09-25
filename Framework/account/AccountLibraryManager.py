@@ -2,7 +2,8 @@ import json
 from Framework.utility.Logger import get_projectLogger
 from Framework.utility.Constants import ACCOUNT_LIBRARY_PATH, Server
 
-# Constants
+
+# Project constants
 logger = get_projectLogger()
 # JSON username key
 JSON_USERNAME_KEY = "username"
@@ -10,9 +11,33 @@ JSON_USERNAME_KEY = "username"
 JSON_PASSWORD_KEY = "password"
 
 
-def __get_account_library():
+def check_account_library_format(accountLib : dict):
     """
-    Gets data contained in `account_library.json` in json format.
+    Checks whether a given dictionary respects the account_library.json pattern.
+
+    Parameters:
+        - accountLib (Dictionary): Will update json with it.
+
+    Returns:
+        - True if the operation was successful, False otherwise.
+    """
+    ret = False
+    for sv in Server:
+        if sv.value in accountLib and \
+                (isinstance(accountLib[sv.value], list) or accountLib[sv.value] == {}) and \
+                all(isinstance(elem, dict) for elem in accountLib[sv.value]) and \
+                (JSON_USERNAME_KEY in elem and JSON_PASSWORD_KEY in elem for elem in accountLib[sv.value]):
+            continue
+        logger.error('In check_account_library_format: JSON does not have the proper form')
+        break
+    else:
+        ret = True
+    return ret
+
+
+def get_account_library():
+    """
+    Gets data contained in `account_library.json` as dictionary if it has no format errors.
 
     Returns:
         - Dictionary containing json if operation was successful, None otherwise.
@@ -23,43 +48,40 @@ def __get_account_library():
         with open(ACCOUNT_LIBRARY_PATH, 'r') as f:
             jsonData = f.read()
     except IOError:
-        logger.error(f'Please ensure that file {ACCOUNT_LIBRARY_PATH} exists and contains the right data')
-    decodedJson = None
+        logger.error(f'In get_account_library: Failed to open {ACCOUNT_LIBRARY_PATH}')
+    accountLib = None
     if jsonData:
         try:
-            decodedJson = json.loads(jsonData)
-        except json.JSONDecodeError:
-            logger.error(f'Invalid json format in file {ACCOUNT_LIBRARY_PATH}')
-    if decodedJson:
-        for sv in Server:
-            if not sv.value in decodedJson or \
-                    not isinstance(decodedJson[sv.value], list) or \
-                    not all(isinstance(elem, dict) for elem in decodedJson[sv.value]) or \
-                    not (JSON_USERNAME_KEY in elem and JSON_PASSWORD_KEY in elem for elem in decodedJson[sv.value]):
-                logger.error('In __get_account_library: JSON does not have the proper form')
-                break
-        else:
-            ret = decodedJson
+            accountLib = dict(json.loads(jsonData))
+        except (json.JSONDecodeError, ValueError):
+            logger.error(f'In get_account_library: Invalid json format in file {ACCOUNT_LIBRARY_PATH}')
+    if accountLib and check_account_library_format(accountLib):
+        ret = accountLib
+    else:
+        logger.error('In get_account_library: JSON failed format check')
     return ret
 
 
-def __write_account_library(newData : dict):
+def write_account_library(newAccountLib : dict):
     """
     Overwrites data in `account_library.json`.
 
     Parameters:
-        - newData (Dictionary): Will update json with it.
+        - newAccountLib (Dictionary): Will update json with it.
 
     Returns:
         - True if the operation was successful, False otherwise.
     """
     ret = False
-    try:
-        with open(ACCOUNT_LIBRARY_PATH, 'w') as f:
-            f.write(json.dumps(newData, indent=4, sort_keys=False))
-            ret = True
-    except IOError:
-        logger.error(f'Please ensure that file {ACCOUNT_LIBRARY_PATH} exists and contains the right data')
+    if check_account_library_format(newAccountLib):
+        try:
+            with open(ACCOUNT_LIBRARY_PATH, 'w') as f:
+                f.write(json.dumps(newAccountLib, indent=4, sort_keys=False))
+                ret = True
+        except IOError:
+            logger.error(f'In write_account_library: Failed to open {ACCOUNT_LIBRARY_PATH}')
+    else:
+        logger.error('In write_account_library: JSON failed format check')
     return ret
 
 
@@ -71,18 +93,43 @@ def reset_server_accounts(server : Server):
         - server (Server): Denotes server.
 
     Returns:
-        - True if operation was successful, None otherwise.
+        - True if operation was successful, False otherwise.
     """
-    ret = None
-    initialJson = __get_account_library()
-    if initialJson:
-        initialJson[server.value] = {}
-        if __write_account_library(initialJson):
+    ret = False
+    accountLib = get_account_library()
+    if accountLib:
+        accountLib[server.value] = []
+        if write_account_library(accountLib):
             ret = True
         else:
-            logger.error('IN reset_server_accounts: Failed to write to `account_library.json`')
+            logger.error('In reset_server_accounts: Failed to write to `account_library.json`')
     else:
-        logger.error('IN reset_server_accounts: Failed to get `account_library.json`')
+        logger.error('In reset_server_accounts: Failed to get `account_library.json`')
+    return ret
+
+
+def get_account_password(server : Server, username : str):
+    """
+    Gets account password from `account_library.json` if the username exists.
+
+    Parameters:
+        - server (Server): Identifies the server.
+        - username (String): Identifies the account.
+
+    Returns:
+        - Dictionary containing account if it exists, None otherwise.
+    """
+    ret = None
+    decodedJson = get_account_library()
+    if decodedJson:
+        for acc in decodedJson[server.value]:
+            if acc[JSON_USERNAME_KEY] == username:
+                ret = str(acc[JSON_PASSWORD_KEY])
+                break
+        else:
+            logger.warning(f'In get_account_password: Failed to retrieve {username} on {server.value}')
+    else:
+        logger.error('In get_account_password: Failed to read `account_library.json`')
     return ret
 
 
@@ -99,50 +146,23 @@ def append_account(server : Server, username : str, password : str):
         - True if the operation was successful, False otherwise.
     """
     ret = False
-    decodedJson = __get_account_library()
-    if decodedJson:
-        for acc in decodedJson[server.value]:
-            if acc[JSON_USERNAME_KEY] == username:
-                logger.warning(f'In append_account: Account already exists {username}')
-                ret = True
-                break
+    accountLib = get_account_library()
+    if accountLib:
+        if get_account_password(server, username):
+            logger.warning(f'In append_account: Account already exists {username}')
+            ret = True
         else:
             newAccount = {
                 JSON_USERNAME_KEY: username,
                 JSON_PASSWORD_KEY: password,
             }
-            decodedJson[server.value].append(newAccount)
-            if __write_account_library(decodedJson):
+            accountLib[server.value].append(newAccount)
+            if write_account_library(accountLib):
                 ret = True
             else:
                 logger.error('In append_account: Failed to write to account_library.json')
     else:
         logger.error('In append_account: Failed to read account_library.json')
-    return ret
-
-
-def get_account_password(server : Server, username : str):
-    """
-    Gets account password from `account_library.json` if the username exists.
-
-    Parameters:
-        - server (Server): Identifies the server.
-        - username (String): Identifies the account.
-
-    Returns:
-        - Dictionary containing account if it exists, None otherwise.
-    """
-    ret = None
-    decodedJson = __get_account_library()
-    if decodedJson:
-        for acc in decodedJson[server.value]:
-            if acc[JSON_USERNAME_KEY] == username:
-                ret = str(acc[JSON_PASSWORD_KEY])
-                break
-        else:
-            logger.warning(f'In get_account: Failed to retrieve {username} on {server.value}')
-    else:
-        logger.error('In get_account: Failed to read `account_library.json`')
     return ret
 
 
@@ -157,10 +177,13 @@ def get_last_account_username(server : Server):
         - String with password if operation was successful, None otherwise.
     """
     ret = None
-    decodedJson = __get_account_library()
-    if decodedJson:
-        if decodedJson[server.value]:
-            ret = str(decodedJson[server.value][-1][JSON_USERNAME_KEY])
+    accountLib = get_account_library()
+    if accountLib:
+        if accountLib[server.value]:
+            try:
+                ret = str(accountLib[server.value][-1][JSON_USERNAME_KEY])
+            except IndexError:
+                logger.error(f'In get_last_account_username: {server.value} is empty')
         else:
             logger.warning(f'In get_last_account_username: No accounts on server')
     else:
@@ -179,12 +202,12 @@ def get_last_account_password(server : Server):
         - String with password if operation was successful, None otherwise.
     """
     ret = None
-    decodedJson = __get_account_library()
-    if decodedJson:
-        if decodedJson[server.value]:
-            ret = str(decodedJson[server.value][-1][JSON_PASSWORD_KEY])
-        else:
-            logger.warning(f'In get_last_account_password: No accounts on server')
+    accountLib = get_account_library()
+    if accountLib:
+        try:
+            ret = str(accountLib[server.value][-1][JSON_PASSWORD_KEY])
+        except IndexError:
+            logger.error(f'In get_last_account_password: {server.value} is empty')
     else:
         logger.error('In get_last_account_password: Failed to read `account_library.json`')
     return ret
@@ -195,17 +218,17 @@ def get_generic_accounts(server : Server, genericPhrase : str):
     Gets all generic accounts created with the given genericPhrase.
 
     Parameters:
-        - genericPhrase (str): Phrase to search for in accounts username.
         - server (Server): Identifies the server.
+        - genericPhrase (str): Phrase to search for in accounts username.
 
     Returns:
         - List containing all generic accounts, None if error is encountered.
     """
     ret = None
-    decodedJson = __get_account_library()
-    if decodedJson:
-        ret = [str(acc[JSON_USERNAME_KEY]) for acc in decodedJson[server.value] \
+    accountLib = get_account_library()
+    if accountLib:
+        ret = [str(acc[JSON_USERNAME_KEY]) for acc in accountLib[server.value] \
                 if str(acc[JSON_USERNAME_KEY]).startswith(genericPhrase)]
     else:
-        logger.error('In append_account: Failed to read account_library.json')
+        logger.error('In get_generic_accounts: Failed to read account_library.json')
     return ret

@@ -9,13 +9,13 @@ from pathlib import Path
 # Current project
 FRAMEWORK_PATH = Path(os.path.dirname(os.path.abspath(__file__))).parent.absolute()
 # Chrome driver path
-CHROME_DRIVER_PATH = os.path.join(FRAMEWORK_PATH, 'files\chromedriver.exe')
+CHROME_DRIVER_PATH = os.path.join(FRAMEWORK_PATH, *('files\\chromedriver.exe'.split('\\')))
 # Data file path
-DATA_PATH = os.path.join(FRAMEWORK_PATH, 'files\\data.json')
+DATA_PATH = os.path.join(FRAMEWORK_PATH, *('files\\data.json'.split('\\')))
 # Account library file path
-ACCOUNT_LIBRARY_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account_library.json')
+ACCOUNT_LIBRARY_PATH = os.path.join(FRAMEWORK_PATH, *('files\\account_library.json'.split('\\')))
 # Log file path
-LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\execution.log')
+LOGS_PATH = os.path.join(FRAMEWORK_PATH, *('files\\execution.log'.split('\\')))
 
 
 # General purpose functions
@@ -128,7 +128,8 @@ class XPATHCollection(dict):
             'ALLIANCE_NAME_INPUT': '//input[@name="ally2"]',
             'ALLIANCE_OK_BTN': '//*[@id="btn_ok"]',
             'ALLIANCE_ACCEPT_BTN': '//a[text()="%s"]/../../*[@class="acc"]/a',
-            'ALLIANCE_TAG': '//*[contains(text(), the Alliance)]/../../..//*[contains(text(), "%s")]',
+            'ALLIANCE_CURRENT_TAG': '//*[contains(text(), the Alliance)]/../../..//*[contains(text(), "%s")]',
+            'ALLIANCE_TAG_ERROR': '//*[contains(text(), "That tag is already taken")]',
             #
             # Overview
             #
@@ -136,7 +137,8 @@ class XPATHCollection(dict):
             #
             # Statistics
             #
-            'MY_RANKING': '//*[@id="player"]//*[@class="hl"]//*[@class="ra"]',
+            'STATISTICS_MY_RANKING': '//*[@id="player"]//*[@class="hl"]//*[@class="ra"]',
+            'STATISTICS_ACCOUNT': '//*[@id="player"]//*[@class="hl"]//*[@class="pla"]/a',
             #
             # Map
             #
@@ -209,14 +211,14 @@ class XPATHCollection(dict):
             self.__setitem__(key, value)
 
 
-# Enum of all existing tribes
+# All tribes
 class Tribe(Enum):
     ROMANS = 'ROMANS'
     TEUTONS = 'TEUTONS'
     GAULS = 'GAULS'
     
 
-# Enum of all existing buildings
+# All buildings
 class BuildingType(IntEnum):
     EmptyPlace = 0
     Woodcutter = 1
@@ -257,7 +259,7 @@ class BuildingType(IntEnum):
     GreatGranary = 39
 
 
-# Enum of all existing units
+# All units
 class TroopType(Enum):
     Legionnaire = 1
     Praetorian = 2
@@ -291,7 +293,7 @@ class TroopType(Enum):
     GSettler = 30
 
 
-# Enum with all resource types
+# All resource types
 class ResourceType(Enum):
     LUMBER = 'lumber'
     CLAY = 'clay'
