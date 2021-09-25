@@ -20,14 +20,19 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
     Returns:
         - True if the operation is successful, False otherwise.
     """
-    barracks = [1, 2, 3, 11, 12, 13, 14, 21, 22]
-    stable = [4, 5, 6, 15, 16, 23, 24, 25, 26]
+    barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger, TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
+    stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris, TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder, TroopType.Druidrider, TroopType.Haeduan]
     siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram, TroopType.Trebuchet]
 
 
     buildingDict = dict()
+    for x in barracks:
+        buildingDict[x] = BuildingType.Barracks
+    for x in stable:
+        buildingDict[x] = BuildingType.Stable
     for x in siege:
         buildingDict[x] = BuildingType.SiegeWorkshop
+    
     #TODO
     enter_building(sws, buildingDict[tpType])
 
