@@ -1,7 +1,6 @@
 from Framework.screen.HomeUI import move_to_map, move_to_overview
-from Framework.utility.Constants import get_XPATH
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import get_XPATH, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
 # Project constants
@@ -23,7 +22,7 @@ def get_village_coordinates(sws : SWS, villageName : str):
     ret = None
     if move_to_map(sws):
         if sws.isVisible(XPATH.VILLAGE_BY_NAME % villageName):
-            altList = sws.getElementAttribute(XPATH.VILLAGE_BY_NAME % villageName, 'alt')
+            altList = sws.getElementAttribute(XPATH.VILLAGE_BY_NAME % villageName, Attr.ALT)
             if altList:
                 coordsText = altList.split()[0]
                 coords = coordsText[1:-1].split('|')

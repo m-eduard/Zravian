@@ -4,9 +4,8 @@ import time
 from Framework.account.AccountLibraryManager import append_account, get_generic_accounts, get_last_account_username, \
     get_last_account_password
 from Framework.account.Login import initial_setup, login
-from Framework.utility.Constants import Server, Tribe, get_XPATH
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import Server, Tribe, get_XPATH, get_projectLogger 
+from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
 # Project constants
@@ -60,7 +59,7 @@ class _AccountCreator:
         if self.sws.newTab(TEMP_EMAIL_URL, switchTo=True):
             # Generate a new email
             if self.sws.clickElement(XPATH.TE_RANDOM_BTN, refresh=True, scrollIntoView=True, javaScriptClick=True):
-                email = self.sws.getElementAttribute(XPATH.TE_EMAIL_ADDRESS, 'value')
+                email = self.sws.getElementAttribute(XPATH.TE_EMAIL_ADDRESS, Attr.VALUE)
                 if email:
                     ret = str(email)
                     logger.success(f'In generate_email: Generated email {email}')
@@ -88,7 +87,7 @@ class _AccountCreator:
             while startTime < endTime:
                 if self.sws.isVisible(XPATH.TE_ZRAVIAN_MAIL):
                     # Extract the email id in order to see its content
-                    email_id = self.sws.getElementAttribute(XPATH.TE_ZRAVIAN_MAIL, 'id')
+                    email_id = self.sws.getElementAttribute(XPATH.TE_ZRAVIAN_MAIL, Attr.ID)
                     if email_id:
                         # Open email
                         if not self.sws.clickElement(XPATH.TE_ZRAVIAN_MAIL, scrollIntoView=True, javaScriptClick=True):
@@ -111,7 +110,7 @@ class _AccountCreator:
             ACTIVATE_TEXT = r'activate\.php\?'
             link = None
             # Extract text from the activation email
-            text = self.sws.getElementAttribute(XPATH.TE_EMAIL_TEXT % email_id, 'text', waitFor=True)
+            text = self.sws.getElementAttribute(XPATH.TE_EMAIL_TEXT % email_id, Attr.TEXT, waitFor=True)
             if text:
                 try:
                     # Seacrh the activation link
@@ -274,7 +273,7 @@ class _AccountCreator:
                 ret = True
                 logger.success('Registration successful')
             elif self.sws.isVisible(XPATH.ZRAVIAN_ERROR_STATUS):
-                errorMsg = self.sws.getElementAttribute(XPATH.ZRAVIAN_ERROR_STATUS_MSG, 'text')
+                errorMsg = self.sws.getElementAttribute(XPATH.ZRAVIAN_ERROR_STATUS_MSG, Attr.TEXT)
                 if errorMsg:
                     # If the name is in use, add the account to `account_library.json` and marked password
                     # as unknown

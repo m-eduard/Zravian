@@ -1,7 +1,6 @@
 from Framework.screen.HomeUI import move_to_messages, move_to_overview
-from Framework.utility.Constants import get_XPATH
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import get_XPATH, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS
 
 
 # Project constants

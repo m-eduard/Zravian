@@ -1,8 +1,7 @@
 import re
 from enum import IntEnum, Enum
-from Framework.utility.Constants import ResourceType, Server, get_XPATH
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import ResourceType, Server, get_XPATH, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
 # Project constants
@@ -103,7 +102,7 @@ def __search_in_instructions(sws : SWS, locators : list, item : InstructionsSear
                 logger.error(f'In __search_in_instructions: Failed to find {locator}')
                 break
         else:
-            ret = sws.getElementAttribute(item.value, 'text')
+            ret = sws.getElementAttribute(item.value, Attr.TEXT)
         sws.exit_iframe()
     else:
         logger.error('In __search_in_instructions: Failed to open instructions')
@@ -166,7 +165,7 @@ def get_level_up_mode(sws : SWS):
     """
     status = None
     if is_screen_overview(sws) or is_screen_village(sws):
-        coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
+        coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, Attr.TITLE)
         if coneTitle:
             if "enable" in coneTitle:
                 status = LevelUpMode.OFF
@@ -195,7 +194,7 @@ def set_level_up_mode(sws : SWS, levelUpMode : LevelUpMode):
     """
     status = False
     if is_screen_overview(sws) or is_screen_village(sws):
-        coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
+        coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, Attr.TITLE)
         if coneTitle:
             if (levelUpMode == LevelUpMode.ON and "enable" in coneTitle) or \
                     (levelUpMode == LevelUpMode.OFF and "disable" in coneTitle):
@@ -247,7 +246,7 @@ def get_village_name(sws : SWS):
     """
     ret = None
     if is_screen_overview(sws) or is_screen_village(sws):
-        villageName = sws.getElementAttribute(XPATH.VILLAGE_NAME, 'text')
+        villageName = sws.getElementAttribute(XPATH.VILLAGE_NAME, Attr.TEXT)
         if villageName:
             ret = villageName
         else:
@@ -269,7 +268,7 @@ def get_storage(sws : SWS):
     """
     storage = {}
     # Extract lumber storage
-    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'text')
+    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, Attr.TEXT)
     if lumber:
         try:
             lumber_curr = int(lumber.split('/')[0])
@@ -280,7 +279,7 @@ def get_storage(sws : SWS):
     else:
         logger.error('In get_storage: Failed to get lumber storage')
     # Extract clay storage
-    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, 'text')
+    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, Attr.TEXT)
     if clay:
         try:
             clay_curr = int(clay.split('/')[0])
@@ -291,7 +290,7 @@ def get_storage(sws : SWS):
     else:
         logger.error('In get_storage: Failed to get clay storage')
     # Extract iron storage
-    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, 'text')
+    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, Attr.TEXT)
     if iron:
         try:
             iron_curr = int(iron.split('/')[0])
@@ -302,7 +301,7 @@ def get_storage(sws : SWS):
     else:
         logger.error('In get_storage: Failed to get iron storage')
     # Extract crop storage
-    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, 'text')
+    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, Attr.TEXT)
     if crop:
         try:
             crop_curr = int(crop.split('/')[0])
@@ -327,7 +326,7 @@ def get_production(sws : SWS):
     """
     production = {}
     # Extract lumber production
-    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'title')
+    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, Attr.TITLE)
     if lumber:
         try:
             production[ResourceType.LUMBER] = int(lumber)
@@ -336,7 +335,7 @@ def get_production(sws : SWS):
     else:
         logger.error('In get_storage: Failed to get lumber storage')
     # Extract clay production
-    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, 'title')
+    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, Attr.TITLE)
     if clay:
         try:
             production[ResourceType.CLAY] = int(clay)
@@ -345,7 +344,7 @@ def get_production(sws : SWS):
     else:
         logger.error('In get_storage: Failed to get clay storage')
     # Extract iron production
-    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, 'title')
+    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, Attr.TITLE)
     if iron:
         try:
             production[ResourceType.IRON] = int(iron)
@@ -354,7 +353,7 @@ def get_production(sws : SWS):
     else:
         logger.error('In get_storage: Failed to get iron storage')
     # Extract crop production
-    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, 'title')
+    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, Attr.TITLE)
     if crop:
         try:
             production[ResourceType.CROP] = int(crop)
@@ -376,7 +375,7 @@ def get_all_villages_name(sws : SWS):
     Returns:
         - List of strings.
     """
-    villages = sws.getElementsAttribute(XPATH.ALL_VILLAGES_LINKS, 'text')
+    villages = sws.getElementsAttribute(XPATH.ALL_VILLAGES_LINKS, Attr.TEXT)
     return villages
 
 
@@ -391,7 +390,7 @@ def get_current_village(sws : SWS):
         - String with village name if operation was successful, None otherwise.
     """
     ret = None
-    selectedVillage = sws.getElementAttribute(XPATH.SELECTED_VILLAGE, 'text')
+    selectedVillage = sws.getElementAttribute(XPATH.SELECTED_VILLAGE, Attr.TEXT)
     if selectedVillage:
         ret = selectedVillage
     else:

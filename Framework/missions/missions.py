@@ -2,9 +2,8 @@ from enum import IntEnum
 import re
 import time
 from Framework.screen.HomeUI import press_continue_btn
-from Framework.utility.Constants import get_XPATH
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import get_XPATH, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
 # Project constants
@@ -101,7 +100,7 @@ def is_initial_setup(sws : SWS):
 	ret = False
 	INITIAL_SCREEN_TEXT = 'Welcome to Zravian!'
 	if open_mission_dialog(sws):
-		title = sws.getElementAttribute(XPATH.MISSION_NAME, 'text', waitFor=True)
+		title = sws.getElementAttribute(XPATH.MISSION_NAME, Attr.TEXT, waitFor=True)
 		if title:
 			ret = INITIAL_SCREEN_TEXT in title
 		else:
@@ -123,7 +122,7 @@ def get_mission_number(sws : SWS):
 	"""
 	num = None
 	if open_mission_dialog(sws):
-		title = sws.getElementAttribute(XPATH.MISSION_NAME, 'text', waitFor=True)
+		title = sws.getElementAttribute(XPATH.MISSION_NAME, Attr.TEXT, waitFor=True)
 		if title:
 			titleRe = re.search('([0-9]+)(.*)', title)
 			titleNum, titleWord = None, None

@@ -1,6 +1,5 @@
 import json
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.Constants import ACCOUNT_LIBRARY_PATH, Server
+from Framework.utility.Constants import ACCOUNT_LIBRARY_PATH, Server, get_projectLogger
 
 
 # Project constants
@@ -127,7 +126,7 @@ def get_account_password(server : Server, username : str):
                 ret = str(acc[JSON_PASSWORD_KEY])
                 break
         else:
-            logger.warning(f'In get_account_password: Failed to retrieve {username} on {server.value}')
+            logger.info(f'In get_account_password: Failed to retrieve {username} on {server.value}')
     else:
         logger.error('In get_account_password: Failed to read `account_library.json`')
     return ret
@@ -158,6 +157,7 @@ def append_account(server : Server, username : str, password : str):
             }
             accountLib[server.value].append(newAccount)
             if write_account_library(accountLib):
+                logger.info(f'In append_account: Added account {username}: {password}')
                 ret = True
             else:
                 logger.error('In append_account: Failed to write to account_library.json')
