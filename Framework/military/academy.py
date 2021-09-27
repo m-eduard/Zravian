@@ -1,8 +1,8 @@
 from Framework.infrastructure.builder import construct_building, enter_building, level_up_building_at
 from Framework.infrastructure.builder import check_building_page_title, get_building_data
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.SeleniumWebScraper import SWS
 from Framework.utility.Constants import BuildingType, TroopType, get_TROOPS, get_XPATH
-from Framework.utility.Logger import get_projectLogger
+from Framework.utility.Constants import get_projectLogger
 
 
 logger = get_projectLogger()

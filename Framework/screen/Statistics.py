@@ -1,7 +1,6 @@
 from Framework.screen.HomeUI import move_to_statistics, move_to_overview
-from Framework.utility.Constants import get_XPATH
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import get_XPATH, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
 # Project constants
@@ -21,7 +20,7 @@ def get_rank(sws : SWS):
     """
     ret = None
     if move_to_statistics(sws):
-        rankText = sws.getElementAttribute(XPATH.MY_RANKING, 'text')
+        rankText = sws.getElementAttribute(XPATH.MY_RANKING, Attr.TEXT)
         if rankText:
             if move_to_overview(sws):
                 try:

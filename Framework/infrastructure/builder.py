@@ -1,9 +1,9 @@
 import time
 import re
 from Framework.screen.HomeUI import get_server, move_to_overview, move_to_village
-from Framework.utility.Constants import BuildingType, get_BUILDINGS, get_XPATH, get_building_type_by_name, time_to_seconds
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import BuildingType, get_BUILDINGS, get_XPATH, get_building_type_by_name, \
+    time_to_seconds, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
 # Project constants
@@ -93,7 +93,7 @@ def get_busy_workers_timer(sws : SWS):
     if initialURL:
         if move_to_overview(sws):
             propList = [XPATH.FINISH_DIALOG, XPATH.INSIDE_TIMER]
-            workingTimer = sws.getElementAttribute(propList, 'text')
+            workingTimer = sws.getElementAttribute(propList, Attr.TEXT)
             if sws.get(initialURL):
                 if workingTimer:
                     ret = time_to_seconds(workingTimer)
@@ -122,14 +122,14 @@ def get_time_to_build(sws : SWS, bdType : BuildingType):
     time_left = None
     if sws.isVisible(XPATH.BUILDING_PAGE_EMPTY_TITLE):
         propList = [XPATH.CONSTRUCT_BUILDING_NAME % BUILDINGS[bdType].name, XPATH.CONSTRUCT_COSTS]
-        costs = sws.getElementAttribute(propList, 'text')
+        costs = sws.getElementAttribute(propList, Attr.TEXT)
         try:
             time_left = time_to_seconds(costs.split('|')[-1])
         except (AttributeError, IndexError):
             logger.error('In get_time_to_build: Failed to get time from costs')
     else:
         propList = [XPATH.LEVEL_UP_COSTS]
-        costs = sws.getElementAttribute(propList, 'text')
+        costs = sws.getElementAttribute(propList, Attr.TEXT)
         try:
             time_left = time_to_seconds(costs.split('|')[-1].split()[0])
         except (AttributeError, IndexError):
@@ -189,10 +189,10 @@ def select_and_demolish_building(sws : SWS, index : int):
         if sws.clickElement(XPATH.DEMOLITION_BUILDING_OPTION % (str(index) + '.')):
             if sws.clickElement(XPATH.DEMOLITION_BTN, refresh=True):
                 propList = [XPATH.FINISH_DIALOG, XPATH.INSIDE_TIMER]
-                demolitionTimer = sws.getElementAttribute(propList, 'text')
+                demolitionTimer = sws.getElementAttribute(propList, Attr.TEXT)
                 # White for demolishing to end
                 while demolitionTimer:
-                    demolitionTimer = sws.getElementAttribute(propList, 'text')
+                    demolitionTimer = sws.getElementAttribute(propList, Attr.TEXT)
                     if demolitionTimer:
                         dmTime = max(MIN_WAIT, time_to_seconds(demolitionTimer))
                         time.sleep(dmTime)
@@ -317,7 +317,7 @@ def check_resources(sws : SWS, bdType : BuildingType, forced : bool = False):
         propList.append(XPATH.CONSTRUCT_BUILDING_NAME % BUILDINGS[bdType].name)
     propList.append(XPATH.BUILDING_ERR_RESOURCES)
     propList.append(XPATH.INSIDE_TIMER)
-    requirementTimer = sws.getElementAttribute(propList, 'text')
+    requirementTimer = sws.getElementAttribute(propList, Attr.TEXT)
     if requirementTimer:
         time_left = time_to_seconds(requirementTimer)
         if forced:
@@ -423,7 +423,7 @@ def find_buildings(sws : SWS, bdType : BuildingType):
     if moveStatus:
         lst = []
         # Finding sites with requested building and retrieving the 'href' to determine the site id
-        sitesHref = sws.getElementsAttribute(XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, 'href')
+        sitesHref = sws.getElementsAttribute(XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, Attr.HREF)
         for href in sitesHref:
             try:
                 lst.append(int(re.search('id=([0-9]+)', href).group(1)))
@@ -459,7 +459,7 @@ def get_building_data(sws : SWS, bdType : BuildingType):
         moveStatus = move_to_village(sws)
     if moveStatus:
         lst = []
-        attributes = ['href', 'alt']
+        attributes = [Attr.HREF, Attr.ALT]
         # Finding sites with requested building and retrieving the 'href' to determine the site id and
         # 'alt' to determine building level
         sitesAttr = sws.getElementsAttributes(XPATH.BUILDING_SITE_NAME % BUILDINGS[bdType].name, attributes)
@@ -623,7 +623,7 @@ def level_up_building_at(sws : SWS, index : int, forced : bool = False, waitToFi
         else:
             moveStatus = move_to_village(sws)
         if moveStatus:
-            buildingSiteElemText = sws.getElementAttribute(XPATH.BUILDING_SITE_ID % index, 'alt')
+            buildingSiteElemText = sws.getElementAttribute(XPATH.BUILDING_SITE_ID % index, Attr.ALT)
             bdType = None
             if buildingSiteElemText:
                 buildingSiteRe = re.search('(.*) level', buildingSiteElemText)

@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import json
 from enum import IntEnum, Enum
@@ -9,13 +10,13 @@ from pathlib import Path
 # Current project
 FRAMEWORK_PATH = Path(os.path.dirname(os.path.abspath(__file__))).parent.absolute()
 # Chrome driver path
-CHROME_DRIVER_PATH = os.path.join(FRAMEWORK_PATH, 'files\chromedriver.exe')
+CHROME_DRIVER_PATH = os.path.join(FRAMEWORK_PATH, *('files\\chromedriver.exe'.split('\\')))
 # Data file path
-DATA_PATH = os.path.join(FRAMEWORK_PATH, 'files\\data.json')
+DATA_PATH = os.path.join(FRAMEWORK_PATH, *('files\\data.json'.split('\\')))
 # Account library file path
-ACCOUNT_LIBRARY_PATH = os.path.join(FRAMEWORK_PATH, 'files\\account_library.json')
+ACCOUNT_LIBRARY_PATH = os.path.join(FRAMEWORK_PATH, *('files\\account_library.json'.split('\\')))
 # Log file path
-LOGS_PATH = os.path.join(FRAMEWORK_PATH, 'files\\execution.log')
+LOGS_PATH = os.path.join(FRAMEWORK_PATH, *('files\\execution.log'.split('\\')))
 
 
 # General purpose functions
@@ -132,7 +133,8 @@ class XPATHCollection(dict):
             'ALLIANCE_NAME_INPUT': '//input[@name="ally2"]',
             'ALLIANCE_OK_BTN': '//*[@id="btn_ok"]',
             'ALLIANCE_ACCEPT_BTN': '//a[text()="%s"]/../../*[@class="acc"]/a',
-            'ALLIANCE_TAG': '//*[contains(text(), the Alliance)]/../../..//*[contains(text(), "%s")]',
+            'ALLIANCE_CURRENT_TAG': '//*[contains(text(), the Alliance)]/../../..//*[contains(text(), "%s")]',
+            'ALLIANCE_TAG_ERROR': '//*[contains(text(), "That tag is already taken")]',
             #
             # Overview
             #
@@ -140,7 +142,8 @@ class XPATHCollection(dict):
             #
             # Statistics
             #
-            'MY_RANKING': '//*[@id="player"]//*[@class="hl"]//*[@class="ra"]',
+            'STATISTICS_MY_RANKING': '//*[@id="player"]//*[@class="hl"]//*[@class="ra"]',
+            'STATISTICS_ACCOUNT': '//*[@id="player"]//*[@class="hl"]//*[@class="pla"]/a',
             #
             # Map
             #
@@ -229,14 +232,14 @@ class XPATHCollection(dict):
             self.__setitem__(key, value)
 
 
-# Enum of all existing tribes
+# All tribes
 class Tribe(Enum):
     ROMANS = 'ROMANS'
     TEUTONS = 'TEUTONS'
     GAULS = 'GAULS'
     
 
-# Enum of all existing buildings
+# All buildings
 class BuildingType(IntEnum):
     EmptyPlace = 0
     Woodcutter = 1
@@ -311,7 +314,7 @@ class TroopType(IntEnum):
     GSettler = 30
 
 
-# Enum with all resource types
+# All resource types
 class ResourceType(Enum):
     LUMBER = 'lumber'
     CLAY = 'clay'
@@ -346,11 +349,102 @@ class Troop:
             self.requirements.append((get_building_type_by_name(building), level))
 
 
+# The logger used for the project
+class ProjectLogger:
+    # Format for log timestamp
+    TIMESTAMP_FORMAT = "%d/%m/%y %H:%M:%S"
+
+    class TextColors:
+        SUCCESS = '\033[92m'
+        INFO = '\033[96m'
+        WARNING = '\033[93m'
+        ERROR = '\033[91m'
+        NORMAL = '\033[0m'
+        BOLD = '\033[1m'
+        UNDERLINE = '\033[4m'
+
+    def __init__(self):
+        self.debugMode = False
+        START_SESSION = '<' + 25 * '-' + 'STARTED NEW SESSION' + 25 * '-' + '>'
+        # Print start message
+        self.success(START_SESSION)
+
+    def set_debugMode(self, status : bool):
+        """
+        Sets debug mode to True or False.
+
+        Parameters:
+            - status (bool): Value to set debugMode to.
+        """
+        self.debugMode = status
+
+    def success(self, text : str):
+        """
+        Logs text to log file with a timestamp as success notification.
+
+        Parameters:
+            - text (str): Text to log.
+        """
+        timestamp = datetime.now().strftime(self.TIMESTAMP_FORMAT)
+        message = '%s - SUCCESS: %s' % (timestamp, text)
+        terminal_message = self.TextColors.SUCCESS + message + self.TextColors.NORMAL
+        with open(LOGS_PATH, 'a+') as f:
+            f.write(f'{message}\n')
+        if self.debugMode:
+            print(terminal_message)
+
+    def info(self, text : str):
+        """
+        Logs text to log file with a timestamp as informative.
+
+        Parameters:
+            - text (str): Text to log.
+        """
+        timestamp = datetime.now().strftime(self.TIMESTAMP_FORMAT)
+        message = '%s - INFO: %s' % (timestamp, text)
+        terminal_message = self.TextColors.INFO + message + self.TextColors.NORMAL
+        with open(LOGS_PATH, 'a+') as f:
+            f.write(f'{message}\n')
+        if self.debugMode:
+            print(terminal_message)
+
+    def warning(self, text : str):
+        """
+        Logs text to log file with a timestamp as warning.
+
+        Parameters:
+            - text (str): Text to log.
+        """
+        timestamp = datetime.now().strftime(self.TIMESTAMP_FORMAT)
+        message = '%s - WARNING: %s' % (timestamp, text)
+        terminal_message = self.TextColors.WARNING + message + self.TextColors.NORMAL
+        with open(LOGS_PATH, 'a+') as f:
+            f.write(f'{message}\n')
+        if self.debugMode:
+            print(terminal_message)
+
+    def error(self, text : str):
+        """
+        Logs text to log file with a timestamp as error.
+
+        Parameters:
+            - text (str): Text to log.
+        """
+        timestamp = datetime.now().strftime(self.TIMESTAMP_FORMAT)
+        message = '%s - ERROR: %s' % (timestamp, text)
+        terminal_message = self.TextColors.ERROR + message + self.TextColors.NORMAL
+        with open(LOGS_PATH, 'a+') as f:
+            f.write(f'{message}\n')
+        if self.debugMode:
+            print(terminal_message)
+
+
 # Getters
 # Singleton Instances
 XPATHCollectionInstance = None
 BUILDINGSInstance = None
 TROOPSInstance = None
+LOGGERInstance = None
 
 
 def init_data():
@@ -417,3 +511,16 @@ def get_XPATH():
     if XPATHCollectionInstance is None:
         XPATHCollectionInstance = XPATHCollection()
     return XPATHCollectionInstance
+
+
+def get_projectLogger():
+    """
+    Instantiates LOGGERInstance if needed.
+    
+    Returns:
+        - The Project Logger.
+    """
+    global LOGGERInstance
+    if not LOGGERInstance:
+        LOGGERInstance = ProjectLogger()
+    return LOGGERInstance

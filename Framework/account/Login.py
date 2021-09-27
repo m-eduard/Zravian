@@ -1,9 +1,8 @@
 from contextlib import contextmanager
 from Framework.account.AccountLibraryManager import get_account_password
 from Framework.missions.missions import accept_missions, skip_missions
-from Framework.utility.Constants import Server, get_XPATH
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import Server, get_XPATH, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS
 
 
 # Project constants
@@ -17,8 +16,8 @@ def login(server : Server, username : str, password=None, headless=False):
     Opens travian and logs in based on given credentials.
 
     Parameters:
-        - server (Server): URL to load, taken from account json by default.
-        - username (str): username used to login, taken from account json by default.
+        - server (Server): URL to load.
+        - username (str): username used to login.
         - headless (bool): Set to False in order to see browser, False by default.
         - password (str): Password used to login, taken from account json by default.
 
@@ -51,13 +50,13 @@ def login(server : Server, username : str, password=None, headless=False):
     sws.close()
 
 
-def initial_setup(sws : SWS, doTasks=False):
+def initial_setup(sws : SWS, doTasks):
     """
     First login setup.
 
     Parameters:
-        - sws (SWS): Selenium Web Scraper.
-        - doTasks (bool): If set account will do tasks, False by default.
+    - sws (SWS): Selenium Web Scraper.
+    - doTasks (bool): If set account will do tasks, False by default.
 
     Returns:
         - True if operation was succesful, False otherwise.

@@ -1,7 +1,6 @@
 from Framework.screen.HomeUI import move_to_overview, move_to_profile
-from Framework.utility.Constants import Tribe, get_XPATH
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import Tribe, get_XPATH, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
 # Project constants
@@ -24,7 +23,7 @@ def get_tribe(sws : SWS):
     if not TRIBE:
         initialURL = sws.getCurrentUrl()
         if move_to_profile(sws):
-            text = sws.getElementAttribute(XPATH.PROFILE_TRIBE, 'text')
+            text = sws.getElementAttribute(XPATH.PROFILE_TRIBE, Attr.TEXT)
             if text:
                 text = text.split()[-1].upper()
                 for tribe in Tribe:
