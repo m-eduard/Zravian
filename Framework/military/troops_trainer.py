@@ -59,6 +59,37 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 	
 	return status
 
+def get_total_training_time(sws : SWS):
+	"""
+	Gets the execution time needed for the current queued troops to be trained
+	Parameters:
+		- sws (SWS): Selenium Web Scraper
+	"""
+	totalTime = 0
+
+	status = False
+
+	trainingUnits = sws.getElementsAttribute(XPATH.TROOP_TYPE_TIME, 'text')
+	trainingTimes = sws.getElementsAttribute(XPATH.TROOP_TRAIN_TIME, 'text')
+
+	for i in range(len(trainingTimes)):
+		if status == False:
+			status = True
+
+		if trainingTimes[i] and trainingUnits[i]:
+			if trainingTimes[i][-1] != '?':
+				logger.success(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+				totalTime += time_to_seconds(trainingTimes[i])
+			else:
+				logger.error(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+		else:
+			logger.error(f'In {get_total_training_time.__name__}: no text could be extracted from the table')
+
+	if status == False:
+		logger.warning(f'In {get_total_training_time.__name__}: no troops are queued for training')
+
+	return totalTime
+
 def reduce_train_time(sws : SWS, bdType : BuildingType = None):
 	"""
 	Presses the "Reduce the troop training time" button
@@ -90,34 +121,3 @@ def reduce_train_time(sws : SWS, bdType : BuildingType = None):
 		logger.warning(f'In {reduce_train_time.__name__}: Not training any troops.')
 
 	return status
-
-def get_total_training_time(sws : SWS):
-	"""
-	Gets the execution time needed for the current queued troops to be trained
-	Parameters:
-		- sws (SWS): Selenium Web Scraper
-	"""
-	totalTime = 0
-
-	status = False
-
-	trainingUnits = sws.getElementsAttribute(XPATH.TROOP_TYPE_TIME, 'text')
-	trainingTimes = sws.getElementsAttribute(XPATH.TROOP_TRAIN_TIME, 'text')
-
-	for i in range(len(trainingTimes)):
-		if status == False:
-			status = True
-
-		if trainingTimes[i] and trainingUnits[i]:
-			if trainingTimes[i][-1] != '?':
-				logger.success(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
-				totalTime += time_to_seconds(trainingTimes[i])
-			else:
-				logger.error(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
-		else:
-			logger.error(f'In {get_total_training_time.__name__}: no text could be extracted from the table')
-
-	if status == False:
-		logger.warning(f'In {get_total_training_time.__name__}: no troops are queued for training')
-
-	return totalTime
