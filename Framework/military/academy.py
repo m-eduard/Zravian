@@ -1,8 +1,7 @@
-from Framework.military.military_utils import enter_academy
-from Framework.infrastructure.builder import construct_building, level_up_building_at
+from Framework.infrastructure.builder import construct_building, enter_building, level_up_building_at
 from Framework.infrastructure.builder import check_building_page_title, get_building_data
 from Framework.utility.SeleniumUtils import SWS
-from Framework.utility.Constants import BuildingType, Troop, TroopType, get_TROOPS, get_XPATH
+from Framework.utility.Constants import BuildingType, TroopType, get_TROOPS, get_XPATH
 from Framework.utility.Logger import get_projectLogger
 
 
@@ -89,7 +88,7 @@ def research(sws : SWS, tpType : TroopType, forced : bool = False):
     """
     status = False
     if check_troop_bd_requirements(sws, tpType, forced):
-        enter_academy(sws)
+        enter_building(sws, BuildingType.Academy)
         if select_and_research(sws, tpType):
             logger.success(f'In function research: {TROOPS[tpType].name} was researched.')
             status = True
