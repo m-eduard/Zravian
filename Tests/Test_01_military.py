@@ -16,12 +16,12 @@ class Test_01_military:
 			assert enter_building(sws, BuildingType.Barracks)
 
 			troops = sws.getElementsAttribute('//table[@class="build_details"]//*[@class="tit"]//a', 'text')
-			max = sws.getElementAttribute('//table[@class="build_details"]//*[@class="max"]', 'text')
-
-			half = [int(x) / 2 for x in max]
+			
 
 			# test make_troops_by_amount() for every troop that can be trained in the barracks,
-			# for half of the maximum amount trainable (because all max values are extracted before
-			# training any troops, at some point, there may not be enough resources to train any troops)
+			# for half of the maximum amount trainable
 			for i in range(len(troops)):
-				make_troops_by_amount(sws, getattr(TroopType, troops[i]), half[i])
+				max = sws.getElementAttribute(f'//table[@class="build_details"]//tr[{i}]//*[@class="max"]', 'text')
+				half = int(max) / 2
+
+				assert make_troops_by_amount(sws, getattr(TroopType, troops[i]), half) == True
