@@ -1,4 +1,4 @@
-from Framework.infrastructure.builder import check_building_page_title, enter_building, time_to_seconds
+from Framework.infrastructure.builder import enter_building, time_to_seconds
 from Framework.utility.Logger import get_projectLogger
 from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH
 from Framework.utility.SeleniumUtils import SWS
@@ -45,7 +45,7 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 		except ValueError:
 			logger.error(f'In make_troops_by_amount: {maxUnits[1:-1]} is not int')
 			maxUnits = None
-	if maxUnits and maxUnits > amount:
+	if maxUnits and maxUnits >= amount:
 		if sws.sendKeys(XPATH.TROOP_INPUT_BOX % TROOPS[tpType].name, amount):
 			if sws.clickElement(XPATH.TROOP_TRAIN_BTN, refresh=True):
 				logger.success(f'In function make_troops_by_amount: {amount} {TROOPS[tpType].name} were trained')
@@ -59,18 +59,18 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 	
 	return status
 
-def get_total_training_time(sws : SWS):
+def get_current_building_training_time(sws : SWS):
 	"""
-	Gets the execution time needed for the current queued troops to be trained
+	Gets the training time needed for the troops inside the building which page is currently open
+
 	Parameters:
 		- sws (SWS): Selenium Web Scraper
 	"""
 	totalTime = 0
-
 	status = False
 
-	trainingUnits = sws.getElementsAttribute(XPATH.TROOP_TYPE_TIME, 'text')
-	trainingTimes = sws.getElementsAttribute(XPATH.TROOP_TRAIN_TIME, 'text')
+	trainingUnits = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TYPE, 'text')
+	trainingTimes = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TIME, 'text')
 
 	for i in range(len(trainingTimes)):
 		if status == False:
@@ -89,6 +89,34 @@ def get_total_training_time(sws : SWS):
 		logger.warning(f'In {get_total_training_time.__name__}: no troops are queued for training')
 
 	return totalTime
+
+def get_total_training_time(sws : SWS, bdType : BuildingType = None):
+	"""
+	Gets the execution time needed for the current queued troops to be trained
+
+	Parameters:
+		- sws (SWS): Selenium Web Scraper
+		- bdType (BuildingType): if a value is offered, the function extracts the time required for the
+								 troops inside the specified building to be trained;
+								 else, it goes thorugh every building that can train troops
+								 and extracts the time
+	
+	Returns:
+		- the training time for the specified building, if a bdType parameteer was offered, a list of times otherwirse
+	"""
+	time = 0
+
+	if bdType == None:
+		time = []
+		trainingBuildings= [BuildingType.Barracks, BuildingType.Stable, BuildingType.SiegeWorkshop]
+
+		for bd in trainingBuildings:
+			enter_building(sws, bd)
+			time.append(get_current_building_training_time(sws))
+	else:
+		time = get_current_building_training_time(sws)
+	
+	return time
 
 def reduce_train_time(sws : SWS, bdType : BuildingType = None):
 	"""

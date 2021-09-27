@@ -98,38 +98,3 @@ def research(sws : SWS, tpType : TroopType, forced : bool = False):
     else:
         logger.error('In function research: Failed to check and resolve requirements.')
     return status
-    
-    """
-
-    -Check requirements -> reference construct_bulding
-    --error checking
-    -press button
-
-    """
-
-def research_all_possible_troops(sws):
-    """
-    Researches and upgrades buildings such as all prerequisites for researching any troops are met.
-
-    Parameters:
-        - sws (SWS): Used to interact with the webpage.
-
-    Returns:
-        - True if the operation is successful, False otherwise.
-    """
-    status = True
-
-    # go inside the academy and extract all researchable troops names
-    enter_academy(sws)
-
-    # XPATH.RESEARCH_UNIT_NAME is a generic xpath associated with all
-    # images of troops that can be currently researched or researched
-    # after some prerequisites are met
-    for troop in sws.getElementsAttribute(XPATH.RESEARCH_UNIT_NAME, 'alt'):
-        if troop == 'Ram':
-            troop = 'RRam'
-
-        if not research(sws, getattr(TroopType, troop), True):
-            status = False
-
-    return status

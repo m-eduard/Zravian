@@ -31,7 +31,8 @@ def check_mission_dialog_open(sws : SWS):
 	startTime = time.time()
 	endTime = startTime + MAX_POLLING_TIME
 	while startTime < endTime:
-		if STABLE_TEXT in sws.getElementAttribute(XPATH.MISSION_DIALOG_STATUS, 'style'):
+		ls = sws.getElementAttribute(XPATH.MISSION_DIALOG_STATUS, 'style')
+		if ls and STABLE_TEXT in ls:
 			ret = sws.isVisible(XPATH.MISSION_DIALOG)
 			break
 		time.sleep(DEFAULT_POLLING_TIME)
@@ -207,4 +208,3 @@ def skip_missions(sws : SWS):
 	else:
 		logger.error('In skip_missions: Failed to open mission dialog')
 	return ret
-

@@ -19,7 +19,7 @@ GENERIC_PHRASE = '0bomb'
 TEMP_EMAIL_URL = 'https://mailpoof.com/'
 # Polling constants
 DEFAULT_POLLING_TIME = 1
-MAX_POLLING_TIME = 30
+MAX_POLLING_TIME = 60
 # Unknown element
 UNKNOWN = ''
 # Error for name in use
