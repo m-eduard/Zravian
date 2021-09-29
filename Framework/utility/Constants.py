@@ -3,6 +3,7 @@ import os
 import json
 from enum import IntEnum, Enum
 from pathlib import Path
+from collections import namedtuple
 
 #
 # PATHS
@@ -32,6 +33,10 @@ def time_to_seconds(currTime : str):
     """
     SECONDS_IN_HOUR = 3600
     SECONDS_IN_MIN = 3600
+    # Zravian unknown time format
+    UNKWNOWN_TIME = '00?'
+    if UNKWNOWN_TIME in currTime:
+        currTime.replace(UNKWNOWN_TIME, '00')
     h, m, s = currTime.split(':')
     return int(h) * SECONDS_IN_HOUR + int(m) * SECONDS_IN_MIN + int(s)
 
@@ -103,13 +108,14 @@ class XPATHCollection(dict):
             # General
             #
             'FINISH_DIALOG': '//*[contains(text(), "Finished in")]',
-            'INSIDE_TIMER': './/*[contains(@id, "timer")]',
+            'INSIDE_TIMER': '//*[contains(@id, "timer")]',
             #
             # Profile
             #
             'EDIT_PROFILE': '//a[text()="Edit profile"]',
             'PROFILE_DESCR': '//*[@id="edit"]//textarea[@name="be2"]',
             'PROFILE_TRIBE': '//*[@class="details"]//*[contains(text(), "Tribe:")]/..',
+            'PROFILE_CAPITAL': '//*[@id="villages"]//*[@class="none3"][contains(text(), "(capital)")]/../nam',
             'PROFILE_OK_BTN': '//*[@id="btn_ok"]',
             'SELECT_VILLAGE': '//*[@id="side_info"]//*[contains(text(), "%s")]',
             'SELECTED_VILLAGE': '//*[@id="side_info"]//*[@class="dot h1"]//a',
@@ -181,21 +187,23 @@ class XPATHCollection(dict):
             'BUILDING_PAGE_EMPTY_TITLE': '//*[contains(text(), "Construct building.")]',
             # Construct new building menu
             'CONSTRUCT_BUILDING_NAME': '//*[contains(@alt, "%s")]/../../../..',
-            'CONSTRUCT_BUILDING_BTN': './/*[contains(text(), "Construct buildings")]',
+            'CONSTRUCT_BUILDING_BTN': '//*[contains(text(), "Construct buildings")]',
             # Constructing/Leveling up errors
-            'BUILDING_ERR_RESOURCES': './/*[contains(text(), "Enough resources in")]',
-            'BUILDING_ERR_WH': './/*[contains(text(), "Upgrade your warehouse")]',
-            'BUILDING_ERR_GR': './/*[contains(text(), "Upgrade your granary")]',
-            'BUILDING_ERR_BUSY_WORKERS': './/*[contains(text(), "Your builders are already working")]',
+            'CONSTRUCT_ERR_WRAPPER': '//*[@id="new_building"]',
+            'LEVEL_UP_ERR_WRAPPER': '//*[@id="contract"]',
+            'BUILDING_ERR_RESOURCES': '//*[contains(text(), "Enough resources in")]',
+            'BUILDING_ERR_WH': '//*[contains(text(), "Upgrade your warehouse")]',
+            'BUILDING_ERR_GR': '//*[contains(text(), "Upgrade your granary")]',
+            'BUILDING_ERR_BUSY_WORKERS': '//*[contains(text(), "Your builders are already working")]',
             'BUILDING_ERR_MAX_LVL': '//*[contains(text(), "fully upgraded")]',
             # Costs
             'LEVEL_UP_COSTS': '//*[@id="contract"]',
-            'CONSTRUCT_COSTS': './/*[@class="res"]',
+            'CONSTRUCT_COSTS': '//*[@class="res"]',
             # SUCCESSFUL UPGRADE
-            'CONSTRUCT_BUILDING_ID': './/*[contains(text(), "Construct buildings")]',
+            'CONSTRUCT_BUILDING_ID': '//*[contains(text(), "Construct buildings")]',
             'LEVEL_UP_BUILDING_BTN': '//*[contains(text(), "Upgrade to level")]',
             # DEMOLITION
-            'DEMOLITION_BUILDING_OPTION': '//*[contains(text(), "%s")]',
+            'DEMOLITION_BUILDING_OPTION': '//*[contains(text(), "%d.")]',
             'DEMOLITION_BTN': '//*[@id="btn_demolish"]',
             #
             # Marketplace
@@ -248,6 +256,7 @@ class BuildingType(IntEnum):
     TownHall = 24
     Residence = 25
     Palace = 26
+    Treasury = 27
     TradeOffice = 28
     GreatBarracks = 29
     GreatStable = 30
@@ -258,6 +267,8 @@ class BuildingType(IntEnum):
     HeroMansion = 37
     GreatWarehouse = 38
     GreatGranary = 39
+    WonderOfTheWorld = 40
+    HorseDrinkingPool = 41
 
 
 # All units
@@ -302,15 +313,45 @@ class ResourceType(Enum):
     CROP = 'crop'
 
 
+# Requirement named tuple
+BuildingRequirement = namedtuple(typename='BuildingRequirement', field_names=['buildingType', 'level'])
+
+# Special requirement named tuple
+class SRType(Enum):
+    ARTIFACT = 'ARTIFACT'
+    NO_CAPITAL = 'NO CAPITAL'
+    NO_RESIDENCE = 'NO Residence'
+    NO_PALACE = 'NO Palace'
+    NO_WW = 'NO Wonder of the World'
+    TRIBE_ROMANS = 'TRIBE ROMANS'
+    TRIBE_TEUTONS = 'TRIBE TEUTONS'
+    TRIBE_GAULS = 'TRIBE GAULS'
+
+SpecialRequirement = namedtuple(typename='SpecialRequirement', field_names=['type'])
+
+
 # Class containing building properties
-class Building:
+class BuildingInfo:
     def __init__(self, data):
+        # Keywork in special requirements
         self.id = data['id']
         self.type = BuildingType(self.id)
         self.name = data['name']
+        self.maxLevel = data['maxLevel']
         self.requirements = []
         for building, level in data['requirements']:
-            self.requirements.append((get_building_type_by_name(building), level))
+            self.requirements.append(BuildingRequirement(get_building_type_by_name(building), int(level)))
+        self.specialRequirements = []
+        for value in data['specialRequirements']:
+            for sr in SRType:
+                if value == sr.value:
+                    self.specialRequirements.append(sr)
+                    break
+        self.duplicates = data['duplicates']
+
+
+# Named tuple 
+Building = namedtuple(typename='Building', field_names=['siteId', 'level'])
 
 
 # Class containing troop properties
@@ -422,7 +463,7 @@ class ProjectLogger:
 # Getters
 # Singleton Instances
 XPATHCollectionInstance = None
-BUILDINGSInstance = None
+BUILDINGS_DATA_Instance = None
 TROOPSInstance = None
 LOGGERInstance = None
 
@@ -432,9 +473,9 @@ def init_data():
     Initialises constants by parsing data.json.
     """
     global TROOPSInstance
-    global BUILDINGSInstance
+    global BUILDINGS_DATA_Instance
     # Init
-    BUILDINGSInstance = {}
+    BUILDINGS_DATA_Instance = {}
     TROOPSInstance = {}
     # Read data
     with open(DATA_PATH, 'r') as f:
@@ -444,7 +485,7 @@ def init_data():
     assert len(buildings) == len(BuildingType)
     for bdType, bdData in zip(BuildingType, buildings):
         assert bdType == bdData['id']
-        BUILDINGSInstance[bdType] = Building(bdData)
+        BUILDINGS_DATA_Instance[bdType] = BuildingInfo(bdData)
     # Populate troops
     troops = json.loads(jsonData)['troops']['romans']
     troops += json.loads(jsonData)['troops']['teutons']
@@ -456,16 +497,18 @@ def init_data():
         TROOPSInstance[troopType] = Troop(troopData, troopType)
 
 
-def get_BUILDINGS():
+def get_building_info(bdType : BuildingType) -> BuildingInfo:
     """
-    Instantiates BUILDINGSInstance if needed.
+    Building data for required building if it exists.
+
+    Instantiates BUILDINGS_DATA_Instance if needed.
     
     Returns:
-        - Dictionary linking buildingType to Building(object).
+        - Building data object.
     """
-    if BUILDINGSInstance is None:
+    if BUILDINGS_DATA_Instance is None:
         init_data()
-    return BUILDINGSInstance
+    return BUILDINGS_DATA_Instance[bdType]
 
 
 def get_TROOPS():

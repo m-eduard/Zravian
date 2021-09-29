@@ -42,7 +42,7 @@ def login(server : Server, username : str, password=None, headless=False):
             else:
                 logger.error('In login: Failed to type text in LOGIN_USER_INPUT!')
         else:
-            logger.error('In login: Failed to load {server.value}!')
+            logger.error(f'In login: Failed to load {server.value}!')
     else:
         logger.error(f'In login: Failed to identify password for {username} on {server.value}')
     if not status:
