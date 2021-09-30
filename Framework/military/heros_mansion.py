@@ -1,7 +1,6 @@
 from Framework.infrastructure.builder import check_building_page_title
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS
 
 logger = get_projectLogger()
 TROOPS = get_TROOPS()
