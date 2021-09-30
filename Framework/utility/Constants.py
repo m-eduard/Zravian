@@ -226,7 +226,9 @@ class XPATHCollection(dict):
             #
             'HERO_TRAIN_BTN': '//*[@class="build_details"]//*[@alt="%s"]/../../..//*[contains(text(), "Train")]',
             'HERO_EXISTING': '//*[contains(text(), "Experience")]',
-            # Blacksmith
+            #
+            # Upgrading troops
+            #
             'UPGRADE_BTN': '//*[@class="build_details"]//*[contains(text(), "%s")]/../../../*[@class="act"]//a',
             # Research errors
             'RESEARCH_ERR_RESOURCES': '//*[contains(text(), "%s")]/../../..//*[contains(text(), "Not enough resources")]',
