@@ -1,7 +1,7 @@
 from Framework.infrastructure.builder import enter_building, time_to_seconds
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH
-from Framework.utility.SeleniumUtils import SWS
+from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH, get_projectLogger
+from Framework.utility.SeleniumWebScraper import SWS, Attr
+from time import sleep
 
 
 logger = get_projectLogger()
@@ -37,7 +37,7 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 	enter_building(sws, buildingDict[tpType])
 
 	status = False
-	maxUnits = sws.getElementAttribute(XPATH.TROOP_MAX_UNITS % TROOPS[tpType].name, 'text')
+	maxUnits = sws.getElementAttribute(XPATH.TROOP_MAX_UNITS % TROOPS[tpType].name, Attr.TEXT)
 	# The number is between parantheses
 	if maxUnits:
 		try:
@@ -59,18 +59,53 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 	
 	return status
 
+def troop_max_amount(sws : SWS, tpType : TroopType):
+	"""
+	Find the maximum amount of units of a specified type that can be trained.
+
+	Parameters:
+		- sws (SWS): Selenium Web Scraper.
+		- tpType (TroopType): Denotes troop.
+
+	Returns:
+		- The maximum troops that can be trained when the function is called
+	"""
+	barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger, TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
+	stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris, TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder, TroopType.Druidrider, TroopType.Haeduan]
+	siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram, TroopType.Trebuchet]
+
+
+	buildingDict = dict()
+	for x in barracks:
+		buildingDict[x] = BuildingType.Barracks
+	for x in stable:
+		buildingDict[x] = BuildingType.Stable
+	for x in siege:
+		buildingDict[x] = BuildingType.SiegeWorkshop
+	
+	enter_building(sws, buildingDict[tpType])
+	maxUnits = sws.getElementAttribute(XPATH.TROOP_MAX_UNITS % TROOPS[tpType].name, Attr.TEXT)
+
+	return int(maxUnits[1:-1])
+
 def get_current_building_training_time(sws : SWS):
 	"""
 	Gets the training time needed for the troops inside the building which page is currently open
 
 	Parameters:
 		- sws (SWS): Selenium Web Scraper
+	
+	Returns:
+		- time needed to end the training of the troops inside the opened page building
+		- number of undefined times (00:00:00?)
 	"""
 	totalTime = 0
 	status = False
 
-	trainingUnits = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TYPE, 'text')
-	trainingTimes = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TIME, 'text')
+	undefined = 0
+
+	trainingUnits = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TYPE, Attr.TEXT)
+	trainingTimes = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TIME, Attr.TEXT)
 
 	for i in range(len(trainingTimes)):
 		if status == False:
@@ -82,13 +117,14 @@ def get_current_building_training_time(sws : SWS):
 				totalTime += time_to_seconds(trainingTimes[i])
 			else:
 				logger.error(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
+				undefined += 1
 		else:
 			logger.error(f'In {get_total_training_time.__name__}: no text could be extracted from the table')
 
 	if status == False:
 		logger.warning(f'In {get_total_training_time.__name__}: no troops are queued for training')
 
-	return totalTime
+	return [totalTime, undefined]
 
 def get_total_training_time(sws : SWS, bdType : BuildingType = None):
 	"""
@@ -102,15 +138,19 @@ def get_total_training_time(sws : SWS, bdType : BuildingType = None):
 								 and extracts the time
 	
 	Returns:
-		- the training time for the specified building, if a bdType parameteer was offered, a list of times otherwirse
+		- the training time for the specified building, if a bdType parameteer was offered, a list of times otherwirse\
+		- number of undefined times (00:00:00?)
+
+		- None if no troop is in training
 	"""
-	time = 0
+	time = None
 
 	if bdType == None:
 		time = []
 		trainingBuildings= [BuildingType.Barracks, BuildingType.Stable, BuildingType.SiegeWorkshop]
 
 		for bd in trainingBuildings:
+			sleep(1)
 			enter_building(sws, bd)
 			time.append(get_current_building_training_time(sws))
 	else:
@@ -144,7 +184,7 @@ def reduce_train_time(sws : SWS, bdType : BuildingType = None):
 			else:
 				logger.error(f'In {reduce_train_time.__name__}: Failed to press the button.')
 		else:
-			logger.warning(f'In {reduce_train_time.__name__}: Not enough gold for speedup.')
+			logger.warning(f'In {reduce_train_time.__name__}: Reduce train time button is not visible.')
 	else:
 		logger.warning(f'In {reduce_train_time.__name__}: Not training any troops.')
 
