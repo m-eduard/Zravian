@@ -226,6 +226,8 @@ class XPATHCollection(dict):
             #
             'HERO_TRAIN_BTN': '//*[@class="build_details"]//*[@alt="%s"]/../../..//*[contains(text(), "Train")]',
             'HERO_EXISTING': '//*[contains(text(), "Experience")]',
+            'HERO_NAME': '//*[@method="post"]//*[contains(text(), "Hero name")]/..//input',
+            'HERO_SAVE_NAME': '//*[@id="btn_save"]',
             #
             # Upgrading troops
             #
