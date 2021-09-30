@@ -1,5 +1,5 @@
 from Framework.infrastructure.builder import enter_building, time_to_seconds
-from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH, get_projectLogger
+from Framework.utility.Constants import  BuildingType, Troop, TroopType, get_TROOPS, get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS, Attr
 from time import sleep
 
@@ -23,6 +23,7 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 	barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger, TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
 	stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris, TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder, TroopType.Druidrider, TroopType.Haeduan]
 	siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram, TroopType.Trebuchet]
+	palace = [TroopType.Chieftain, TroopType.TSettler]
 
 
 	buildingDict = dict()
@@ -32,8 +33,9 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 		buildingDict[x] = BuildingType.Stable
 	for x in siege:
 		buildingDict[x] = BuildingType.SiegeWorkshop
-	
-	#TODO
+	for x in palace:
+		buildingDict[x] = BuildingType.Palace
+
 	enter_building(sws, buildingDict[tpType])
 
 	status = False
