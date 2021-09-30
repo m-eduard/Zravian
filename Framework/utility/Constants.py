@@ -213,6 +213,7 @@ class XPATHCollection(dict):
             #
             # Barracks
             #
+            'TRAINABLE_TROOP': '//table[@class="build_details"]//*[@class="tit"]//a',
             'TROOP_INPUT_BOX': '//*[@class="build_details"]//*[@alt="%s"]/../../..//input',
             'TROOP_MAX_UNITS': '//*[@alt="%s"]/../../../..//*[@class="max"]/a',
             'TROOP_TRAIN_BTN': '//*[@id="btn_train"]',
@@ -225,6 +226,8 @@ class XPATHCollection(dict):
             #
             'HERO_TRAIN_BTN': '//*[@class="build_details"]//*[@alt="%s"]/../../..//*[contains(text(), "Train")]',
             'HERO_EXISTING': '//*[contains(text(), "Experience")]',
+            # Blacksmith
+            'UPGRADE_BTN': '//*[@class="build_details"]//*[contains(text(), "%s")]/../../../*[@class="act"]//a',
             # Research errors
             'RESEARCH_ERR_RESOURCES': '//*[contains(text(), "%s")]/../../..//*[contains(text(), "Not enough resources")]',
         }
