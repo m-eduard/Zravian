@@ -8,10 +8,9 @@ logger = get_projectLogger()
 XPATH = get_XPATH()
 
 
-def get_village_coordinates(sws : SWS, villageName : str):
+def get_village_coordinates(sws: SWS, villageName: str):
     """
-    Gets a village coordinates from map view.
-    Does not scroll in order to search for a village.
+    Gets a village coordinates from map view. Does not scroll in order to search for a village.
 
     Parameters:
         - sws (SWS): Selenium Web Scraper.
@@ -32,17 +31,15 @@ def get_village_coordinates(sws : SWS, villageName : str):
                 except ValueError as err:
                     logger.error(f'In get_village_coordinates: Coordinates text does not respect pattern: {err}')
             else:
-                logger.error('In get_village_coordinates: Failed to get village "alt" attribute')
+                logger.error('In get_village_coordinates: SWS.getElementAttribute() failed')
         else:
             logger.warning('In get_village_coordinates: Failed to find village')
     else:
-        logger.error('In get_village_coordinates: Failed to move to Map')
+        logger.error('In get_village_coordinates: move_to_map() failed')
     # Return to Overview
     if move_to_overview(sws) and ret:
         logger.success(f'In get_village_coordinates: Coords of {villageName} were retireved')
     else:
         ret = None
-        logger.error('In get_village_coordinates: Failed to move to Overview')
+        logger.error('In get_village_coordinates: move_to_overview() failed')
     return ret
-
-

@@ -1,14 +1,17 @@
-    In order to provide a stable action set within the Framework, all functions
-present in screen directory may be called without any prior condition
-and should ensure the return to a stable zone (Overview screen) after the
-execution is complete.
-    In order to do so, the pattern for these functions looks like this:
+Functions from `HomeUI.py` represent the UI options and should be available in
+every screen without fulfilling any prior condition. Its up to the user to
+provide a suitable environment for the function use. (e.g.:
+`press_continue_button()` is to be used after creating a new account or
+founding a new village only).<br>
+<br>
+Functions contained in other modules of `screen` directory: 
+- `OverviewVillage.py`;
+- `Map.py`;
+- `Statistics.py`;
+- `Reports.py`;
+- `Messages.py`;
+- `Profile.py`;<br>
 
-```
-move_to_requiredScreen()
-perform_action()
-move_to_overview()
-```
-
-NOTE: Even if errors are encountered, move_to_overview() must be called
-regardless.
+Will each **ensure** its environment using `move_to_*` functions suite and also
+return to a *stable state* once the operation is complete - each function will
+call `move_to_overview()`.

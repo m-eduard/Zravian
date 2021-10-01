@@ -1,7 +1,7 @@
-from enum import IntEnum, Enum
+from enum import Enum
 import re
 from Framework.utility.Constants import ResourceType, Server, get_XPATH, get_projectLogger
-from Framework.utility.SeleniumWebScraper import SWS
+from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
 # Project constants
@@ -20,26 +20,15 @@ class Screen(Enum):
     REPORTS = 'report.php'
 
 
-# On/off mode for the level up cone
-class LevelUpMode(IntEnum):
-    OFF = 0
-    ON = 1
-
-
 # Values that might be retrieved from instructions
 class InstructionsSearchItem(Enum):
     COSTS = XPATH.INSTRUCTIONS_COSTS
 
 
 # Utils
-def __get_current_screen(sws : SWS):
+def __get_current_screen(sws: SWS):
     """
-    Tells which of the following screen is active:
-      - Overview
-      - Village
-      - Map
-      - Statistics
-      - None, if you are inside a menu i.e. Constructing a new building.
+    Tells which screen is active.
 
     Parameters:
         - sws (SWS): Selenium Web Scraper.
@@ -47,28 +36,32 @@ def __get_current_screen(sws : SWS):
     Returns:
         - Current screen if operation was successful, None otherwise.
     """
+    ret = None
+    URL = sws.getCurrentUrl()
     for screen in Screen:
-        if screen.value in sws.getCurrentUrl():
-            return screen
-    return None
+        if screen.value in URL:
+            ret = screen
+            break
+    else:
+        logger.error(f'In __get_current_screen: Unknown screen for {URL}')
+    return ret
 
 
-def __move_to_screen(sws : SWS, screen : Screen, forced : bool):
+def __move_to_screen(sws: SWS, screen: Screen, forced: bool):
     """
     Ensures that the current screen is the desired screen.
 
     Parameters:
         - sws (SWS): Selenium Web Scraper.
         - screen (Screen): Desired screen.
-        - forced (bool): If True will refresh the screen even tho
-            is the desired one, False by default
+        - forced (bool): If True and on the desired screen will refresh page.
 
     Returns:
         - True if the operation was successful, False otherwise.
     """
     ret = False
-    BASE_URL = sws.getCurrentUrl().rsplit("/", 1)[0] + '/'
     if screen != __get_current_screen(sws) or forced:
+        BASE_URL = sws.getCurrentUrl().rsplit("/", 1)[0] + '/'
         if sws.get(BASE_URL + screen.value):
             ret = True
         else:
@@ -78,7 +71,7 @@ def __move_to_screen(sws : SWS, screen : Screen, forced : bool):
     return ret
 
 
-def __search_in_instructions(sws : SWS, locators : list, item : InstructionsSearchItem):
+def __search_in_instructions(sws: SWS, locators: list, item: InstructionsSearchItem):
     """
     Searches information in instructions menu.
 
@@ -91,7 +84,9 @@ def __search_in_instructions(sws : SWS, locators : list, item : InstructionsSear
         - String with requested value, None if error occured.
     """
     ret = None
+    # Instructions menu text
     INSTRUCTIONS_MENU = 'Instructions'
+    # Instructions iframe name
     INSTRUCTIONS_IFRAME = 'Frame'
     # Open instructions menu
     if sws.clickElement(XPATH.STRING_ON_SCREEN % INSTRUCTIONS_MENU):
@@ -99,24 +94,24 @@ def __search_in_instructions(sws : SWS, locators : list, item : InstructionsSear
         for locator in locators:
             if sws.isVisible(XPATH.STRING_ON_SCREEN % locator):
                 if not sws.clickElement(XPATH.STRING_ON_SCREEN % locator):
-                    logger.error(f'In __search_in_instructions: Failed to click {locator}')
+                    logger.error(f'In __search_in_instructions: SWS.clickElement() failed')
                     break
             else:
                 logger.error(f'In __search_in_instructions: Failed to find {locator}')
                 break
         else:
-            ret = sws.getElementAttribute(item.value, 'text')
+            ret = sws.getElementAttribute(item.value, Attr.TEXT)
         sws.exit_iframe()
         if not sws.clickElement(sws.MISSION_CLOSE_BTN):
             ret = None
-            logger.error('In __search_in_instructions: Failed to open instructions')
+            logger.error('In __search_in_instructions: SWS.clickElement() failed')
     else:
-        logger.error('In __search_in_instructions: Failed to open instructions')
+        logger.error('In __search_in_instructions: SWS.clickElement() failed')
     return ret
 
 
 # User UI
-def press_continue_btn(sws : SWS):
+def press_continue_btn(sws: SWS):
     """
     Presses the continue button after first ever login.
 
@@ -127,15 +122,16 @@ def press_continue_btn(sws : SWS):
         - True if the operation was successful, False otherwise.
     """
     ret = False
+    # Continue button text
     CONTINUE_BTN_TEXT = 'Continue'
     if sws.clickElement(XPATH.STRING_ON_SCREEN % CONTINUE_BTN_TEXT, refresh=True):
         ret = True
     else:
-        logger.error('In press_continue_btn: Failed to press continue button')
+        logger.error('In press_continue_btn: SWS.clickElement() failed')
     return ret
 
 
-def get_server(sws : SWS):
+def get_server(sws: SWS):
     """
     Gets the current server.
 
@@ -150,7 +146,7 @@ def get_server(sws : SWS):
     try:
         serverURL = re.match(r'(.*)\/(.*)', sws.getCurrentUrl()).group(1) + '/'
     except AttributeError as err:
-        logger.error(f'In get_server: Regex failed to get server: {err}')
+        logger.error(f'In get_server: Regex failed to extract server: {err}')
     if serverURL:
         for server in Server:
             if server.value == serverURL:
@@ -161,73 +157,7 @@ def get_server(sws : SWS):
     return ret
 
 
-def get_level_up_mode(sws : SWS):
-    """
-    Gets level up mode status.
-
-    Parameters:
-        - sws (SWS): Selenium Web Scraper.
-
-    Returns:
-        - LevelUpMode if operation was successful, None otherwise.
-    """
-    ret = None
-    # Status identifiers
-    STATUS_ENABLED_TEXT = 'enable'
-    STATUS_DISABLED_TEXT = 'disable'
-    if is_screen_overview(sws) or is_screen_village(sws):
-        coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
-        if coneTitle:
-            if STATUS_ENABLED_TEXT in coneTitle:
-                ret = LevelUpMode.OFF
-            elif STATUS_DISABLED_TEXT in coneTitle:
-                ret = LevelUpMode.ON
-            else:
-                logger.error('In get_level_up_mode: Unknown cone status')
-        else:
-            logger.error('In get_level_up_mode: Level up cone not found')
-    else:
-        logger.warning('In get_level_up_mode: Level up mode is available just' \
-            'in overview and village')
-    return ret
-
-
-def set_level_up_mode(sws : SWS, levelUpMode : LevelUpMode):
-    """
-    Sets level up mode.
-
-    Parameters:
-        - sws (SWS): Selenium Web Scraper.
-        - levelUpMode (LevelUpMode): Will set level up mode to this.
-
-    Returns:
-        - True if the operation was successful, False otherwise.
-    """
-    ret = False
-    # Status identifiers
-    STATUS_ENABLED_TEXT = 'enable'
-    STATUS_DISABLED_TEXT = 'disable'
-    if is_screen_overview(sws) or is_screen_village(sws):
-        coneTitle = sws.getElementAttribute(XPATH.LEVEL_UP_CONE, 'title')
-        if coneTitle:
-            if (levelUpMode == LevelUpMode.ON and STATUS_ENABLED_TEXT in coneTitle) or \
-                    (levelUpMode == LevelUpMode.OFF and STATUS_DISABLED_TEXT in coneTitle):
-                if sws.clickElement(XPATH.LEVEL_UP_CONE, refresh=True):
-                    ret = True
-                else:
-                    logger.error('In set_level_up_mode: Failed to click LEVEL_UP_CONE')
-            else:
-                logger.info('In set_level_up_mode: Cone already set')
-                ret = True
-        else:
-            logger.error('In set_level_up_mode: Cone title could not be found')
-    else:
-        logger.warning('In set_level_up_mode: Level up mode is available just \
-            in overview and village')
-    return ret
-
-
-def instructions_get_costs(sws : SWS, locators : list):
+def instructions_get_costs(sws: SWS, locators: list):
     """
     Searches costs information for building/troop.
 
@@ -245,36 +175,14 @@ def instructions_get_costs(sws : SWS, locators : list):
         try:
             ret = costsText.split('\n')[1].split('|')[:-1]
         except IndexError:
-            logger.error(f'In instructions_get_costs: Costs does not respect pattern {costsText}')
+            logger.error(f'In instructions_get_costs: Costs do not respect pattern {costsText}')
     else:
-        logger.error('In instructions_get_costs: Failed to find required page and get costs')
+        logger.error('In instructions_get_costs: __search_in_instructions() failed')
     return ret
 
 
 # Village dependent
-def get_village_name(sws : SWS):
-    """
-    Gets village name in overview or village screen.
-
-    Parameters:
-        - sws (SWS): Selenium Web Scraper.
-
-    Returns:
-        - String with village name if operation was successful, None otherwise.
-    """
-    ret = None
-    if is_screen_overview(sws) or is_screen_village(sws):
-        villageName = sws.getElementAttribute(XPATH.VILLAGE_NAME, 'text')
-        if villageName:
-            ret = villageName
-        else:
-            logger.error('In get_village_name: Failed to get village name from element')
-    else:
-        logger.warning('In get_village_name: Unable to get village name on this screen')
-    return ret
-
-
-def get_storage(sws : SWS):
+def get_storage(sws: SWS):
     """
     Gets for storage for each resource for current village.
 
@@ -286,53 +194,53 @@ def get_storage(sws : SWS):
     """
     storage = {}
     # Extract lumber storage
-    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'text')
+    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, Attr.TEXT)
     if lumber:
         try:
             lumber_curr = int(lumber.split('/')[0])
             lumber_cap = int(lumber.split('/')[1])
             storage[ResourceType.LUMBER] = (lumber_curr, lumber_cap)
-        except (IndexError, ValueError) as e:
-            logger.error('In get_storage: Lumber storage does not respect pattern. Error: %s' % e)
+        except (IndexError, ValueError) as err:
+            logger.error('In get_storage: Lumber storage does not respect pattern. Error: %s' % err)
     else:
-        logger.error('In get_storage: Failed to get lumber storage')
+        logger.error('In get_storage: SWS.getElementAttribute() failed')
     # Extract clay storage
-    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, 'text')
+    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, Attr.TEXT)
     if clay:
         try:
             clay_curr = int(clay.split('/')[0])
             clay_cap = int(clay.split('/')[1])
             storage[ResourceType.CLAY] = (clay_curr, clay_cap)
-        except (IndexError, ValueError) as e:
-            logger.error('In get_storage: Clay storage does not respect pattern. Error: %s' % e)
+        except (IndexError, ValueError) as err:
+            logger.error('In get_storage: Clay storage does not respect pattern. Error: %s' % err)
     else:
-        logger.error('In get_storage: Failed to get clay storage')
+        logger.error('In get_storage: SWS.getElementAttribute() failed')
     # Extract iron storage
-    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, 'text')
+    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, Attr.TEXT)
     if iron:
         try:
             iron_curr = int(iron.split('/')[0])
             iron_cap = int(iron.split('/')[1])
             storage[ResourceType.IRON] = (iron_curr, iron_cap)
-        except (IndexError, ValueError) as e:
-            logger.error('In get_storage: Iron storage does not respect pattern. Error: %s' % e)
+        except (IndexError, ValueError) as err:
+            logger.error('In get_storage: Iron storage does not respect pattern. Error: %s' % err)
     else:
-        logger.error('In get_storage: Failed to get iron storage')
+        logger.error('In get_storage: SWS.getElementAttribute() failed')
     # Extract crop storage
-    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, 'text')
+    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, Attr.TEXT)
     if crop:
         try:
             crop_curr = int(crop.split('/')[0])
             crop_cap = int(crop.split('/')[1])
             storage[ResourceType.CROP] = (crop_curr, crop_cap)
-        except (IndexError, ValueError) as e:
-            logger.error('In get_storage: Crop storage does not respect pattern. Error: %s' % e)
+        except (IndexError, ValueError) as err:
+            logger.error('In get_storage: Crop storage does not respect pattern. Error: %s' % err)
     else:
-        logger.error('In get_storage: Failed to get crop storage')
+        logger.error('In get_storage: SWS.getElementAttribute() failed')
     return storage
 
 
-def get_production(sws : SWS):
+def get_production(sws: SWS):
     """
     Gets for production for each resource for current village.
 
@@ -344,48 +252,48 @@ def get_production(sws : SWS):
     """
     production = {}
     # Extract lumber production
-    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, 'title')
+    lumber = sws.getElementAttribute(XPATH.PRODUCTION_LUMBER, Attr.TITLE)
     if lumber:
         try:
             production[ResourceType.LUMBER] = int(lumber)
-        except ValueError as e:
-            logger.error('In get_production: Failed to convert to int. Error: %s' % e)
+        except ValueError as err:
+            logger.error('In get_production: Failed to convert to int. Error: %s' % err)
     else:
-        logger.error('In get_storage: Failed to get lumber storage')
+        logger.error('In get_production: SWS.getElementAttribute() failed')
     # Extract clay production
-    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, 'title')
+    clay = sws.getElementAttribute(XPATH.PRODUCTION_CLAY, Attr.TITLE)
     if clay:
         try:
             production[ResourceType.CLAY] = int(clay)
-        except ValueError as e:
-            logger.error('In get_production: Failed to convert to int. Error: %s' % e)
+        except ValueError as err:
+            logger.error('In get_production: Failed to convert to int. Error: %s' % err)
     else:
-        logger.error('In get_storage: Failed to get clay storage')
+        logger.error('In get_production: SWS.getElementAttribute() failed')
     # Extract iron production
-    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, 'title')
+    iron = sws.getElementAttribute(XPATH.PRODUCTION_IRON, Attr.TITLE)
     if iron:
         try:
             production[ResourceType.IRON] = int(iron)
-        except ValueError as e:
-            logger.error('In get_production: Failed to convert to int. Error: %s' % e)
+        except ValueError as err:
+            logger.error('In get_production: Failed to convert to int. Error: %s' % err)
     else:
-        logger.error('In get_storage: Failed to get iron storage')
+        logger.error('In get_production: SWS.getElementAttribute() failed')
     # Extract crop production
-    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, 'title')
+    crop = sws.getElementAttribute(XPATH.PRODUCTION_CROP, Attr.TITLE)
     if crop:
         try:
             production[ResourceType.CROP] = int(crop)
-        except ValueError as e:
-            logger.error('In get_production: Failed to convert to int. Error: %s' % e)
+        except ValueError as err:
+            logger.error('In get_production: Failed to convert to int. Error: %s' % err)
     else:
-        logger.error('In get_storage: Failed to get crop storage')
+        logger.error('In get_production: SWS.getElementAttribute() failed')
     return production
 
 
 # Multi village
-def multi_villages_status(sws : SWS):
+def multi_villages_status(sws: SWS):
     """
-    Gets the multi-village status.
+    Checks if the user has multiple villages.
 
     Parameters:
         - sws (SWS): Selenium Web Scraper.
@@ -396,7 +304,7 @@ def multi_villages_status(sws : SWS):
     return sws.isVisible(XPATH.ALL_VILLAGES_LINKS)
 
 
-def get_all_villages_name(sws : SWS):
+def get_all_villages_name(sws: SWS):
     """
     Gets the name of all villages:
 
@@ -408,13 +316,13 @@ def get_all_villages_name(sws : SWS):
     """
     ret = []
     if multi_villages_status(sws):
-        ret = sws.getElementsAttribute(XPATH.ALL_VILLAGES_LINKS, 'text')
+        ret = sws.getElementsAttribute(XPATH.ALL_VILLAGES_LINKS, Attr.TEXT)
     else:
-        logger.warning('In get_all_villages_name: More than one village to use this')
+        logger.warning('In get_all_villages_name: multi_villages_status() failed')
     return ret
 
 
-def get_current_village(sws : SWS):
+def get_current_village(sws: SWS):
     """
     Gets the currently selected village.
 
@@ -426,17 +334,17 @@ def get_current_village(sws : SWS):
     """
     ret = None
     if multi_villages_status(sws):
-        selectedVillage = sws.getElementAttribute(XPATH.SELECTED_VILLAGE, 'text')
+        selectedVillage = sws.getElementAttribute(XPATH.SELECTED_VILLAGE, Attr.TEXT)
         if selectedVillage:
             ret = selectedVillage
         else:
-            logger.error('In get_current_village: Failed to get selected village')
+            logger.error('In get_current_village: SWS.getElementAttribute() failed')
     else:
-        logger.warning('In get_current_village: More than one village to use this')
+        logger.warning('In get_current_village: multi_villages_status() failed')
     return ret
 
 
-def select_village(sws : SWS, villageName : str):
+def select_village(sws: SWS, villageName: str):
     """
     Attempts to select a village.
 
@@ -450,18 +358,15 @@ def select_village(sws : SWS, villageName : str):
     ret = False
     if multi_villages_status(sws):
         if sws.clickElement(XPATH.SELECT_VILLAGE % villageName, refresh=True):
-            if get_village_name(sws) == villageName:
-                ret = True
-            else:
-                logger.error('In select_village: New village name does not correspond')
+            ret = True
         else:
-            logger.error(f'In select_village: Failed to move to village {villageName}')
+            logger.error(f'In select_village: SWS.clickElement() failed')
     else:
-        logger.warning('In select_village: More than one village to use this')
+        logger.warning('In select_village: multi_villages_status() failed')
     return ret
 
 
-def village_send_goods(sws : SWS, villageName : str, ammount : list):
+def village_send_goods(sws: SWS, villageName: str, ammount: list):
     """
     Sends goods to desired village.
 
@@ -473,25 +378,10 @@ def village_send_goods(sws : SWS, villageName : str, ammount : list):
     Returns:
         - True if operation was successful, None otherwise.
     """
-    ret = False
-    if len(ammount) == len(ResourceType) and all(isinstance(elem, int) for elem in ammount):
-        if get_current_village(sws) != villageName:
-            if sws.clickElement(XPATH.SEND_GOODS % villageName, refresh=True):
-                if sws.sendKeys(XPATH.SEND_LUMBER_INPUT_BOX, str(ammount[0])):
-                    pass
-                else:
-                    logger.error('In village_send_goods: Failed to send lumber')
-            else:
-                logger.warning('In village_send_goods: Failed to open send resources page.'
-                    'Ensure marketplace is built')
-        else:
-            logger.warning('In village_send_goods: Unable to send goods to the same village')
-    else:
-        logger.error('In village_send_goods: Ammount must contain exactly 4 integers')
-    return ret
+    return True
 
 
-def village_send_troops(sws : SWS, villageName : str):
+def village_send_troops(sws: SWS, villageName: str):
     """
     Will send goods to desired village.
 
@@ -508,7 +398,7 @@ def village_send_troops(sws : SWS, villageName : str):
 
 # Screen
 # Current screen checking
-def is_screen_overview(sws : SWS):
+def is_screen_overview(sws: SWS):
     """
     Checks if the current screen is Overview.
 
@@ -521,7 +411,7 @@ def is_screen_overview(sws : SWS):
     return __get_current_screen(sws) == Screen.OVERVIEW
 
 
-def is_screen_village(sws : SWS):
+def is_screen_village(sws: SWS):
     """
     Checks if the current screen is Village.
 
@@ -534,7 +424,7 @@ def is_screen_village(sws : SWS):
     return __get_current_screen(sws) == Screen.VILLAGE
 
 
-def is_screen_map(sws : SWS):
+def is_screen_map(sws: SWS):
     """
     Checks if the current screen is Map.
 
@@ -547,7 +437,7 @@ def is_screen_map(sws : SWS):
     return __get_current_screen(sws) == Screen.MAP
 
 
-def is_screen_statistics(sws : SWS):
+def is_screen_statistics(sws: SWS):
     """
     Checks if the current screen is Statistics.
 
@@ -560,7 +450,7 @@ def is_screen_statistics(sws : SWS):
     return __get_current_screen(sws) == Screen.STATISTICS
 
 
-def is_screen_messages(sws : SWS):
+def is_screen_messages(sws: SWS):
     """
     Checks if the current screen is Messages.
 
@@ -573,7 +463,7 @@ def is_screen_messages(sws : SWS):
     return __get_current_screen(sws) == Screen.MESSAGES
 
 
-def is_screen_reports(sws : SWS):
+def is_screen_reports(sws: SWS):
     """
     Checks if the current screen is Reports.
 
@@ -586,7 +476,7 @@ def is_screen_reports(sws : SWS):
     return __get_current_screen(sws) == Screen.REPORTS
 
 
-def is_screen_profile(sws : SWS):
+def is_screen_profile(sws: SWS):
     """
     Checks if the current screen is Profile.
 
@@ -600,7 +490,7 @@ def is_screen_profile(sws : SWS):
 
 
 # Change current screen
-def move_to_overview(sws : SWS, forced : bool = False):
+def move_to_overview(sws: SWS, forced: bool = False):
     """
     Changes current screen to Overview.
 
@@ -614,7 +504,7 @@ def move_to_overview(sws : SWS, forced : bool = False):
     return __move_to_screen(sws, Screen.OVERVIEW, forced)
 
 
-def move_to_village(sws : SWS, forced : bool = False):
+def move_to_village(sws: SWS, forced: bool = False):
     """
     Changes current screen to Village.
 
@@ -628,7 +518,7 @@ def move_to_village(sws : SWS, forced : bool = False):
     return __move_to_screen(sws, Screen.VILLAGE, forced)
 
 
-def move_to_map(sws : SWS, forced : bool = False):
+def move_to_map(sws: SWS, forced: bool = False):
     """
     Changes current screen to Map.
 
@@ -642,7 +532,7 @@ def move_to_map(sws : SWS, forced : bool = False):
     return __move_to_screen(sws, Screen.MAP, forced)
 
 
-def move_to_statistics(sws : SWS, forced : bool = False):
+def move_to_statistics(sws: SWS, forced: bool = False):
     """
     Changes current screen to Statistics.
 
@@ -656,7 +546,7 @@ def move_to_statistics(sws : SWS, forced : bool = False):
     return __move_to_screen(sws, Screen.STATISTICS, forced)
 
 
-def move_to_reports(sws : SWS, forced : bool = False):
+def move_to_reports(sws: SWS, forced: bool = False):
     """
     Changes current screen to Reports.
 
@@ -670,7 +560,7 @@ def move_to_reports(sws : SWS, forced : bool = False):
     return __move_to_screen(sws, Screen.REPORTS, forced)
 
 
-def move_to_messages(sws : SWS, forced : bool = False):
+def move_to_messages(sws: SWS, forced: bool = False):
     """
     Changes current screen to Messages.
 
@@ -684,7 +574,7 @@ def move_to_messages(sws : SWS, forced : bool = False):
     return __move_to_screen(sws, Screen.MESSAGES, forced)
 
 
-def move_to_profile(sws : SWS, forced : bool = False):
+def move_to_profile(sws: SWS, forced: bool = False):
     """
     Changes current screen to Profile.
 

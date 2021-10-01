@@ -8,7 +8,7 @@ logger = get_projectLogger()
 XPATH = get_XPATH()
 
 
-def read_all_new_messages(sws : SWS):
+def read_all_new_messages(sws: SWS):
     """
     Reads all new messages, does not store them.
 
@@ -24,19 +24,19 @@ def read_all_new_messages(sws : SWS):
         while sws.isVisible(XPATH.STRING_ON_SCREEN % NEW_MSG_TEXT):
             if sws.clickElement(f"{XPATH.STRING_ON_SCREEN % NEW_MSG_TEXT}/*", refresh=True):
                 if not move_to_messages(sws, forced=True):
-                    logger.error('In read_all_new_messages: Failed to return to Messages')
+                    logger.error('In read_all_new_messages: move_to_messages() failed')
                     break
             else:
-                logger.error('In read_all_new_messages: Failed to open new message')
+                logger.error('In read_all_new_messages: sws.ClickElement() failed')
                 break
         else:
             ret = True
     else:
-        logger.error('In read_all_new_messages: Failed to move to Messages')
+        logger.error('In read_all_new_messages: move_to_messages() failed')
     # Return to Overview
     if move_to_overview(sws) and ret:
         logger.success('In read_all_new_messages: All new messages were read')
     else:
         ret = False
-        logger.error('In read_all_new_messages: Failed to move to Overview')
+        logger.error('In read_all_new_messages: move_to_overview() failed')
     return ret
