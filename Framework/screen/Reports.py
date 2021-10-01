@@ -1,4 +1,4 @@
-from Framework.screen.HomeUI import move_to_reports, move_to_overview
+from Framework.screen.Navigation import move_to_reports, move_to_overview
 from Framework.utility.Constants import get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS
 
@@ -27,7 +27,7 @@ def read_all_new_reports(sws: SWS):
                     logger.error('In read_all_new_reports: move_to_reports() failed')
                     break
             else:
-                logger.error('In read_all_new_reports: SWS.clickElement() failed')
+                logger.error('In read_all_new_reports: Failed to open report')
                 break
         else:
             ret = True

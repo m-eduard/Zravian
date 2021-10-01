@@ -1,4 +1,4 @@
-from Framework.screen.HomeUI import move_to_messages, move_to_overview
+from Framework.screen.Navigation import move_to_messages, move_to_overview
 from Framework.utility.Constants import get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS
 
@@ -27,7 +27,7 @@ def read_all_new_messages(sws: SWS):
                     logger.error('In read_all_new_messages: move_to_messages() failed')
                     break
             else:
-                logger.error('In read_all_new_messages: sws.ClickElement() failed')
+                logger.error('In read_all_new_messages: Failed to open message')
                 break
         else:
             ret = True

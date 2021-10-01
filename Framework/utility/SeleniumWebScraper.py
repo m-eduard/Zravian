@@ -92,12 +92,12 @@ class SWS:
             if waitFor:
                 WebDriverWait(self.driver, MAX_PAGE_LOAD_TIME).until(EC.element_to_be_clickable((By.XPATH, prop)))
             elem = self.driver.find_element_by_xpath(prop)
+        except InvalidSelectorException:
+            logger.error(f'In __findElement: Syntax {prop} is not a properly defined xpath expression')
         except TimeoutException:
             logger.error(f'In __findElement: Element {prop} generated a timeout')
         except NoSuchElementException:
             logger.info(f'In __findElement: Element {prop} not found')
-        except InvalidSelectorException:
-            logger.error(f'In __findElement: Syntax {prop} is not a properly defined xpath expression')
         return elem
 
     @__seleniumRefreshLock
@@ -117,12 +117,12 @@ class SWS:
             if waitFor:
                 WebDriverWait(self.driver, MAX_PAGE_LOAD_TIME).until(EC.element_to_be_clickable((By.XPATH, prop)))
             elems = self.driver.find_elements_by_xpath(prop)
+        except InvalidSelectorException:
+            logger.error(f'In __findElements: Syntax {prop} is not a properly defined xpath expression')
         except TimeoutException:
             logger.warning(f'In __findElements: Element {prop} generated a timeout')
         except NoSuchElementException:
             logger.info(f'In __findElements: Element {prop} not found')
-        except InvalidSelectorException:
-            logger.error(f'In __findElement: Syntax {prop} is not a properly defined xpath expression')
         return elems
 
     @contextmanager

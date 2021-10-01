@@ -137,10 +137,18 @@ class XPATHCollection(dict):
             'SEND_GOODS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send goods")]',
             'SEND_TROOPS': '//*[@id="side_info"]//*[contains(text(), "%s")]/../../../..//*[contains(text(), "Send troops!")]',
             #
-            # Home
+            # OVillage
             #
             'LEVEL_UP_CONE': '//*[@id="cone"]',
             'INSTRUCTIONS_COSTS': '//*[@CLASS="dur"]/..',
+            #
+            # Gold
+            #
+            'GOLD_AMOUNT': '//*[@id="side_navi"]//[@class="gold"]/..',
+            'PLUS_MENU': '//*[@id="side_navi"]//*[contains(text(), "Zravian Plus")]',
+            'PLUS_MENU_ACTIVATE_OPT': '//*[@class="plusFunctions"]//*[contains(text(), "%s")]/../*[@class="act"]/a',
+            'PLUS_MENU_OPT_TIME_LEFT': '//*[@class="plusFunctions"]//*[contains(text(), "%s")]/../*[@class="run"]',
+            'PLUS_MENU_OPT_COST': '//*[@class="plusFunctions"]//*[contains(text(), "%s")]/../*[@class="cost"]',
             #
             # Alliance
             #
@@ -196,8 +204,10 @@ class XPATHCollection(dict):
             # Localization
             'BUILDING_SITE_NAME': '//area[contains(@alt, "%s")]',
             'BUILDING_SITE_ID': '//area[contains(@href, "id=%d")]',
-            'BUILDING_PAGE_TITLE': '//*[contains(text(), "%s")]',
+            # Menu
+            'BUILDING_PAGE_TITLE': '//*[@id="build"]//*[contains(text(), "%s")]',
             'BUILDING_PAGE_EMPTY_TITLE': '//*[contains(text(), "Construct building.")]',
+            'BUILDING_MENU_TITLE': '//*[@id="build"]/h1',
             # Construct new building menu
             'CONSTRUCT_BUILDING_NAME': '//*[contains(@alt, "%s")]/../../../..',
             'CONSTRUCT_BUILDING_BTN': '//*[contains(text(), "Construct buildings")]',

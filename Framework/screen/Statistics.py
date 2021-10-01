@@ -1,4 +1,4 @@
-from Framework.screen.HomeUI import move_to_statistics, move_to_overview
+from Framework.screen.Navigation import move_to_statistics, move_to_overview
 from Framework.utility.Constants import get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS, Attr
 
@@ -27,7 +27,7 @@ def get_rank(sws: SWS):
             except (ValueError, IndexError) as err:
                 logger.error(f'In get_rank: Failed to retrieve rank. Error: {err}')
         else:
-            logger.error('In get_rank: SWS.getElementAttribute() failed')
+            logger.error('In get_rank: Failed to retrieve ranking')
     else:
         logger.error('In get_rank: move_to_statistics() failed')
     # Return to Overview
@@ -35,5 +35,5 @@ def get_rank(sws: SWS):
         logger.success('In get_rank: Rank was successfully retrieved')
     else:
         ret = None
-        logger.error('In get_tribe: move_to_overview() failed')
+        logger.error('In get_rank: move_to_overview() failed')
     return ret

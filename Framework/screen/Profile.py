@@ -1,4 +1,4 @@
-from Framework.screen.HomeUI import move_to_overview, move_to_profile
+from Framework.screen.Navigation import move_to_overview, move_to_profile
 from Framework.utility.Constants import Tribe, get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS, Attr
 
@@ -32,7 +32,7 @@ def get_tribe(sws : SWS):
                 else:
                     logger.error('In get_tribe: Tribe could not be determined')
             else:
-                logger.error('In get_tribe: SWS.getElementAttribute() failed')
+                logger.error('In get_tribe: Failed to get tribe text')
         else:
             logger.error('In get_tribe: move_to_profile() failed')
     # Return to Overview
@@ -60,7 +60,7 @@ def get_capital(sws : SWS):
         if capital:
             ret = capital
         else:
-            logger.error('In get_capital: SWS.getElementAttribute() failed')
+            logger.error('In get_capital: Failed to extract capital')
     else:
         logger.error('In get_capital: move_to_profile() failed')
     # Return to Overview
@@ -90,11 +90,11 @@ def update_description(sws : SWS, text : str):
                 if sws.clickElement(XPATH.PROFILE_OK_BTN, refresh=True):
                     ret = True
                 else:
-                    logger.error('In update_description: SWS.clickElement() failed')
+                    logger.error('In update_description: Failed to press OK')
             else:
-                logger.error('In update_description: SWS.sendKeys() failed')
+                logger.error('In update_description: Failed to write in description box')
         else:
-            logger.error('In update_description: SWS.clickElement() failed')
+            logger.error('In update_description: Failed to click edit profile')
     else:
         logger.error('In update_description: move_to_profile() failed')
     # Return to Overview
@@ -125,9 +125,9 @@ def update_village_name(sws : SWS, initialName : str, newName : str):
                 if sws.sendKeys(XPATH.STRING_ON_SCREEN % initialName, newName):
                     ret = True
                 else:
-                    logger.error('In change_village_name: SWS.sendKeys() failed')
+                    logger.error('In change_village_name: Failed to write the new name')
             else:
-                logger.error('In change_village_name: SWS.sendKeys() failed')
+                logger.error('In change_village_name: Failed to clear the old name')
         else:
             logger.error('In change_village_name: Failed to find old name')
     else:

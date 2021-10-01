@@ -22,14 +22,9 @@ class ProjectLogger:
         # Print start message
         self.success(START_SESSION)
 
-    def set_debugMode(self, status : bool):
-        """
-        Sets debug mode to True or False.
-
-        Parameters:
-            - status (bool): Value to set debugMode to.
-        """
-        self.debugMode = status
+    def turn_on_debugMode(self):
+        """Turns on debug mode."""
+        self.debugMode = True
 
     def success(self, text : str):
         """

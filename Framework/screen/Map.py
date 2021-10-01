@@ -1,4 +1,4 @@
-from Framework.screen.HomeUI import move_to_map, move_to_overview
+from Framework.screen.Navigation import move_to_map, move_to_overview
 from Framework.utility.Constants import get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS, Attr
 
@@ -31,7 +31,7 @@ def get_village_coordinates(sws: SWS, villageName: str):
                 except ValueError as err:
                     logger.error(f'In get_village_coordinates: Coordinates text does not respect pattern: {err}')
             else:
-                logger.error('In get_village_coordinates: SWS.getElementAttribute() failed')
+                logger.error('In get_village_coordinates: Failed to extract village coordinates')
         else:
             logger.warning('In get_village_coordinates: Failed to find village')
     else:

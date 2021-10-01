@@ -9,9 +9,13 @@ from Framework.account.AccountLibraryManager import get_account_library, reset_s
     get_account_password, get_last_account_username, get_last_account_password, get_generic_accounts, \
     write_account_library
 from Framework.account.CreateAccount import create_new_account
-from Framework.account.Login import login
-from Framework.missions.missions import MissionNum, get_mission_number, open_mission_dialog
+from Framework.account.Login import Login
+from Framework.screen.Dialog import MissionNum, get_mission_number, open_mission_dialog, is_initial_setup
 from Framework.utility.Constants import Server
+
+
+# Testing constants
+HEADLESS = True
 
 
 class Test_01_account_smokeTest:
@@ -156,7 +160,7 @@ class Test_01_account_smokeTest:
 
         # S2. Login using get_last_account_username() and get_last_account_password() and open missions dialog.
         # O2. The mission number should be 1.
-        with login(sv, get_last_account_username(sv), get_last_account_password(sv), headless=True) as sws:
+        with Login(sv, get_last_account_username(sv), get_last_account_password(sv), headless=HEADLESS) as sws:
             assert sws is not None
             assert open_mission_dialog(sws)
             assert get_mission_number(sws) == MissionNum.M1
@@ -166,7 +170,7 @@ class Test_01_account_smokeTest:
 
         # S4. Login using only get_last_account_username() and open missions dialog.
         # O4. The mission popup should have no number.
-        with login(sv, get_last_account_username(sv), headless=True) as sws:
+        with Login(sv, get_last_account_username(sv), headless=HEADLESS) as sws:
             assert sws is not None
             assert open_mission_dialog(sws)
-            assert get_mission_number(sws) == None
+            assert is_initial_setup(sws)
