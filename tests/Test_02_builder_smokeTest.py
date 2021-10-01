@@ -92,7 +92,7 @@ class Test_02_builder_smokeTest:
         # Wall to level 5
         WALL_LEVEL = 5
         # Buildings in village after everything else is demolished
-        with login(Server.S10k, '0bomb1', headless=False) as sws:
+        with login(Server.S10k, '0bomb1', headless=True) as sws:
             if sws:
                 # S1. If not constructed, construct Main Building and Wall.
                 # O1. Main Building and Wall should be constructed.
@@ -237,7 +237,7 @@ class Test_02_builder_smokeTest:
         # Stress test number of iterations
         STRESS_COUNT = 3
         # Buildings in village after everything else is demolished
-        with login(Server.S10k, '0bomb1', headless=False) as sws:
+        with login(Server.S10k, '0bomb1', headless=True) as sws:
             if sws:
                 # S1. If not constructed, construct Main Building and Wall.
                 # O1. Main Building and Wall should be constructed.

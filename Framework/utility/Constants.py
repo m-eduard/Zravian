@@ -1,9 +1,10 @@
-from datetime import datetime
 import os
 import json
 from enum import IntEnum, Enum
 from pathlib import Path
 from collections import namedtuple
+from Framework.utility.Logger import ProjectLogger
+
 
 #
 # PATHS
@@ -20,8 +21,16 @@ ACCOUNT_LIBRARY_PATH = os.path.join(FRAMEWORK_PATH, *('files\\account_library.js
 LOGS_PATH = os.path.join(FRAMEWORK_PATH, *('files\\execution.log'.split('\\')))
 
 
+# Project singletons
+XPATHCollectionInstance = None
+BUILDINGS_DATA_Instance = None
+TROOPSInstance = None
+# Logger will be initialised to provide features for other elements
+logger = ProjectLogger()
+
+
 # General purpose functions
-def time_to_seconds(currTime : str):
+def time_to_seconds(currTime: str):
     """
     Converts time in format hh:mm:ss to seconds
 
@@ -32,16 +41,17 @@ def time_to_seconds(currTime : str):
         - Equivalent time in seconds.
     """
     SECONDS_IN_HOUR = 3600
-    SECONDS_IN_MIN = 3600
-    # Zravian unknown time format
-    UNKWNOWN_TIME = '00?'
-    if UNKWNOWN_TIME in currTime:
-        currTime.replace(UNKWNOWN_TIME, '00')
-    h, m, s = currTime.split(':')
-    return int(h) * SECONDS_IN_HOUR + int(m) * SECONDS_IN_MIN + int(s)
+    SECONDS_IN_MIN = 60
+    ret = None
+    try:
+        h, m, s = currTime.split(':')
+        ret = int(h) * SECONDS_IN_HOUR + int(m) * SECONDS_IN_MIN + int(s)
+    except ValueError as err:
+        logger.error(f'In time_to_seconds: Invalid time format: {err}')
+    return ret
 
 
-def get_building_type_by_name(text : str):
+def get_building_type_by_name(text: str):
     """
     Finds BuildingType based on text.
     Parameters:
@@ -49,12 +59,15 @@ def get_building_type_by_name(text : str):
     Returns:
         - BuildingType.
     """
+    ret = None
     text = ''.join([word.capitalize() for word in text.split()])
     for bdType in BuildingType:
         if bdType.name == text:
-            return bdType
-    print(f'Nothing for {text}')
-    return None
+            ret = bdType
+            break
+    else:
+        logger.error(f'In get_building_type_by_name: Failed to get building type from "{text}"')
+    return ret
 
 
 # Servers list
@@ -370,104 +383,7 @@ class Troop:
             self.requirements.append((get_building_type_by_name(building), level))
 
 
-# The logger used for the project
-class ProjectLogger:
-    # Format for log timestamp
-    TIMESTAMP_FORMAT = "%d/%m/%y %H:%M:%S"
-
-    class TextColors:
-        SUCCESS = '\033[92m'
-        INFO = '\033[96m'
-        WARNING = '\033[93m'
-        ERROR = '\033[91m'
-        NORMAL = '\033[0m'
-        BOLD = '\033[1m'
-        UNDERLINE = '\033[4m'
-
-    def __init__(self):
-        self.debugMode = False
-        START_SESSION = '<' + 25 * '-' + 'STARTED NEW SESSION' + 25 * '-' + '>'
-        # Print start message
-        self.success(START_SESSION)
-
-    def set_debugMode(self, status : bool):
-        """
-        Sets debug mode to True or False.
-
-        Parameters:
-            - status (bool): Value to set debugMode to.
-        """
-        self.debugMode = status
-
-    def success(self, text : str):
-        """
-        Logs text to log file with a timestamp as success notification.
-
-        Parameters:
-            - text (str): Text to log.
-        """
-        timestamp = datetime.now().strftime(self.TIMESTAMP_FORMAT)
-        message = '%s - SUCCESS: %s' % (timestamp, text)
-        terminal_message = self.TextColors.SUCCESS + message + self.TextColors.NORMAL
-        with open(LOGS_PATH, 'a+') as f:
-            f.write(f'{message}\n')
-        if self.debugMode:
-            print(terminal_message)
-
-    def info(self, text : str):
-        """
-        Logs text to log file with a timestamp as informative.
-
-        Parameters:
-            - text (str): Text to log.
-        """
-        timestamp = datetime.now().strftime(self.TIMESTAMP_FORMAT)
-        message = '%s - INFO: %s' % (timestamp, text)
-        terminal_message = self.TextColors.INFO + message + self.TextColors.NORMAL
-        with open(LOGS_PATH, 'a+') as f:
-            f.write(f'{message}\n')
-        if self.debugMode:
-            print(terminal_message)
-
-    def warning(self, text : str):
-        """
-        Logs text to log file with a timestamp as warning.
-
-        Parameters:
-            - text (str): Text to log.
-        """
-        timestamp = datetime.now().strftime(self.TIMESTAMP_FORMAT)
-        message = '%s - WARNING: %s' % (timestamp, text)
-        terminal_message = self.TextColors.WARNING + message + self.TextColors.NORMAL
-        with open(LOGS_PATH, 'a+') as f:
-            f.write(f'{message}\n')
-        if self.debugMode:
-            print(terminal_message)
-
-    def error(self, text : str):
-        """
-        Logs text to log file with a timestamp as error.
-
-        Parameters:
-            - text (str): Text to log.
-        """
-        timestamp = datetime.now().strftime(self.TIMESTAMP_FORMAT)
-        message = '%s - ERROR: %s' % (timestamp, text)
-        terminal_message = self.TextColors.ERROR + message + self.TextColors.NORMAL
-        with open(LOGS_PATH, 'a+') as f:
-            f.write(f'{message}\n')
-        if self.debugMode:
-            print(terminal_message)
-
-
 # Getters
-# Singleton Instances
-XPATHCollectionInstance = None
-BUILDINGS_DATA_Instance = None
-TROOPSInstance = None
-LOGGERInstance = None
-
-
 def init_data():
     """
     Initialises constants by parsing data.json.
@@ -538,12 +454,7 @@ def get_XPATH():
 
 def get_projectLogger():
     """
-    Instantiates LOGGERInstance if needed.
-    
     Returns:
-        - The Project Logger.
+        - The Project Logger Singleton.
     """
-    global LOGGERInstance
-    if not LOGGERInstance:
-        LOGGERInstance = ProjectLogger()
-    return LOGGERInstance
+    return logger
