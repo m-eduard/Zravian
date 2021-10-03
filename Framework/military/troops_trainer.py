@@ -1,7 +1,6 @@
 from Framework.infrastructure.builder import enter_building, time_to_seconds
 from Framework.utility.Constants import  BuildingType, Troop, TroopType, get_TROOPS, get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS, Attr
-from time import sleep
 
 
 logger = get_projectLogger()
@@ -20,11 +19,14 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 	Returns:
 		- True if the operation is successful, False otherwise.
 	"""
-	barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger, TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
-	stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris, TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder, TroopType.Druidrider, TroopType.Haeduan]
-	siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram, TroopType.Trebuchet]
+	barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger,\
+				TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
+	stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris,\
+			  	TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder,\
+			  	TroopType.Druidrider, TroopType.Haeduan]
+	siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram,\
+		 	 	TroopType.Trebuchet]
 	palace = [TroopType.Chieftain, TroopType.TSettler]
-
 
 	buildingDict = dict()
 	for x in barracks:
@@ -36,29 +38,28 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 	for x in palace:
 		buildingDict[x] = BuildingType.Palace
 
-	enter_building(sws, buildingDict[tpType])
-
 	status = False
-	maxUnits = sws.getElementAttribute(XPATH.TROOP_MAX_UNITS % TROOPS[tpType].name, Attr.TEXT)
-	# The number is between parantheses
-	if maxUnits:
-		try:
-			maxUnits = int(maxUnits[1:-1])
-		except ValueError:
-			logger.error(f'In make_troops_by_amount: {maxUnits[1:-1]} is not int')
-			maxUnits = None
-	if maxUnits and maxUnits >= amount:
-		if sws.sendKeys(XPATH.TROOP_INPUT_BOX % TROOPS[tpType].name, amount):
-			if sws.clickElement(XPATH.TROOP_TRAIN_BTN, refresh=True):
-				logger.success(f'In function make_troops_by_amount: {amount} {TROOPS[tpType].name} were trained')
-				status = True
+	if enter_building(sws, buildingDict[tpType]):
+		maxUnits = sws.getElementAttribute(XPATH.TROOP_MAX_UNITS % TROOPS[tpType].name, Attr.TEXT)
+		if maxUnits:
+			try:
+				maxUnits = int(maxUnits[1:-1])
+			except ValueError:
+				logger.error(f'In make_troops_by_amount: {maxUnits[1:-1]} is not int')
+				maxUnits = None
+		if maxUnits and maxUnits >= amount:
+			if sws.sendKeys(XPATH.TROOP_INPUT_BOX % TROOPS[tpType].name, amount):
+				if sws.clickElement(XPATH.TROOP_TRAIN_BTN, refresh=True):
+					logger.success(f'In make_troops_by_amount: {amount} {TROOPS[tpType].name} were trained')
+					status = True
+				else:
+					logger.error('In make_troops_by_amount: Failed to press train')
 			else:
-				logger.error('In function make_troops_by_amount: Failed to press train')
+				logger.error('In make_troops_by_amount: Failed to insert amount of troops')
 		else:
-			logger.error('In function make_troops_by_amount: Failed to insert amount of troops')
+			logger.warning('In make_troops_by_amount: Not enough resources')
 	else:
-		logger.warning('In function make_troops_by_amount: Not enough resources')
-	
+		logger.error(f'In make_troops_by_amount: Failed to enter {buildingDict[tpType]}')
 	return status
 
 def troop_max_amount(sws : SWS, tpType : TroopType):
@@ -72,11 +73,14 @@ def troop_max_amount(sws : SWS, tpType : TroopType):
 	Returns:
 		- The maximum troops that can be trained when the function is called
 	"""
-	barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger, TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
-	stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris, TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder, TroopType.Druidrider, TroopType.Haeduan]
-	siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram, TroopType.Trebuchet]
+	barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger,\
+				TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
+	stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris,\
+			  	TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder,\
+			  	TroopType.Druidrider, TroopType.Haeduan]
+	siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram,\
+		 	 	TroopType.Trebuchet]
 	palace = [TroopType.Chieftain, TroopType.TSettler]
-
 
 	buildingDict = dict()
 	for x in barracks:
@@ -88,48 +92,33 @@ def troop_max_amount(sws : SWS, tpType : TroopType):
 	for x in palace:
 		buildingDict[x] = BuildingType.Palace
 	
-	enter_building(sws, buildingDict[tpType])
-	maxUnits = sws.getElementAttribute(XPATH.TROOP_MAX_UNITS % TROOPS[tpType].name, Attr.TEXT)
-
+	if enter_building(sws, buildingDict[tpType]):
+		maxUnits = sws.getElementAttribute(XPATH.TROOP_MAX_UNITS % TROOPS[tpType].name, Attr.TEXT)
+	else:
+		logger.error(f'In troop_max_amount: Failed to enter {buildingDict[tpType]}')
 	return int(maxUnits[1:-1])
 
-def get_current_building_training_time(sws : SWS):
+def get_current_building_time(sws : SWS):
 	"""
-	Gets the training time needed for the troops inside the building which page is currently open
+	Gets the time until the troops inside the current building are training.
 
 	Parameters:
 		- sws (SWS): Selenium Web Scraper
 	
 	Returns:
-		- time needed to end the training of the troops inside the opened page building
-		- number of undefined times (00:00:00?)
+		- time needed to end the training of the troops inside the current building
 	"""
-	totalTime = 0
-	status = False
-
-	undefined = 0
-
-	trainingUnits = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TYPE, Attr.TEXT)
+	time = 0
 	trainingTimes = sws.getElementsAttribute(XPATH.TRAINING_TROOPS_TIME, Attr.TEXT)
-
-	for i in range(len(trainingTimes)):
-		if status == False:
-			status = True
-
-		if trainingTimes[i] and trainingUnits[i]:
-			if trainingTimes[i][-1] != '?':
-				logger.success(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
-				totalTime += time_to_seconds(trainingTimes[i])
-			else:
-				logger.error(f'In {get_total_training_time.__name__}: {trainingTimes[i]}s for {trainingUnits[i]}.')
-				undefined += 1
+	if trainingTimes:
+		logger.success(f'In get_current_building_time: {trainingTimes[-1]}.')
+		if trainingTimes[-1][-1] != '?':
+			time = time_to_seconds(trainingTimes[-1])
 		else:
-			logger.error(f'In {get_total_training_time.__name__}: no text could be extracted from the table')
-
-	if status == False:
-		logger.warning(f'In {get_total_training_time.__name__}: no troops are queued for training')
-
-	return [totalTime, undefined]
+			time = 0
+	else:
+		logger.error(f'In get_current_building_time: no text could be extracted from the table')
+	return time
 
 def get_total_training_time(sws : SWS, bdType : BuildingType = None):
 	"""
@@ -139,29 +128,26 @@ def get_total_training_time(sws : SWS, bdType : BuildingType = None):
 		- sws (SWS): Selenium Web Scraper
 		- bdType (BuildingType): if a value is offered, the function extracts the time required for the
 								 troops inside the specified building to be trained;
-								 else, it goes thorugh every building that can train troops
+								 else, it goes through every building that can train troops
 								 and extracts the time
 	
 	Returns:
-		- the training time for the specified building, if a bdType parameteer was offered, a list of times otherwirse\
+		- the training time for the specified building, if a bdType parameteer was offered, a list of times otherwise
 		- number of undefined times (00:00:00?)
 
 		- None if no troop is in training
 	"""
-	time = None
-
+	time = []
 	if bdType == None:
-		time = []
-		trainingBuildings= [BuildingType.Barracks, BuildingType.Stable, BuildingType.SiegeWorkshop]
-
+		trainingBuildings = [BuildingType.Barracks, BuildingType.Stable, BuildingType.SiegeWorkshop,\
+								BuildingType.Palace]
 		for bd in trainingBuildings:
-			sleep(1)
 			enter_building(sws, bd)
-			time.append(get_current_building_training_time(sws))
+			time.append(get_current_building_time(sws))
 	else:
-		time = get_current_building_training_time(sws)
-	
+		time.append(get_current_building_time(sws))
 	return time
+
 
 def reduce_train_time(sws : SWS, bdType : BuildingType = None):
 	"""
@@ -177,20 +163,17 @@ def reduce_train_time(sws : SWS, bdType : BuildingType = None):
 		- True if the operation is successful, False otherwise.
 	"""
 	status = False
-
 	if bdType:
 		enter_building(sws, bdType)
-
 	if sws.isVisible(XPATH.TRAINING_TROOPS_TABLE):
 		if sws.isVisible(XPATH.TROOP_REDUCE_TIME_BTN):
 			if sws.clickElement(XPATH.TROOP_REDUCE_TIME_BTN, refresh=True):
-				logger.success(f'In {reduce_train_time.__name__}: Succesfuly reduced training time.')
+				logger.success(f'In reduce_train_time: Succesfuly reduced training time.')
 				status = True
 			else:
-				logger.error(f'In {reduce_train_time.__name__}: Failed to press the button.')
+				logger.error(f'In reduce_train_time: Failed to press the button.')
 		else:
-			logger.warning(f'In {reduce_train_time.__name__}: Reduce train time button is not visible.')
+			logger.warning(f'In reduce_train_time: Reduce train time button is not visible.')
 	else:
-		logger.warning(f'In {reduce_train_time.__name__}: Not training any troops.')
-
+		logger.warning(f'In reduce_train_time: Not training any troops.')
 	return status
