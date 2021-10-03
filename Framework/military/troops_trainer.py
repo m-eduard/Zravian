@@ -120,7 +120,7 @@ def get_current_building_time(sws : SWS):
 
 def get_total_training_time(sws : SWS, bdType : BuildingType = None):
 	"""
-	Gets the execution time needed for the current queued troops to be trained
+	Gets the execution time needed for the current queued troops to be trained.
 
 	Parameters:
 		- sws (SWS): Selenium Web Scraper
