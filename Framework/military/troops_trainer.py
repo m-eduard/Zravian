@@ -62,6 +62,7 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 		logger.error(f'In make_troops_by_amount: Failed to enter {buildingDict[tpType]}')
 	return status
 
+
 def troop_max_amount(sws : SWS, tpType : TroopType):
 	"""
 	Find the maximum amount of units of a specified type that can be trained.
@@ -98,6 +99,7 @@ def troop_max_amount(sws : SWS, tpType : TroopType):
 		logger.error(f'In troop_max_amount: Failed to enter {buildingDict[tpType]}')
 	return int(maxUnits[1:-1])
 
+
 def get_current_building_time(sws : SWS):
 	"""
 	Gets the time until the troops inside the current building are training.
@@ -117,6 +119,7 @@ def get_current_building_time(sws : SWS):
 	else:
 		logger.error(f'In get_current_building_time: no text could be extracted from the table')
 	return time
+
 
 def get_total_training_time(sws : SWS, bdType : BuildingType = None):
 	"""
