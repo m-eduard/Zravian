@@ -130,18 +130,18 @@ def get_total_training_time(sws : SWS, bdType : BuildingType = None):
 								 and extracts the time
 	
 	Returns:
-		- the training time for the specified building, if a bdType parameteer was offered, a list of times otherwise
-		- number of undefined times (00:00:00?)
-
-		- None if no troop is in training
+		- the training time for the specified building, if a bdType parameteer was offered; a list of times otherwise
 	"""
 	time = []
 	if bdType == None:
 		trainingBuildings = [BuildingType.Barracks, BuildingType.Stable, BuildingType.SiegeWorkshop,\
 								BuildingType.Palace]
 		for bd in trainingBuildings:
-			enter_building(sws, bd)
-			time.append(get_current_building_time(sws))
+			if enter_building(sws, bd):
+				time.append(get_current_building_time(sws))
+			else:
+				logger.error(f'In get_total_training_time: failed to enter {bd}')
+				time.append(0)
 	else:
 		time.append(get_current_building_time(sws))
 	return time
