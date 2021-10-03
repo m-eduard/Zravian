@@ -114,8 +114,6 @@ def get_current_building_time(sws : SWS):
 		logger.success(f'In get_current_building_time: {trainingTimes[-1]}.')
 		if trainingTimes[-1][-1] != '?':
 			time = time_to_seconds(trainingTimes[-1])
-		else:
-			time = 0
 	else:
 		logger.error(f'In get_current_building_time: no text could be extracted from the table')
 	return time
@@ -152,7 +150,6 @@ def get_total_training_time(sws : SWS, bdType : BuildingType = None):
 def reduce_train_time(sws : SWS, bdType : BuildingType = None):
 	"""
 	Presses the "Reduce the troop training time" button
-	(works only if you're on the page of a building designed for training troops).
 
 	Parameters:
 		- sws (SWS): Selenium Web Scraper.
