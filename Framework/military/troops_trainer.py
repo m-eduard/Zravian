@@ -1,5 +1,5 @@
 from Framework.infrastructure.builder import enter_building, time_to_seconds
-from Framework.utility.Constants import  BuildingType, Troop, TroopType, get_TROOPS, get_XPATH, get_projectLogger
+from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
