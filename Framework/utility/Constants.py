@@ -232,6 +232,7 @@ class XPATHCollection(dict):
             # Upgrading troops
             #
             'UPGRADE_BTN': '//*[@class="build_details"]//*[contains(text(), "%s")]/../../../*[@class="act"]//a',
+            'UPGRADE_TIME': '//*[@class="under_progress"]//*[@alt="%s"]/../..//*[@class="dur"]',
             # Research errors
             'RESEARCH_ERR_RESOURCES': '//*[contains(text(), "%s")]/../../..//*[contains(text(), "Not enough resources")]',
         }
