@@ -10,7 +10,7 @@ from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 # Project constants
 logger = get_projectLogger()
-XPATH = get_XPATH(
+XPATH = get_XPATH()
 # Generic phrase to include in all accounts (At least 5 characters long)
 GENERIC_PHRASE = '0bomb'
 # URL for temporary email generator site
