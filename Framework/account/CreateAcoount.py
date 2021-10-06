@@ -2,9 +2,8 @@ from Framework.account.Login import initial_setup, login
 import time
 from enum import Enum
 from Framework.account.AccountLibraryManager import JSON_PASSWORD_KEY, JSON_USERNAME_KEY, append_account, get_account_library, get_last_account
-from Framework.utility.SeleniumUtils import SWS
-from Framework.utility.Logger import get_projectLogger
-from Framework.utility.Constants import Server, Tribe, get_XPATH
+from Framework.utility.SeleniumWebScraper import SWS
+from Framework.utility.Constants import Server, Tribe, get_XPATH, get_projectLogger
 
 logger = get_projectLogger()
 XPATH = get_XPATH()
