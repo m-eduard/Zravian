@@ -3,7 +3,7 @@ import re
 import time
 from Framework.screen.HomeUI import press_continue_btn
 from Framework.utility.Constants import get_XPATH, get_projectLogger
-from Framework.utility.SeleniumWebScraper import SWS, Att
+from Framework.utility.SeleniumWebScraper import SWS, Attr
 
 
 # Project constants
