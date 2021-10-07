@@ -13,21 +13,6 @@ from Framework.military.troops_trainer import make_troops_by_amount, reduce_trai
 from Framework.military.upgrade_troops import upgrade_troop_defense, upgrade_troop_offense
 from Framework.military.heros_mansion import name_hero, train_hero
 
-
-# def setup_module():
-# 	global sws
-# 	global sws_generator
-# 	sws_generator = login(Server.S10k, username="0bomb15", headless=True)
-# 	sws = next(sws_generator)
-# 	assert sws is not None
-
-# def teardown_module():
-# 	global sws
-# 	global sws_generator
-# 	if sws:
-# 		sws_generator.close()
-# 	sws = None
-
 def get_tpType_by_name(literalName : str):
 	tpType = None
 
