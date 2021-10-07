@@ -3,31 +3,47 @@
     {
       "id": 0,
       "name": "Empty place",
-      "requirements": []
+      "maxLevel": 0,
+      "requirements": [],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 1,
       "name": "Woodcutter",
-      "requirements": []
+      "maxLevel": 20,
+      "requirements": [],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 2,
       "name": "Clay Pit",
-      "requirements": []
+      "maxLevel": 20,
+      "requirements": [],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 3,
       "name": "Iron Mine",
-      "requirements": []
+      "maxLevel": 20,
+      "requirements": [],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 4,
       "name": "Cropland",
-      "requirements": []
+      "maxLevel": 20,
+      "requirements": [],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 5,
       "name": "Sawmill",
+      "maxLevel": 5,
       "requirements": [
         [
           "Woodcutter",
@@ -37,11 +53,14 @@
           "Main Building",
           5
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 6,
       "name": "Brickworks",
+      "maxLevel": 5,
       "requirements": [
         [
           "Clay Pit",
@@ -51,11 +70,14 @@
           "Main Building",
           5
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 7,
       "name": "Iron Foundry",
+      "maxLevel": 5,
       "requirements": [
         [
           "Iron Mine",
@@ -65,21 +87,27 @@
           "Main Building",
           5
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 8,
       "name": "Flour Mill",
+      "maxLevel": 5,
       "requirements": [
         [
           "Cropland",
           5
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 9,
       "name": "Bakery",
+      "maxLevel": 5,
       "requirements": [
         [
           "Cropland",
@@ -93,31 +121,40 @@
           "Main Building",
           5
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 10,
       "name": "Warehouse",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
           1
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": true
     },
     {
       "id": 11,
       "name": "Granary",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
           1
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": true
     },
     {
       "id": 12,
       "name": "Blacksmith",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
@@ -127,11 +164,14 @@
           "Academy",
           3
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 13,
       "name": "Armoury",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
@@ -141,31 +181,43 @@
           "Academy",
           1
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 14,
       "name": "Tournament Square",
+      "maxLevel": 20,
       "requirements": [
         [
           "Rally Point",
           15
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 15,
       "name": "Main Building",
-      "requirements": []
+      "maxLevel": 20,
+      "requirements": [],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 16,
       "name": "Rally Point",
-      "requirements": []
+      "maxLevel": 20,
+      "requirements": [],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 17,
       "name": "Marketplace",
+      "maxLevel": 20,
       "requirements": [
         [
           "Warehouse",
@@ -179,21 +231,27 @@
           "Main Building",
           3
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 18,
       "name": "Embassy",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
           1
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 19,
       "name": "Barracks",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
@@ -203,11 +261,14 @@
           "Rally point",
           1
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 20,
       "name": "Stable",
+      "maxLevel": 20,
       "requirements": [
         [
           "Blacksmith",
@@ -217,11 +278,14 @@
           "Academy",
           5
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 21,
       "name": "Siege Workshop",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
@@ -231,11 +295,14 @@
           "Academy",
           10
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 22,
       "name": "Academy",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
@@ -245,16 +312,22 @@
           "Barracks",
           3
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 23,
       "name": "Cranny",
-      "requirements": []
+      "maxLevel": 10,
+      "requirements": [],
+      "specialRequirements": [],
+      "duplicates": true
     },
     {
       "id": 24,
       "name": "Town Hall",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
@@ -264,21 +337,29 @@
           "Academy",
           10
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 25,
       "name": "Residence",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
           5
         ]
-      ]
+      ],
+      "specialRequirements": [
+        "NO Palace"
+      ],
+      "duplicates": false
     },
     {
       "id": 26,
       "name": "Palace",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
@@ -288,11 +369,31 @@
           "Embassy",
           1
         ]
-      ]
+      ],
+      "specialRequirements": [
+        "NO Residence"
+      ],
+      "duplicates": false
+    },
+    {
+      "id": 27,
+      "name": "Treasury",
+      "maxLevel": 20,
+      "requirements": [
+        [
+          "Main Building",
+          10
+        ]
+      ],
+      "specialRequirements": [
+        "NO Wonder of the World"
+      ],
+      "duplicates": false
     },
     {
       "id": 28,
       "name": "Trade Office",
+      "maxLevel": 20,
       "requirements": [
         [
           "Marketplace",
@@ -302,36 +403,52 @@
           "Stable",
           10
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 29,
       "name": "Great Barracks",
+      "maxLevel": 20,
       "requirements": [
         [
           "Barracks",
           20
         ]
-      ]
+      ],
+      "specialRequirements": [
+        "NO CAPITAL"
+      ],
+      "duplicates": false
     },
     {
       "id": 30,
       "name": "Great Stable",
+      "maxLevel": 20,
       "requirements": [
         [
           "Stable",
           20
         ]
-      ]
+      ],
+      "specialRequirements": [
+        "NO CAPITAL"
+      ],
+      "duplicates": false
     },
     {
       "id": 32,
       "name": "Wall",
-      "requirements": []
+      "maxLevel": 20,
+      "requirements": [],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 34,
       "name": "Stonemason",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
@@ -341,11 +458,14 @@
           "Palace",
           3
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 35,
       "name": "Brewery",
+      "maxLevel": 10,
       "requirements": [
         [
           "Granary",
@@ -355,21 +475,31 @@
           "Rally Point",
           10
         ]
-      ]
+      ],
+      "specialRequirements": [
+        "TRIBE TEUTONS"
+      ],
+      "duplicates": false
     },
     {
       "id": 36,
       "name": "Trapper",
+      "maxLevel": 20,
       "requirements": [
         [
           "Rally Point",
           1
         ]
-      ]
+      ],
+      "specialRequirements": [
+        "TRIBE GAULS"
+      ],
+      "duplicates": false
     },
     {
       "id": 37,
       "name": "Hero's Mansion",
+      "maxLevel": 20,
       "requirements": [
         [
           "Main Building",
@@ -379,27 +509,64 @@
           "Rally Point",
           1
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 38,
       "name": "Great Warehouse",
+      "maxLevel": 20,
       "requirements": [
         [
           "Warehouse",
           10
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
     },
     {
       "id": 39,
       "name": "Great Granary",
+      "maxLevel": 20,
       "requirements": [
         [
           "Granary",
           10
         ]
-      ]
+      ],
+      "specialRequirements": [],
+      "duplicates": false
+    },
+    {
+      "id": 40,
+      "name": "Wonder of the World",
+      "maxLevel": 100,
+      "requirements": [],
+      "specialRequirements": [
+        "NO CAPITAL"
+      ],
+      "duplicates": false
+    },
+    {
+      "id": 41,
+      "name": "Horse Drinking Trough",
+      "maxLevel": 20,
+      "requirements": [
+        [
+          "Rally Point",
+          10
+        ],
+        [
+          "Stable",
+          20
+        ]
+      ],
+      "specialRequirements": [
+        "TRIBE ROMANS"
+      ],
+      "duplicates": false
     }
   ],
   "troops": {

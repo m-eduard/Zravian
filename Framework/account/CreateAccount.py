@@ -3,7 +3,7 @@ import re
 import time
 from Framework.account.AccountLibraryManager import append_account, get_generic_accounts, get_last_account_username, \
     get_last_account_password
-from Framework.account.Login import initial_setup, login
+from Framework.account.Login import Login, initial_setup
 from Framework.utility.Constants import Server, Tribe, get_XPATH, get_projectLogger 
 from Framework.utility.SeleniumWebScraper import SWS, Attr
 
@@ -76,7 +76,7 @@ class _AccountCreator:
         Switches to email tab and clicks on the activation link from the activation mail.
 
         Returns:
-            - True if the operation is successful, False otherwise.
+            - True if operation is successful, False otherwise.
         """
         ret = False
         email_id = None
@@ -221,7 +221,7 @@ class _AccountCreator:
             - region (_Region): Region of new account.
 
         Returns:
-            - True if the operation was successful, False otherwise.
+            - True if operation was successful, False otherwise.
         """
         ret = False
         personalContentDone = False
@@ -301,7 +301,7 @@ class _AccountCreator:
             - password (str): Password of new account.
 
         Returns:
-            - True if the operation was successful, False otherwise.
+            - True if operation was successful, False otherwise.
         """
         ret = False
         if append_account(server, username, password):
@@ -323,7 +323,7 @@ class _AccountCreator:
             - region (_Region): Region of new account.
 
         Returns:
-            - True if the operation was successful, False otherwise.
+            - True if operation was successful, False otherwise.
         """
         ret = False
         if not username and not password:
@@ -370,7 +370,7 @@ def create_new_account(username : str = None, password : str = None, server=Serv
         - doTasks (bool): If True will accept tasks, False by default.
 
     Returns:
-        - True if the operation is successful, False otherwise.
+        - True if operation is successful, False otherwise.
     """
     ret = False
     # Register account
@@ -381,7 +381,7 @@ def create_new_account(username : str = None, password : str = None, server=Serv
         username, password = get_last_account_username(server), get_last_account_password(server)
         if username and password:
             # Login on the new account
-            with login(server, username, password, headless=True, ) as sws:
+            with Login(server, username, password, headless=True, ) as sws:
                 # Perform initial configuration
                 if sws:
                     if initial_setup(sws, doTasks):

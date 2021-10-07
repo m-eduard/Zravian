@@ -1,4 +1,4 @@
-from Framework.screen.HomeUI import move_to_overview, move_to_profile
+from Framework.screen.Navigation import move_to_overview, move_to_profile
 from Framework.utility.Constants import Tribe, get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS, Attr
 
@@ -21,7 +21,6 @@ def get_tribe(sws : SWS):
     """
     global TRIBE
     if not TRIBE:
-        initialURL = sws.getCurrentUrl()
         if move_to_profile(sws):
             text = sws.getElementAttribute(XPATH.PROFILE_TRIBE, Attr.TEXT)
             if text:
@@ -32,20 +31,45 @@ def get_tribe(sws : SWS):
                         break
                 else:
                     logger.error('In get_tribe: Tribe could not be determined')
-                if not sws.get(initialURL):
-                    TRIBE = None
-                    logger.error('In get_tribe: Could not get back to initial page')
             else:
-                logger.error('In get_tribe: Could not find text element')
+                logger.error('In get_tribe: Failed to get tribe text')
         else:
-            logger.error('In get_tribe: Failed to move to Profile')
+            logger.error('In get_tribe: move_to_profile() failed')
     # Return to Overview
     if move_to_overview(sws) and TRIBE:
         logger.success('In get_tribe: Tribe identified')
     else:
         TRIBE = None
-        logger.error('In get_tribe: Failed to move to Overview')
+        logger.error('In get_tribe: move_to_overview() failed')
     return TRIBE
+
+
+def get_capital(sws : SWS):
+    """
+    Gets the capital from profile view.
+
+    Parameters:
+        - sws (SWS): Selenium Web Scraper.
+
+    Returns:
+        - String if the operation was successful, None otherwise.
+    """
+    ret = None
+    if move_to_profile(sws):
+        capital = sws.getElementAttribute(XPATH.PROFILE_CAPITAL, Attr.TEXT)
+        if capital:
+            ret = capital
+        else:
+            logger.error('In get_capital: Failed to extract capital')
+    else:
+        logger.error('In get_capital: move_to_profile() failed')
+    # Return to Overview
+    if move_to_overview(sws) and ret:
+        logger.success('In get_capital: Capital identified')
+    else:
+        ret = None
+        logger.error('In get_capital: Failed to move to Overview')
+    return ret
 
 
 def update_description(sws : SWS, text : str):
@@ -68,17 +92,17 @@ def update_description(sws : SWS, text : str):
                 else:
                     logger.error('In update_description: Failed to press OK')
             else:
-                logger.error('In update_description: Failed to insert text in description')
+                logger.error('In update_description: Failed to write in description box')
         else:
-            logger.error('In update_description: Failed to press edit profile')
+            logger.error('In update_description: Failed to click edit profile')
     else:
-        logger.error('In update_description: Failed to move to Profile')
+        logger.error('In update_description: move_to_profile() failed')
     # Return to Overview
     if move_to_overview(sws) and ret:
         logger.success(f'In update_description: Description was updated to {text}')
     else:
         ret = False
-        logger.error('In update_description: Failed to move to Overview')
+        logger.error('In update_description: move_to_overview() failed')
     return ret
 
 
@@ -101,17 +125,17 @@ def update_village_name(sws : SWS, initialName : str, newName : str):
                 if sws.sendKeys(XPATH.STRING_ON_SCREEN % initialName, newName):
                     ret = True
                 else:
-                    logger.error('In change_village_name: Failed to insert new name')
+                    logger.error('In change_village_name: Failed to write the new name')
             else:
-                logger.error('In change_village_name: Failed to clear text box')
+                logger.error('In change_village_name: Failed to clear the old name')
         else:
             logger.error('In change_village_name: Failed to find old name')
     else:
-        logger.error('In change_village_name: Failed to move to Profile')
+        logger.error('In change_village_name: move_to_profile() failed')
     # Return to Overview
     if move_to_overview(sws) and ret:
         logger.success(f'In change_village_name: village {initialName} is now {newName}')
     else:
         ret = False
-        logger.error('In change_village_name: Failed to move to Overview')
+        logger.error('In change_village_name: move_to_overview() failed')
     return ret

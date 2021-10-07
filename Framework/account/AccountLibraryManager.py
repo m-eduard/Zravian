@@ -18,7 +18,7 @@ def check_account_library_format(accountLib : dict):
         - accountLib (Dictionary): Will update json with it.
 
     Returns:
-        - True if the operation was successful, False otherwise.
+        - True if operation was successful, False otherwise.
     """
     ret = False
     for sv in Server:
@@ -69,7 +69,7 @@ def write_account_library(newAccountLib : dict):
         - newAccountLib (Dictionary): Will update json with it.
 
     Returns:
-        - True if the operation was successful, False otherwise.
+        - True if operation was successful, False otherwise.
     """
     ret = False
     if check_account_library_format(newAccountLib):
@@ -142,7 +142,7 @@ def append_account(server : Server, username : str, password : str):
         - password (String): Account password.
 
     Returns:
-        - True if the operation was successful, False otherwise.
+        - True if operation was successful, False otherwise.
     """
     ret = False
     accountLib = get_account_library()

@@ -4,7 +4,6 @@ import time
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException, InvalidSelectorException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.expected_conditions import staleness_of
 from selenium.webdriver.support.ui import WebDriverWait
@@ -15,7 +14,7 @@ from Framework.utility.Constants import CHROME_DRIVER_PATH, get_projectLogger
 logger = get_projectLogger()
 
 # Max time for a page to load
-MAX_PAGE_LOAD_TIME = 5
+MAX_PAGE_LOAD_TIME = 30
 
 
 # Attributes to be retrieved for a WebElement
@@ -30,7 +29,7 @@ class Attr(Enum):
 
 
 class SWS:
-    def __init__(self, headless : bool):
+    def __init__(self, headless: bool):
         options = webdriver.ChromeOptions()
         if headless:  # Set headless = False in order to see the browser
             options.add_argument("--headless")
@@ -77,12 +76,11 @@ class SWS:
         return inner_func
 
     @__seleniumRefreshLock
-    def __findElement(driver : WebDriver, prop : str, waitFor : bool = False):
+    def __findElement(self, prop: str, waitFor: bool = False):
         """
         Finds a WebElement identified by xpath and prop.
 
         Parameters:
-            - driver (WebDriver or WebElement): Used to perform find_element().
             - prop (str): Property to search for.
             - waitFor (bool): If True function will wait for element to load, False by default.
         
@@ -92,23 +90,22 @@ class SWS:
         elem = None
         try:
             if waitFor:
-                WebDriverWait(driver, MAX_PAGE_LOAD_TIME).until(EC.element_to_be_clickable((By.XPATH, prop)))
-            elem = driver.find_element_by_xpath(prop)
+                WebDriverWait(self.driver, MAX_PAGE_LOAD_TIME).until(EC.element_to_be_clickable((By.XPATH, prop)))
+            elem = self.driver.find_element_by_xpath(prop)
+        except InvalidSelectorException:
+            logger.error(f'In __findElement: Syntax {prop} is not a properly defined xpath expression')
         except TimeoutException:
             logger.error(f'In __findElement: Element {prop} generated a timeout')
         except NoSuchElementException:
             logger.info(f'In __findElement: Element {prop} not found')
-        except InvalidSelectorException:
-            logger.error(f'In __findElement: Syntax {prop} is not a properly defined xpath expression')
         return elem
 
     @__seleniumRefreshLock
-    def __findElements(driver : WebDriver, prop : str, waitFor : bool = False):
+    def __findElements(self, prop: str, waitFor: bool = False):
         """
         Finds WebElements identified by xpath and prop.
 
         Parameters:
-            - driver (WebDriver or WebElement): Used to perform find_element().
             - prop (str): Property to search for.
             - waitFor (bool): If True function will wait for element to load, False by default.
         
@@ -118,18 +115,18 @@ class SWS:
         elems = []
         try:
             if waitFor:
-                WebDriverWait(driver, MAX_PAGE_LOAD_TIME).until(EC.element_to_be_clickable((By.XPATH, prop)))
-            elems = driver.find_elements_by_xpath(prop)
+                WebDriverWait(self.driver, MAX_PAGE_LOAD_TIME).until(EC.element_to_be_clickable((By.XPATH, prop)))
+            elems = self.driver.find_elements_by_xpath(prop)
+        except InvalidSelectorException:
+            logger.error(f'In __findElements: Syntax {prop} is not a properly defined xpath expression')
         except TimeoutException:
             logger.warning(f'In __findElements: Element {prop} generated a timeout')
         except NoSuchElementException:
             logger.info(f'In __findElements: Element {prop} not found')
-        except InvalidSelectorException:
-            logger.error(f'In __findElement: Syntax {prop} is not a properly defined xpath expression')
         return elems
 
     @contextmanager
-    def __waitPageToLoad(self, timeout : int = MAX_PAGE_LOAD_TIME):
+    def __waitPageToLoad(self, timeout: int = MAX_PAGE_LOAD_TIME):
         """
         Used to wait for a page refresh.
 
@@ -156,7 +153,7 @@ class SWS:
         # Ensure the refference is now stale
         assert staleness_of(old_page)
 
-    def get(self, URL : str, checkURL : bool = True):
+    def get(self, URL: str, checkURL: bool = True):
         """
         Loads a webpage.
 
@@ -185,7 +182,7 @@ class SWS:
         """
         return str(self.driver.current_url)
 
-    def refresh(self, hardRefesh : bool = False):
+    def refresh(self, hardRefesh: bool = False):
         """
         Reloads current page.
 
@@ -201,7 +198,7 @@ class SWS:
             self.driver.close()
             self.switchToTab(initialURL)
 
-    def newTab(self, URL : str, switchTo : bool = False):
+    def newTab(self, URL: str, switchTo: bool = False):
         """
         Creates a new tab with requested URL.
 
@@ -253,7 +250,7 @@ class SWS:
             logger.error('In switchToTab: Invalid parameter identifier')
         return success
 
-    def enter_iframe(self, frameIdentifier : str):
+    def enter_iframe(self, frameIdentifier: str):
         """
         Enters a frame identified by string.
 
@@ -267,30 +264,7 @@ class SWS:
         self.driver.switch_to_default_content()
 
     @__seleniumRefreshLock
-    def propList_to_driver_and_prop(self, prop : list, waitFor : bool):
-        """
-        Based on a list of properties finds the WebElement identified by all properties but the last.
-        Returns it and the last property.
-
-        Parameters:
-            - prop ([str]): Property to search for.
-            - waitFor (bool): If True function will wait for element to load, False by default.
-
-        Returns:
-            - WebElement, str.
-        """
-        tmp_driver = self.driver
-        # Separate last property from the other properties
-        *identifiers, lastProp = prop
-        # Incrementally compute driver based on all properties except the last one
-        for currProp in identifiers:
-            tmp_driver = SWS.__findElement(tmp_driver, currProp, waitFor)
-            if not tmp_driver:
-                break
-        return tmp_driver, lastProp
-
-    @__seleniumRefreshLock
-    def isVisible(self, prop, waitFor : bool = False):
+    def isVisible(self, prop, waitFor: bool = False):
         """
         Checks whether a WebElement is visible.
 
@@ -303,19 +277,17 @@ class SWS:
         """
         success = False
         if prop:
-            tmp_driver = self.driver
             if isinstance(prop, list):
-                tmp_driver, prop = self.propList_to_driver_and_prop(prop, waitFor)
-            if tmp_driver:
-                elem = SWS.__findElement(tmp_driver, prop, waitFor)
-                if elem != None:
-                    success = True
+                prop = ''.join(prop)
+            elem = self.__findElement(prop, waitFor)
+            if elem != None:
+                success = True
         else:
             logger.error('In isVisible: Invalid parameter prop')
         return success
 
     @__seleniumRefreshLock
-    def getElementAttribute(self, prop, attr : Attr, waitFor : bool = False):
+    def getElementAttribute(self, prop, attr: Attr, waitFor: bool = False):
         """
         Finds a WebElement and returns the value of attr.
 
@@ -337,7 +309,7 @@ class SWS:
         return ret
 
     @__seleniumRefreshLock
-    def getElementAttributes(self, prop, attr : list, waitFor : bool = False):
+    def getElementAttributes(self, prop, attr: list, waitFor: bool = False):
         """
         Finds a WebElement and returns list with value of attr.
 
@@ -351,24 +323,22 @@ class SWS:
         """
         ret = []
         if prop:
-            tmp_driver = self.driver
             if isinstance(prop, list):
-                tmp_driver, prop = self.propList_to_driver_and_prop(prop, waitFor)
-            if tmp_driver:
-                elem = SWS.__findElement(tmp_driver, prop, waitFor)
-                if elem:
-                    for at in attr:
-                        if at.value == 'text':
-                            ret.append(elem.text)
-                        else:
-                            ret.append(elem.get_attribute(at.value))
-                    ret = [str(e) for e in ret]
+                prop = ''.join(prop)
+            elem = self.__findElement(prop, waitFor)
+            if elem:
+                for at in attr:
+                    if at.value == 'text':
+                        ret.append(elem.text)
+                    else:
+                        ret.append(elem.get_attribute(at.value))
+                ret = [str(e) for e in ret]
         else:
             logger.error('In getElementAttributes: Invalid parameter prop')
         return ret
 
     @__seleniumRefreshLock
-    def getElementsAttribute(self, prop, attr : Attr, waitFor : bool = False):
+    def getElementsAttribute(self, prop, attr: Attr, waitFor: bool = False):
         """
         Finds all corresponding WebElements and returns the value of attr.
 
@@ -390,7 +360,7 @@ class SWS:
         return ret
 
     @__seleniumRefreshLock
-    def getElementsAttributes(self, prop, attr : list, waitFor : bool = False):
+    def getElementsAttributes(self, prop, attr: list, waitFor: bool = False):
         """
         Finds all corresponding WebElements and returns the value of attr.
 
@@ -404,26 +374,24 @@ class SWS:
         """
         ret = []
         if prop:
-            tmp_driver = self.driver
             if isinstance(prop, list):
-                tmp_driver, prop = self.propList_to_driver_and_prop(prop, waitFor)
-            if tmp_driver:
-                elems = SWS.__findElements(tmp_driver, prop, waitFor)
-                for elem in elems:
-                    tmpList = []
-                    for at in attr:
-                        if at.value == 'text':
-                            tmpList.append(elem.text)
-                        else:
-                            tmpList.append(elem.get_attribute(at.value))
-                    ret.append(tmpList)
+                prop = ''.join(prop)
+            elems = self.__findElements(prop, waitFor)
+            for elem in elems:
+                tmpList = []
+                for at in attr:
+                    if at.value == 'text':
+                        tmpList.append(elem.text)
+                    else:
+                        tmpList.append(elem.get_attribute(at.value))
+                ret.append(tmpList)
         else:
             logger.error('In getElementsAttributes: Invalid parameter prop')
         return ret
 
     @__seleniumRefreshLock
-    def clickElement(self, prop, refresh : bool = False, waitFor : bool = False,
-                scrollIntoView : bool =False, javaScriptClick=False):
+    def clickElement(self, prop, refresh: bool = False, waitFor: bool = False,
+                scrollIntoView: bool =False, javaScriptClick=False):
         """
         Clicks a WebElement.
 
@@ -439,34 +407,32 @@ class SWS:
         """
         success = False
         if prop:
-            tmp_driver = self.driver
             if isinstance(prop, list):
-                tmp_driver, prop = self.propList_to_driver_and_prop(prop, waitFor)
-            if tmp_driver:
-                elem = SWS.__findElement(tmp_driver, prop, waitFor)
-                if elem:
-                    if scrollIntoView:
-                        tmp_driver.execute_script("arguments[0].scrollIntoView();", elem)
-                    if refresh:
-                        with self.__waitPageToLoad():
-                            if javaScriptClick:
-                                self.driver.execute_script("arguments[0].click();", elem)
-                            else:
-                                elem.click()
-                    else:
+                prop = ''.join(prop)
+            elem = self.__findElement(prop, waitFor)
+            if elem:
+                if scrollIntoView:
+                    self.driver.execute_script("arguments[0].scrollIntoView();", elem)
+                if refresh:
+                    with self.__waitPageToLoad():
                         if javaScriptClick:
                             self.driver.execute_script("arguments[0].click();", elem)
                         else:
                             elem.click()
-                    success = True
                 else:
-                    logger.error(f'In clickElement: Failed to click element identified by {prop}')
+                    if javaScriptClick:
+                        self.driver.execute_script("arguments[0].click();", elem)
+                    else:
+                        elem.click()
+                success = True
+            else:
+                logger.error(f'In clickElement: Failed to click element identified by {prop}')
         else:
             logger.error('In clickElement: Invalid parameter prop')
         return success
 
     @__seleniumRefreshLock
-    def sendKeys(self, prop, text : str, waitFor : bool = False):
+    def sendKeys(self, prop, text: str, waitFor: bool = False):
         """
         Sends text input to input box.
 
@@ -480,19 +446,17 @@ class SWS:
         """
         success = False
         if prop:
-            tmp_driver = self.driver
             if isinstance(prop, list):
-                tmp_driver, prop = self.propList_to_driver_and_prop(prop, waitFor)
-            if tmp_driver:
-                elem = SWS.__findElement(tmp_driver, prop, waitFor)
-                if elem:
-                    if text is None:
-                        elem.clear()
-                    else:
-                        elem.send_keys(text)
-                    success = True
+                prop = ''.join(prop)
+            elem = self.__findElement(prop, waitFor)
+            if elem:
+                if text is None:
+                    elem.clear()
                 else:
-                    logger.error(f'In sendKeys: Failed to send keys to element identified by {prop}')
+                    elem.send_keys(text)
+                success = True
+            else:
+                logger.error(f'In sendKeys: Failed to send keys to element identified by {prop}')
         else:
             logger.error('In sendKeys: Invalid parameter prop')
         return success
