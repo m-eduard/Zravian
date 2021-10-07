@@ -52,7 +52,7 @@ class Test_01_military:
 		Objectives:
 			5. make_troops_by_amount() should return True for every call.
 		"""
-		with login(Server.S10k, username="0bomb15", headless=True) as sws:
+		with login(Server.S10k, username="0bomb15", headless=False) as sws:
 			buildings = [BuildingType.Barracks, BuildingType.SiegeWorkshop, BuildingType.Stable]
 
 			for bdType in buildings:

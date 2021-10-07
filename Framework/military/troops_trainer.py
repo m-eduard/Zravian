@@ -1,3 +1,4 @@
+import builtins
 from Framework.infrastructure.builder import enter_building, time_to_seconds
 from Framework.utility.Constants import  BuildingType, TroopType, get_TROOPS, get_XPATH, get_projectLogger
 from Framework.utility.SeleniumWebScraper import SWS, Attr
@@ -6,6 +7,29 @@ from Framework.utility.SeleniumWebScraper import SWS, Attr
 logger = get_projectLogger()
 TROOPS = get_TROOPS()
 XPATH = get_XPATH()
+
+class BuildingData:
+	barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger,\
+					TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
+	stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris,\
+				TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder,\
+				TroopType.Druidrider, TroopType.Haeduan]
+	siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram,\
+				TroopType.Trebuchet]
+	palace = [TroopType.Chieftain, TroopType.TSettler]
+	
+	buildingDict = dict()	
+	for x in barracks:
+		buildingDict[x] = BuildingType.Barracks
+	for x in stable:
+		buildingDict[x] = BuildingType.Stable
+	for x in siege:
+		buildingDict[x] = BuildingType.SiegeWorkshop
+	for x in palace:
+		buildingDict[x] = BuildingType.Palace
+
+tmp = BuildingData()
+buildingDict = tmp.buildingDict
 
 def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 	"""
@@ -19,24 +43,6 @@ def make_troops_by_amount(sws : SWS, tpType : TroopType, amount : int):
 	Returns:
 		- True if the operation is successful, False otherwise.
 	"""
-	barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger,\
-				TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
-	stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris,\
-			  	TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder,\
-			  	TroopType.Druidrider, TroopType.Haeduan]
-	siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram,\
-		 	 	TroopType.Trebuchet]
-	palace = [TroopType.Chieftain, TroopType.TSettler]
-
-	buildingDict = dict()
-	for x in barracks:
-		buildingDict[x] = BuildingType.Barracks
-	for x in stable:
-		buildingDict[x] = BuildingType.Stable
-	for x in siege:
-		buildingDict[x] = BuildingType.SiegeWorkshop
-	for x in palace:
-		buildingDict[x] = BuildingType.Palace
 
 	status = False
 	if enter_building(sws, buildingDict[tpType]):
@@ -74,24 +80,6 @@ def troop_max_amount(sws : SWS, tpType : TroopType):
 	Returns:
 		- The maximum troops that can be trained when the function is called
 	"""
-	barracks = [TroopType.Legionnaire, TroopType.Praetorian, TroopType.Imperian, TroopType.Clubswinger,\
-				TroopType.Spearman, TroopType.Axeman, TroopType.Scout, TroopType.Phalanx, TroopType.Swordsman]
-	stable = [TroopType.Equites_Legati, TroopType.Equites_Imperatoris, TroopType.Equites_Caesaris,\
-			  	TroopType.Paladin, TroopType.Teutonic_Knight, TroopType.Pathfinder, TroopType.Theutates_Thunder,\
-			  	TroopType.Druidrider, TroopType.Haeduan]
-	siege = [TroopType.RRam, TroopType.Fire_Catapult, TroopType.TRam, TroopType.Catapult, TroopType.Battering_Ram,\
-		 	 	TroopType.Trebuchet]
-	palace = [TroopType.Chieftain, TroopType.TSettler]
-
-	buildingDict = dict()
-	for x in barracks:
-		buildingDict[x] = BuildingType.Barracks
-	for x in stable:
-		buildingDict[x] = BuildingType.Stable
-	for x in siege:
-		buildingDict[x] = BuildingType.SiegeWorkshop
-	for x in palace:
-		buildingDict[x] = BuildingType.Palace
 	
 	if enter_building(sws, buildingDict[tpType]):
 		maxUnits = sws.getElementAttribute(XPATH.TROOP_MAX_UNITS % TROOPS[tpType].name, Attr.TEXT)
